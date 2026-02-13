@@ -90,18 +90,29 @@
 
 * **ACID Transactions:** Implemented `POST /api/rentals` using `BEGIN/COMMIT` logic to ensure rental creation and item status updates happen simultaneously.
 * **Rental Verification:** Integrated backend checks to prevent "self-renting" and double-booking of items.
-* **Booking UX:** Developed a dynamic duration picker on the Detail page that calculates total price in real-time.
-* **Success Feedback:** Integrated a `CheckCircle2` animation upon successful rental to improve user confidence.
-* **Borrower Dashboard:** Expanded the Profile page with a "Borrowed Items" section, joining `rentals` and `items` tables to display active contracts.
+* **Booking UX:** Developed a dynamic duration picker on the **Detail page** that calculates total price in real-time.
+* **Success Feedback:** Integrated a `CheckCircle2` animation upon successful rental to improve user confidence and visual flow.
+* **Borrower Dashboard:** Expanded the **Profile page** with a "Borrowed Items" section, joining `rentals` and `items` tables to display active contracts.
+* **Database Automation:** Developed an `init.js` script to automatically sync the `schema.sql` on server startup, ensuring environment portability.
 
 ### ⚠️ Problems Faced
 
-* **Atomic State Desync:** Risk of an item being rented but still appearing as "Available" if a server error occurred.
-* *Fix:* Wrapped the rental creation and item status update in a PostgreSQL transaction block to ensure data integrity.
+* **Endpoint 404 (The Ghost URL):** The frontend "Rent Now" action initially failed because it was calling a non-existent backend route.
+* *Fix:* Developed the `rental.routes.js` controller and registered it in `server.js` to complete the full-stack handshake.
+
+
+* **Atomic State Desync:** Risk of an item being rented but still appearing as "Available" if a server error occurred mid-process.
+* *Fix:* Wrapped the rental creation and item status update in a **PostgreSQL transaction block** (`BEGIN/COMMIT`) to ensure data integrity.
+
+
+* **Module Path Errors:** The new database automation script failed initially due to relative path mismatches between `src/db/` and the root `database/` folder.
+* *Fix:* Standardized paths using `path.join(__dirname, ...)` to ensure the script runs correctly across different directories.
 
 
 
 ### 🔄 Agile Reflections
 
-* **What went well:** We successfully moved from a "Listing" app to a "Transaction" platform. The database schema held up perfectly under the new foreign key requirements.
+* **What went well:** We successfully moved from a "Listing" app to a "Transaction" platform. The database schema held up perfectly under the new foreign key requirements, and the "Zero-Config" startup script now makes the project much easier to share or deploy.
 * **Status:** Sprint 3 CLOSED.
+
+---
