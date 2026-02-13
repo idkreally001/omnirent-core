@@ -23,7 +23,7 @@ OmniRent is a high-trust, peer-to-peer (P2P) rental platform designed to facilit
 ### Installation
 1.  **Clone the repository:**
     ```bash
-    git clone [https://github.com/your-repo/omnirent-core.git](https://github.com/your-repo/omnirent-core.git)
+    git clone https://github.com/idkreally001/omnirent-core.git
     ```
 2.  **Setup Backend:**
     ```bash
