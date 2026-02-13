@@ -1,28 +1,27 @@
-// frontend/src/App.jsx
-import { useEffect, useState } from 'react'
-import axios from 'axios'
+import axios from 'axios';
 
 function App() {
-  const [message, setMessage] = useState("Waiting for backend...")
-
-  useEffect(() => {
-    // This is the handshake call
-    axios.get('http://localhost:5000/api/handshake')
-      .then(response => {
-        setMessage(response.data.message)
-      })
-      .catch(error => {
-        console.error("The handshake failed:", error)
-        setMessage("Backend is not responding.")
-      })
-  }, [])
+  const registerTestUser = async () => {
+    try {
+      const res = await axios.post('http://localhost:5000/api/register', {
+        fullName: "Islam Dev",
+        email: `dev${Math.floor(Math.random() * 1000)}@test.com`,
+        tcNo: "12345678901"
+      });
+      alert(res.data.message);
+    } catch (err) {
+      alert("Registration failed!");
+    }
+  };
 
   return (
-    <div style={{ padding: '50px', textAlign: 'center', fontFamily: 'sans-serif' }}>
-      <h1 style={{ color: '#2563eb' }}>OmniRent Project</h1>
-      <p style={{ fontSize: '1.2rem', fontWeight: 'bold' }}>{message}</p>
+    <div style={{ textAlign: 'center', marginTop: '50px' }}>
+      <h1>OmniRent Admin Panel</h1>
+      <button onClick={registerTestUser} style={{ padding: '10px 20px', cursor: 'pointer' }}>
+        Register Test User
+      </button>
     </div>
-  )
+  );
 }
 
-export default App
+export default App;

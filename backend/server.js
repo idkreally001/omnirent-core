@@ -1,18 +1,35 @@
-// backend/server.js
 const express = require('express');
 const cors = require('cors');
+const pool = require('./src/db'); // Your DB connection
+const identityService = require('./src/services/identity/identity.service'); 
 
 const app = express();
-app.use(cors()); // This tells the server: "It's okay to talk to the React app"
+app.use(cors());
 app.use(express.json());
 
-const PORT = 5000;
+// Registration Endpoint
+app.post('/api/register', async (req, res) => {
+    const { fullName, email, tcNo } = req.body;
 
-// This is a simple "Handshake" endpoint
-app.get('/api/handshake', (req, res) => {
-    res.json({ message: "Hello from the OmniRent Backend! The handshake is successful." });
+    try {
+        // 1. Call the "James" Service (Identity Service)
+        const verification = await identityService.verifyIdentity(fullName, tcNo);
+        
+        if (!verification.success) {
+            return res.status(400).json({ error: "Identity could not be verified." });
+        }
+
+        // 2. Save to Postgres
+        const newUser = await pool.query(
+            "INSERT INTO users (full_name, email, tc_no) VALUES ($1, $2, $3) RETURNING *",
+            [fullName, email, tcNo]
+        );
+
+        res.json({ message: "User registered successfully!", user: newUser.rows[0] });
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send("Server Error");
+    }
 });
 
-app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
-});
+app.listen(5000, () => console.log("Server running on port 5000"));
