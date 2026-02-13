@@ -1,170 +1,43 @@
-# OmniRent 🚀
+# OmniRent: The Universal Sharing Marketplace
 
-> A Peer-to-Peer "Everything" Rental Marketplace\
-> Localized for Turkey \| Built for SENG 204
+OmniRent is a high-trust, peer-to-peer (P2P) rental platform designed to facilitate the temporary exchange of physical goods. By transitioning from a model of "Ownership" to "Access," OmniRent provides a secure ecosystem for users to monetize underutilized assets and access premium equipment on demand.
 
-------------------------------------------------------------------------
+## 🚀 Key Features
+* **Identity Verification:** Multi-layer security checks for all participants.
+* **Managed Logistics:** Integrated "Hub" system for secure item drop-off and pickup.
+* **Smart Escrow:** Automated security deposit provisioning and payment protection.
+* **Dynamic Inventory:** State-machine logic for real-time item availability tracking.
 
-## 📌 Overview
+## 🛠 Tech Stack
+* **Frontend:** React (Vite) + Tailwind CSS
+* **Backend:** Node.js (Express)
+* **Database:** PostgreSQL 17
+* **Architecture:** Modular Service-Adapter Pattern
 
-**OmniRent** is a managed peer-to-peer rental marketplace designed to
-transition society from **ownership** to **access**.\
-Instead of purchasing items that are rarely used, users can securely
-rent what they need --- when they need it.
+## 🏁 Getting Started
 
-The platform operates under a **high-trust intermediary model**, where
-OmniRent handles:
+### Prerequisites
+* Node.js (v22+)
+* PostgreSQL (v17+)
 
--   Identity verification\
--   Secure payment processing\
--   Dispute management\
--   Localized logistics coordination
-
-This ensures safety, transparency, and reliability for both renters and
-item owners.
-
-------------------------------------------------------------------------
-
-## 🎯 Objectives
-
--   Promote sustainable consumption
--   Reduce unnecessary ownership
--   Provide secure peer-to-peer transactions
--   Enable scalable architecture with mock/real API switching
-
-------------------------------------------------------------------------
-
-## 🛠 Technology Stack
-
-| Layer \| Technology \|
-
-\|-------------\|------------\| Frontend \| React (Vite) + Tailwind CSS
-\| \| Backend \| Node.js + Express \| \| Database \| PostgreSQL 17 \| \|
-Architecture\| Service--Adapter Pattern \|
-
-------------------------------------------------------------------------
+### Installation
+1.  **Clone the repository:**
+    ```bash
+    git clone [https://github.com/your-repo/omnirent-core.git](https://github.com/your-repo/omnirent-core.git)
+    ```
+2.  **Setup Backend:**
+    ```bash
+    cd backend
+    npm install
+    # Create a .env file based on the documentation
+    node server.js
+    ```
+3.  **Setup Frontend:**
+    ```bash
+    cd ../frontend
+    npm install
+    npm run dev
+    ```
 
 ## 🏗 System Architecture
-
-OmniRent follows a **Service--Adapter Pattern**.
-
-This architecture enables:
-
--   Seamless switching between **Mock data** (development/testing)
--   Integration with **Real APIs** (production)
--   Clean separation of business logic from infrastructure
-
-This improves maintainability, scalability, and testability.
-
-------------------------------------------------------------------------
-
-## 🚀 Getting Started
-
-### 📋 Prerequisites
-
--   Node.js (v22+)
--   PostgreSQL (v17+)
-
-------------------------------------------------------------------------
-
-## 🔧 Installation
-
-### 1️⃣ Clone the Repository
-
-``` bash
-git clone https://github.com/idkreally001/omnirent-core.git
-cd omnirent-core
-```
-
-------------------------------------------------------------------------
-
-### 2️⃣ Backend Setup
-
-``` bash
-cd backend
-npm install
-```
-
-Create a `.env` file using `.env.example` as reference.
-
-Initialize the database using:
-
-    /backend/database/schema.sql
-
-Start the backend server:
-
-``` bash
-node server.js
-```
-
-Backend runs on:
-
-    http://localhost:5000
-
-------------------------------------------------------------------------
-
-### 3️⃣ Frontend Setup
-
-``` bash
-cd frontend
-npm install
-npm run dev
-```
-
-Frontend runs on:
-
-    http://localhost:5173
-
-------------------------------------------------------------------------
-
-## 📂 Project Structure
-
-    omnirent-core/
-    │
-    ├── backend/
-    │   ├── database/
-    │   ├── routes/
-    │   ├── services/
-    │   ├── adapters/
-    │   └── server.js
-    │
-    ├── frontend/
-    │   ├── src/
-    │   └── ...
-    │
-    └── README.md
-
-------------------------------------------------------------------------
-
-## 🔐 Security & Trust Model
-
-OmniRent prioritizes user safety by:
-
--   Verifying identities
--   Handling payment escrow
--   Maintaining transaction logs
--   Enabling transparent dispute resolution
-
-------------------------------------------------------------------------
-
-## 🌍 Vision
-
-OmniRent aims to support a cultural shift:
-
-> ❌ Ownership\
-> ✅ Access
-
-By making temporary access to goods safe, affordable, and convenient.
-
-------------------------------------------------------------------------
-
-## 📄 License
-
-This project was developed for academic purposes (SENG 204). Further
-licensing terms may be added in future releases.
-
-------------------------------------------------------------------------
-
-## 👥 Authors
-
-Developed as part of the SENG 204 coursework.
+The project follows a **Service-Adapter pattern**, allowing for seamless transitions between mock development environments and production-grade API integrations.
