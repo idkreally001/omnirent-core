@@ -15,7 +15,7 @@ const Navbar = () => {
           </Link>
 
           <div className="hidden md:flex items-center space-x-8 text-sm font-medium">
-            <Link to="/" className="text-gray-600 hover:text-blue-600 transition">Browse Items</Link>
+            <Link to="/" className="text-gray-600 hover:text-blue-600 transition">Home</Link>
             
             {/* Conditional Rendering based on Auth State */}
             {token ? (

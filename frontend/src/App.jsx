@@ -6,6 +6,7 @@ import Register from './pages/Register';
 import Profile from './pages/Profile';
 import Browse from './pages/Browse';
 import ListItem from './pages/ListItem';
+import ItemDetail from './pages/ItemDetail';
 
 // Import your guards
 import PublicRoute from './components/PublicRoute';
@@ -34,6 +35,8 @@ function App() {
             } />
 
             <Route path="/browse" element={<Browse />} />
+
+            <Route path="/item/:id" element={<ItemDetail />} />
 
 
             <Route path="/list-item" element={

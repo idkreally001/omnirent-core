@@ -8,7 +8,8 @@ export default function ListItem() {
     title: '',
     description: '',
     price: '',
-    category: 'Tools'
+    category: 'Tools',
+    image_url: ''
   });
   const navigate = useNavigate();
 
@@ -67,6 +68,18 @@ export default function ListItem() {
             />
           </div>
         </div>
+
+        {/* Add this block inside your ListItem form */}
+<div>
+  <label className="block text-xs font-black uppercase text-gray-400 mb-2 ml-1">Image URL (Optional)</label>
+  <input 
+    type="url" 
+    placeholder="https://images.unsplash.com/photo-..."
+    className="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-blue-600 outline-none transition font-semibold"
+    onChange={(e) => setFormData({...formData, image_url: e.target.value})}
+  />
+  <p className="text-xs text-gray-400 mt-2 ml-1 font-medium">Paste a link to an image of your item.</p>
+</div>
 
         <div>
           <label className="block text-xs font-black uppercase text-gray-400 mb-2 ml-1">Description</label>
