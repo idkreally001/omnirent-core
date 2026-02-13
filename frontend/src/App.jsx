@@ -1,26 +1,57 @@
-import axios from 'axios';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Navbar from './components/Navbar';
+import Home from './pages/Home';
+import Login from './pages/Login';
+import Register from './pages/Register';
+import Profile from './pages/Profile';
+import Browse from './pages/Browse';
+import ListItem from './pages/ListItem';
+
+// Import your guards
+import PublicRoute from './components/PublicRoute';
+import PrivateRoute from './components/PrivateRoute';
 
 function App() {
-  const registerTestUser = async () => {
-    try {
-      const res = await axios.post('http://localhost:5000/api/register', {
-        fullName: "Islam Dev",
-        email: `dev${Math.floor(Math.random() * 1000)}@test.com`,
-        tcNo: "12345678901"
-      });
-      alert(res.data.message);
-    } catch (err) {
-      alert("Registration failed!");
-    }
-  };
-
   return (
-    <div style={{ textAlign: 'center', marginTop: '50px' }}>
-      <h1>OmniRent Admin Panel</h1>
-      <button onClick={registerTestUser} style={{ padding: '10px 20px', cursor: 'pointer' }}>
-        Register Test User
-      </button>
-    </div>
+    <Router>
+      <div className="min-h-screen bg-gray-50 text-gray-900 font-sans">
+        <Navbar />
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <Routes>
+            {/* 1. Open Routes (Anyone can see) */}
+            <Route path="/" element={<Home />} />
+
+            {/* 2. Public-Only Routes (Redirect to Profile if logged in) */}
+            <Route path="/login" element={
+              <PublicRoute>
+                <Login />
+              </PublicRoute>
+            } />
+            <Route path="/register" element={
+              <PublicRoute>
+                <Register />
+              </PublicRoute>
+            } />
+
+            <Route path="/browse" element={<Browse />} />
+
+
+            <Route path="/list-item" element={
+  <PrivateRoute>
+    <ListItem />
+  </PrivateRoute>
+} />
+
+            {/* 3. Private Routes (Redirect to Login if logged out) */}
+            <Route path="/profile" element={
+              <PrivateRoute>
+                <Profile />
+              </PrivateRoute>
+            } />
+          </Routes>
+        </main>
+      </div>
+    </Router>
   );
 }
 
