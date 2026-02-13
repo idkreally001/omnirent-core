@@ -10,8 +10,10 @@ export default function Profile() {
   const [user, setUser] = useState(null);
   const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
   
+  // MODAL & FRICTION STATES
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deletePassword, setDeletePassword] = useState('');
+  const [isConfirmingDelete, setIsConfirmingDelete] = useState(false); // MOVED INSIDE COMPONENT
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   
@@ -39,7 +41,6 @@ export default function Profile() {
         setMyRentals(rentalsRes.data);
       } catch (err) { 
         console.error("Session expired or fetch failed", err);
-        // Force reload to login if the session is dead
         window.location.href = '/login'; 
       }
     };
@@ -48,22 +49,28 @@ export default function Profile() {
 
   const handleLogout = () => {
     localStorage.clear();
-    // Triggers a hard refresh to wipe all app state
     window.location.href = '/'; 
   };
 
   const handleDeleteAccount = async () => {
-    if (!deletePassword) return setError("Password is required");
-    
+    if (!deletePassword) return setError("Password is required to proceed.");
+
+    // STEP 1: Toggle to "Are you sure?" state
+    if (!isConfirmingDelete) {
+      setIsConfirmingDelete(true);
+      return;
+    }
+
+    // STEP 2: Execute actual deletion
     setIsLoading(true);
     try {
       await api.delete('/user/delete-account', { data: { password: deletePassword } });
       localStorage.clear();
-      // Hard redirect after account deletion
       window.location.href = '/'; 
     } catch (err) {
       setError(err.response?.data?.error || "Failed to delete account");
       setIsLoading(false);
+      setIsConfirmingDelete(false); // Reset button if it fails
     }
   };
 
@@ -111,8 +118,6 @@ export default function Profile() {
 
         {/* --- Main Content --- */}
         <div className="md:col-span-2 space-y-8">
-          
-          {/* Account Details */}
           <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-8">
             <h3 className="text-xl font-black mb-6 text-gray-900">Account Details</h3>
             <div className="grid grid-cols-1 gap-4">
@@ -188,7 +193,6 @@ export default function Profile() {
                         </div>
                       </div>
                     </div>
-                    {/* Fixed: Button moved outside of the inner flex info div */}
                     <button 
                       onClick={() => setItemToDelete(item)} 
                       disabled={item.status === 'rented'}
@@ -215,16 +219,24 @@ export default function Profile() {
         </div>
       </div>
 
-      {/* --- MODALS & NOTIFICATIONS (Unchanged logic, fixed minor spacing) --- */}
-      {/* ... Account Delete Modal ... */}
+      {/* Account Delete Modal */}
       {showDeleteModal && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[100] p-4">
           <div className="bg-white rounded-[2rem] p-8 max-w-sm w-full shadow-2xl relative">
-            <button onClick={() => { setShowDeleteModal(false); setError(''); }} className="absolute top-6 right-6 text-gray-400 hover:text-gray-900"><X size={20}/></button>
+            <button 
+              onClick={() => { 
+                setShowDeleteModal(false); 
+                setIsConfirmingDelete(false); 
+                setError(''); 
+              }} 
+              className="absolute top-6 right-6 text-gray-400 hover:text-gray-900"
+            >
+              <X size={20}/>
+            </button>
             <div className="w-14 h-14 bg-red-100 text-red-600 rounded-2xl flex items-center justify-center mb-6">
                 <ShieldAlert size={28} />
             </div>
-            <h3 className="text-2xl font-black text-gray-900 mb-2">Are you sure?</h3>
+            <h3 className="text-2xl font-black text-gray-900 mb-2">Final Warning</h3>
             <p className="text-gray-500 text-sm mb-6 font-medium">This action is permanent. All data will be deleted.</p>
             
             {error && <p className="text-red-600 text-xs font-bold mb-4 bg-red-50 p-2 rounded-lg">{error}</p>}
@@ -233,17 +245,29 @@ export default function Profile() {
               type="password" 
               placeholder="Enter password to confirm" 
               className="w-full p-4 bg-gray-50 border border-gray-200 rounded-2xl mb-4 outline-none focus:ring-2 focus:ring-red-500 font-medium"
-              onChange={(e) => setDeletePassword(e.target.value)}
+              onChange={(e) => {
+                  setDeletePassword(e.target.value);
+                  setIsConfirmingDelete(false); // Reset confirmation if password changes
+              }}
             />
             
             <div className="flex gap-3">
-              <button onClick={() => setShowDeleteModal(false)} className="flex-1 bg-gray-100 text-gray-600 py-4 rounded-2xl font-bold text-sm">Cancel</button>
+              <button 
+                onClick={() => {
+                  setShowDeleteModal(false);
+                  setIsConfirmingDelete(false);
+                  setError('');
+                }} 
+                className="flex-1 bg-gray-100 text-gray-600 py-4 rounded-2xl font-bold text-sm"
+              >
+                Cancel
+              </button>
               <button 
                 onClick={handleDeleteAccount} 
-                disabled={isLoading}
-                className="flex-1 py-4 rounded-2xl font-bold transition text-sm bg-red-600 text-white disabled:opacity-50"
+                disabled={isLoading || !deletePassword}
+                className={`flex-1 py-4 rounded-2xl font-bold transition text-sm text-white disabled:opacity-50 ${isConfirmingDelete ? 'bg-orange-600 animate-pulse' : 'bg-red-600'}`}
               >
-                {isLoading ? 'Deleting...' : 'Delete'}
+                {isLoading ? 'Deleting...' : isConfirmingDelete ? 'Are you sure?' : 'Delete Account'}
               </button>
             </div>
           </div>
