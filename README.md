@@ -1,4 +1,3 @@
-````markdown
 # OmniRent: The Universal Sharing Marketplace
 
 OmniRent is a high-trust, peer-to-peer (P2P) rental platform designed to transition from a model of **"Ownership" to "Access."** It provides a secure ecosystem for users to monetize assets and access premium equipment on demand.
@@ -85,6 +84,3 @@ npm run dev
 ## 🏗 System Architecture
 
 The project follows a **Service-Adapter Pattern**, enabling seamless transitions between mock development environments and production-grade API integrations.
-
-```
-```
