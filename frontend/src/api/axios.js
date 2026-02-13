@@ -1,10 +1,11 @@
 import axios from 'axios';
 
+// CHANGE THIS PART
 const api = axios.create({
-    baseURL: 'http://localhost:5000/api',
+    // Vite uses import.meta.env for environment variables
+    baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api',
 });
 
-// This "Interceptor" grabs the token from storage and sticks it in the header
 api.interceptors.request.use((config) => {
     const token = localStorage.getItem('token');
     if (token) {
