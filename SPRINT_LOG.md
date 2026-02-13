@@ -44,10 +44,6 @@
 * *Fix:* Implemented declarative route guarding in `App.jsx` to check `localStorage` before mounting components.
 
 
-* **Manual Server Restarts:** Backend code changes weren't reflecting, leading to false 404s.
-* *Fix:* Integrated `nodemon` to automate the development workflow.
-
-
 
 ### 🔄 Agile Reflections
 
@@ -56,55 +52,56 @@
 
 ---
 
-## Sprint 2: Marketplace Inventory & UX Refinement (Feb 13, 2026 - Current)
+## Sprint 2: Marketplace Inventory & UX Refinement (Feb 13, 2026)
 
 **Goal:** Implement item listing, public browsing, and professional asset management.
 
 ### ✅ What we did
 
 * **Database Expansion:** Added `image_url` column to `items` table and verified via `psql` CLI.
-* **Dynamic Asset Routing:** Implemented `/item/:id` routes in React and `GET /api/items/:id` in Express to allow for sharable listing URLs.
-* **Item Detail View:** Built a high-fidelity detail page featuring owner information, "Share" logic (clipboard API), and fallback UI for missing media.
-* **Asset Creation Flow:** Updated `ListItem.jsx` to support optional image URLs, linking visual media to the database.
-* **Homepage Evolution:** Refactored `Home.jsx` from a static landing page to a live "Recently Added" feed, importing marketplace cards for immediate user engagement.
-* **Security & Account Control:** Developed password-verified account deletion and owner-only listing removal.
-* **Management UI:** Integrated an "Active Listings" dashboard within the User Profile for real-time CRUD operations.
+* **Dynamic Asset Routing:** Implemented `/item/:id` routes in React and `GET /api/items/:id` in Express.
+* **Item Detail View:** Built a high-fidelity detail page featuring owner information and "Share" logic.
+* **Homepage Evolution:** Refactored `Home.jsx` into a live "Recently Added" feed.
+* **Custom Modal Architecture:** Replaced all browser-native prompts with custom-styled React modals.
+* **Instant Feedback (Toasts):** Built a state-driven Toast notification system for asset removal.
 
 ### ⚠️ Problems Faced
 
-* **Data Persistence Gap:** `image_url` was being collected on the frontend but ignored by the backend SQL query.
-* *Fix:* Refactored `POST /api/items` to destructure and insert the 6th parameter (image_url) into the query.
+* **Data Persistence Gap:** `image_url` was being ignored by the backend SQL query.
+* *Fix:* Refactored `POST /api/items` to destructure and insert the 6th parameter.
 
 
-* **State Sync (Blank Pages):** Application crashed due to missing imports of newly created pages within the Router.
-* *Fix:* Standardized import checks and added `ListItem` and `ItemDetail` to `App.jsx`.
-
-
-* **Latency in UI State:** Login/Logout didn't trigger Navbar updates.
-* *Fix:* Replaced `Maps()` with `window.location.href` for auth-actions to force a full state hydration.
+* **User Offboarding UX:** Deleting an account was too abrupt.
+* *Fix:* Added a password-verified modal with a two-step confirmation button.
 
 
 
 ### 🔄 Agile Reflections
 
-* **What went well:** Moving the "Browse" feed onto the Homepage immediately improved the app's professional feel and "liveliness."
-* **Next Steps:** Begin **Sprint 3: Transactions**, focusing on the `rentals` table, item availability state-changes, and the booking flow.
-
-## Sprint 2: Marketplace Inventory & UX Refinement (Feb 13, 2026 - CLOSED)
-**Goal:** Implement item listing, public browsing, and professional asset management.
-
-### ✅ What we did (Polishing Phase)
-* **Visual Marketplace Feed:** Refactored `Home.jsx` to include a dynamic "Recently Added" section that pulls live data from the database.
-* **Custom Modal Architecture:** Replaced all browser-native `confirm()` and `alert()` prompts with custom-styled React modals for a unified project aesthetic.
-* **High-Stakes Verification:** Implemented a "Double-Check" button pattern for account deletion to prevent accidental data loss.
-* **Instant Feedback (Toasts):** Built a state-driven Toast notification system to confirm successful asset removal without page reloads.
-
-### ⚠️ Problems Faced
-* **User Offboarding UX:** Deleting an account was too abrupt and lacked friction.
-    * *Fix:* Added a password-verified modal with a two-step confirmation button ("Delete" -> "Are you sure?").
-* **Browser Consistency:** Native `confirm()` boxes looked different across browsers (Chrome vs Safari).
-    * *Fix:* Developed custom Tailwind-based modals to ensure a consistent look and feel.
-
-### 🔄 Agile Reflections
-* **What went well:** The combination of "Vertical Slices" for features and a "Polish Pass" for UX has made the app feel significantly more complete and trustworthy.
 * **Status:** Sprint 2 CLOSED.
+
+---
+
+## Sprint 3: Transaction Engine (Feb 13, 2026 - CLOSED)
+
+**Goal:** Enable the core business logic—the ability for one user to rent an item from another.
+
+### ✅ What we did
+
+* **ACID Transactions:** Implemented `POST /api/rentals` using `BEGIN/COMMIT` logic to ensure rental creation and item status updates happen simultaneously.
+* **Rental Verification:** Integrated backend checks to prevent "self-renting" and double-booking of items.
+* **Booking UX:** Developed a dynamic duration picker on the Detail page that calculates total price in real-time.
+* **Success Feedback:** Integrated a `CheckCircle2` animation upon successful rental to improve user confidence.
+* **Borrower Dashboard:** Expanded the Profile page with a "Borrowed Items" section, joining `rentals` and `items` tables to display active contracts.
+
+### ⚠️ Problems Faced
+
+* **Atomic State Desync:** Risk of an item being rented but still appearing as "Available" if a server error occurred.
+* *Fix:* Wrapped the rental creation and item status update in a PostgreSQL transaction block to ensure data integrity.
+
+
+
+### 🔄 Agile Reflections
+
+* **What went well:** We successfully moved from a "Listing" app to a "Transaction" platform. The database schema held up perfectly under the new foreign key requirements.
+* **Status:** Sprint 3 CLOSED.

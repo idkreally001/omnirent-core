@@ -3,6 +3,7 @@ const cors = require('cors');
 const authRoutes = require('./src/api/routes/auth.routes');
 const userRoutes = require('./src/api/routes/user.routes');
 const itemRoutes = require('./src/api/routes/item.routes');
+const rentalRoutes = require('./src/api/routes/rental.routes');
 
 const app = express();
 
@@ -20,5 +21,11 @@ app.use((req, res, next) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/items', itemRoutes);
+app.use('/api/rentals', rentalRoutes);
+
+const initDB = require('./src/db/init');
+initDB().then(() => {
+    app.listen(PORT, () => console.log(`Server running on ${PORT}`));
+});
 
 app.listen(5000, () => console.log("✅ Server running on port 5000"));
