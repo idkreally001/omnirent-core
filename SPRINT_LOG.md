@@ -89,3 +89,22 @@
 
 * **What went well:** Moving the "Browse" feed onto the Homepage immediately improved the app's professional feel and "liveliness."
 * **Next Steps:** Begin **Sprint 3: Transactions**, focusing on the `rentals` table, item availability state-changes, and the booking flow.
+
+## Sprint 2: Marketplace Inventory & UX Refinement (Feb 13, 2026 - CLOSED)
+**Goal:** Implement item listing, public browsing, and professional asset management.
+
+### ✅ What we did (Polishing Phase)
+* **Visual Marketplace Feed:** Refactored `Home.jsx` to include a dynamic "Recently Added" section that pulls live data from the database.
+* **Custom Modal Architecture:** Replaced all browser-native `confirm()` and `alert()` prompts with custom-styled React modals for a unified project aesthetic.
+* **High-Stakes Verification:** Implemented a "Double-Check" button pattern for account deletion to prevent accidental data loss.
+* **Instant Feedback (Toasts):** Built a state-driven Toast notification system to confirm successful asset removal without page reloads.
+
+### ⚠️ Problems Faced
+* **User Offboarding UX:** Deleting an account was too abrupt and lacked friction.
+    * *Fix:* Added a password-verified modal with a two-step confirmation button ("Delete" -> "Are you sure?").
+* **Browser Consistency:** Native `confirm()` boxes looked different across browsers (Chrome vs Safari).
+    * *Fix:* Developed custom Tailwind-based modals to ensure a consistent look and feel.
+
+### 🔄 Agile Reflections
+* **What went well:** The combination of "Vertical Slices" for features and a "Polish Pass" for UX has made the app feel significantly more complete and trustworthy.
+* **Status:** Sprint 2 CLOSED.
