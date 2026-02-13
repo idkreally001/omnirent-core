@@ -1,3 +1,13 @@
+/**
+ * OmniRent v1.0 - Peer-to-Peer Marketplace
+ * Developed by Islam Pashazade
+ * * This project is open-source under the MIT License.
+ * Attribution is required for all re-distributions.
+ */
+
+
+
+
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Home from './pages/Home';
