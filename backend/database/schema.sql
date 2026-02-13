@@ -1,16 +1,14 @@
--- schema.sql
--- Run this inside your 'omnirent' database
-
--- 1. Users Table
+-- Users: Core identity with secure hashing
 CREATE TABLE IF NOT EXISTS users (
     id SERIAL PRIMARY KEY,
     full_name VARCHAR(100) NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
     tc_no VARCHAR(11),
+    password_hash TEXT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- 2. Items Table (The products for rent)
+-- Items: Inventory with availability state machine
 CREATE TABLE IF NOT EXISTS items (
     id SERIAL PRIMARY KEY,
     owner_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
@@ -18,17 +16,18 @@ CREATE TABLE IF NOT EXISTS items (
     description TEXT,
     price_per_day DECIMAL(10, 2) NOT NULL,
     category VARCHAR(50),
-    status VARCHAR(20) DEFAULT 'available', -- 'available', 'rented', 'maintenance'
+    image_url TEXT,
+    status VARCHAR(20) DEFAULT 'available', -- 'available', 'rented'
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- 3. Rentals Table (The transactions/contracts)
+-- Rentals: Transactional contracts
 CREATE TABLE IF NOT EXISTS rentals (
     id SERIAL PRIMARY KEY,
     item_id INTEGER REFERENCES items(id) ON DELETE CASCADE,
     renter_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
-    start_date DATE NOT NULL,
-    end_date DATE NOT NULL,
-    total_price DECIMAL(10, 2),
-    status VARCHAR(20) DEFAULT 'requested' -- 'requested', 'active', 'completed', 'disputed'
+    return_date TIMESTAMP NOT NULL,
+    total_price DECIMAL(10, 2) NOT NULL,
+    status VARCHAR(20) DEFAULT 'active',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
