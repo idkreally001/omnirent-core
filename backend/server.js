@@ -1,3 +1,10 @@
+/**
+ * OmniRent v1.0 - Peer-to-Peer Marketplace
+ * Developed by Islam Pashazade
+ * * This project is open-source under the MIT License.
+ * Attribution is required for all re-distributions.
+ */
+
 const express = require('express');
 const cors = require('cors');
 const authRoutes = require('./src/api/routes/auth.routes');
