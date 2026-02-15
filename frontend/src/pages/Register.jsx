@@ -4,7 +4,7 @@ import api from '../api/axios';
 import { ShieldCheck, UserPlus } from 'lucide-react';
 
 export default function Register() {
-  const [formData, setFormData] = useState({ fullName: '', email: '', tcNo: '', password: '' });
+  const [formData, setFormData] = useState({ fullName: '', email: '', password: '' });
   const [error, setError] = useState('');
 
   const handleSubmit = async (e) => {
@@ -36,17 +36,25 @@ export default function Register() {
       <form onSubmit={handleSubmit} className="space-y-5">
         <input type="text" placeholder="Full Name" className="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none" onChange={(e) => setFormData({...formData, fullName: e.target.value})} required />
         <input type="email" placeholder="Email Address" className="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none" onChange={(e) => setFormData({...formData, email: e.target.value})} required />
-        <input type="text" placeholder="ID Number (TC No)" maxLength="11" className="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none" onChange={(e) => setFormData({...formData, tcNo: e.target.value})} required />
         <input type="password" placeholder="Password" className="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none" onChange={(e) => setFormData({...formData, password: e.target.value})} required />
 
-        <div className="p-4 bg-blue-50 rounded-2xl flex gap-3 items-start">
+        {/*<div className="p-4 bg-blue-50 rounded-2xl flex gap-3 items-start">
           <ShieldCheck className="text-blue-600 shrink-0" size={20} />
           <p className="text-xs text-blue-800 font-medium">Verified using secure NVI service.</p>
-        </div>
+        </div>*/}
 
         <button className="w-full bg-blue-600 text-white py-4 rounded-2xl font-bold text-lg hover:bg-blue-700 transition">
           Create Account
         </button>
+
+        <div className="mt-6 text-center">
+  <p className="text-sm text-gray-500 font-medium">
+    Already have an account?{' '}
+    <Link to="/login" className="text-blue-600 font-bold hover:underline">
+      Login here
+    </Link>
+  </p>
+</div>
       </form>
     </div>
   );

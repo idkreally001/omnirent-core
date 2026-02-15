@@ -14,6 +14,7 @@ const userRoutes = require('./src/api/routes/user.routes');
 const itemRoutes = require('./src/api/routes/item.routes');
 const rentalRoutes = require('./src/api/routes/rental.routes');
 const initDB = require('./src/db/init');
+const notificationRoutes = require('./src/api/routes/notification.routes');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -33,6 +34,8 @@ app.use('/api/auth', authRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/items', itemRoutes);
 app.use('/api/rentals', rentalRoutes);
+app.use('/api/notifications', notificationRoutes);
+
 
 // 4. Atomic Startup Logic
 const startApp = async () => {
