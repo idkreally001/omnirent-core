@@ -16,7 +16,22 @@ router.get('/', auth, async (req, res) => {
     }
 });
 
-// 2. MARK AS READ
+// 2. MARK ALL AS READ (New)
+// Keep this ABOVE the /:id route so Express doesn't confuse 'read-all' with an ID
+router.put('/read-all', auth, async (req, res) => {
+    try {
+        await pool.query(
+            "UPDATE notifications SET is_read = TRUE WHERE user_id = $1 AND is_read = FALSE",
+            [req.user.id]
+        );
+        res.json({ message: "All notifications marked as read" });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Server Error");
+    }
+});
+
+// 3. MARK SINGLE AS READ
 router.put('/:id/read', auth, async (req, res) => {
     try {
         await pool.query(
@@ -29,7 +44,7 @@ router.put('/:id/read', auth, async (req, res) => {
     }
 });
 
-// 3. DELETE ALL READ NOTIFICATIONS (Cleanup)
+// 4. DELETE ALL READ NOTIFICATIONS (Cleanup)
 router.delete('/cleanup', auth, async (req, res) => {
     try {
         await pool.query(

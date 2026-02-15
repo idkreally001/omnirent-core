@@ -18,6 +18,7 @@ import Browse from './pages/Browse';
 import ListItem from './pages/ListItem';
 import ItemDetail from './pages/ItemDetail';
 import PublicProfile from './pages/PublicProfile';
+import ChatPage from './pages/ChatPage';
 
 // Import your guards
 import PublicRoute from './components/PublicRoute';
@@ -63,6 +64,11 @@ function App() {
                 <Profile />
               </PrivateRoute>
             } />
+            <Route path="/messages" element={
+  <PrivateRoute>
+    <ChatPage />
+  </PrivateRoute>
+} />
           </Routes>
         </main>
       </div>

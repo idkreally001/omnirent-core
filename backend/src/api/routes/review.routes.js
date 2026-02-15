@@ -3,7 +3,7 @@ const router = express.Router();
 const pool = require('../../db');
 const auth = require('../middleware/auth.middleware');
 
-// POST /api/reviews -> Submit a review
+// POST /api/reviews -> Submit a review and CLEANUP notifications
 router.post('/', auth, async (req, res) => {
     const { rentalId, rating, comment } = req.body;
     const reviewerId = req.user.id;
@@ -18,7 +18,9 @@ router.post('/', auth, async (req, res) => {
             [rentalId]
         );
 
-        if (rentalRes.rows.length === 0) return res.status(404).json({ error: "Rental not found" });
+        if (rentalRes.rows.length === 0) {
+            return res.status(404).json({ error: "Rental not found" });
+        }
         
         const rental = rentalRes.rows[0];
 
@@ -36,24 +38,33 @@ router.post('/', auth, async (req, res) => {
             return res.status(403).json({ error: "You were not part of this transaction." });
         }
 
-        // 3. Insert the review (UNIQUE constraint in DB handles duplicates)
+        // 3. Insert the review
         await pool.query(
             `INSERT INTO reviews (rental_id, reviewer_id, target_user_id, rating, comment) 
              VALUES ($1, $2, $3, $4, $5)`,
             [rentalId, reviewerId, targetUserId, rating, comment]
         );
 
-        res.json({ message: "Review submitted! Thank you for building trust in the community." });
+        // ⚡️ 4. AUTO-CLEANUP: Delete the notification asking for this review
+        // This stops the user from seeing the "Rate your experience" prompt again
+        await pool.query(
+            `DELETE FROM notifications 
+             WHERE user_id = $1 
+             AND related_id = $2 
+             AND type = 'RETURN_CONFIRMED'`, 
+            [reviewerId, rentalId]
+        );
+
+        res.json({ message: "Review submitted and notification cleared!" });
 
     } catch (err) {
         if (err.code === '23505') { // Postgres Unique Violation
             return res.status(400).json({ error: "You have already reviewed this transaction." });
         }
-        console.error(err.message);
+        console.error("Review Post Error:", err.message);
         res.status(500).send("Server Error");
     }
 });
-
 
 // GET /api/reviews/user/:userId -> Fetch all reviews FOR a specific user
 router.get('/user/:userId', async (req, res) => {

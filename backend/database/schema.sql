@@ -66,4 +66,20 @@ CREATE TABLE IF NOT EXISTS disputes (
     status VARCHAR(20) DEFAULT 'open',
     admin_notes TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);  
+
+
+-- 7. Messages: Peer-to-Peer Communication
+CREATE TABLE IF NOT EXISTS messages (
+    id SERIAL PRIMARY KEY,
+    sender_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    receiver_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    item_id INTEGER REFERENCES items(id) ON DELETE CASCADE, -- Contextual linking
+    content TEXT NOT NULL,
+    is_read BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    read_at TIMESTAMP
 );
+
+-- Indexing for fast conversation loading
+CREATE INDEX IF NOT EXISTS idx_messages_participants ON messages (sender_id, receiver_id);
