@@ -1,18 +1,19 @@
 import { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom'; // Added Link
 import api from '../api/axios';
-import { Share2, User, ArrowLeft, Package, CheckCircle2 } from 'lucide-react';
+import { 
+  Share2, User, ArrowLeft, Package, CheckCircle2, Star // Added Star
+} from 'lucide-react';
 
 export default function ItemDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   
-  // State Management
   const [item, setItem] = useState(null);
   const [days, setDays] = useState(1);
   const [isRenting, setIsRenting] = useState(false);
   const [rentedSuccess, setRentedSuccess] = useState(false);
-  const [copied, setCopied] = useState(false); // Added missing state
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     const fetchItem = async () => {
@@ -21,7 +22,6 @@ export default function ItemDetail() {
         setItem(res.data);
       } catch (err) {
         console.error("Error fetching item:", err);
-        // Optional: navigate('/browse');
       }
     };
     fetchItem();
@@ -59,7 +59,6 @@ export default function ItemDetail() {
 
   return (
     <div className="max-w-5xl mx-auto mt-8 px-4 pb-12 space-y-6">
-      {/* Back Button */}
       <button 
         onClick={() => navigate('/browse')} 
         className="flex items-center gap-2 text-gray-500 hover:text-blue-600 font-bold transition mb-4"
@@ -67,7 +66,7 @@ export default function ItemDetail() {
         <ArrowLeft size={20} /> Back to Marketplace
       </button>
 
-      <div className="bg-white rounded-3xl border border-gray-100 shadow-xl overflow-hidden grid md:grid-cols-2 gap-0">
+      <div className="bg-white rounded-[3rem] border border-gray-100 shadow-xl overflow-hidden grid md:grid-cols-2">
         
         {/* Left: Image Area */}
         <div className="bg-gray-50 flex items-center justify-center border-b md:border-b-0 md:border-r border-gray-100 min-h-[400px]">
@@ -108,26 +107,43 @@ export default function ItemDetail() {
                 
                 <h1 className="text-4xl font-black text-gray-900 mb-6 leading-tight">{item.title}</h1>
                 
-                <div className="space-y-4 mb-8">
-                    <div className="flex items-center gap-3 text-gray-600 font-medium bg-gray-50 p-3 rounded-2xl w-fit">
-                        <User size={20} className="text-blue-500" /> 
-                        <span>Listed by <span className="font-bold text-gray-900">{item.owner_name || 'Anonymous'}</span></span>
-                    </div>
-                </div>
-
                 <p className="text-gray-500 leading-relaxed font-medium text-lg border-l-4 border-gray-200 pl-4 mb-8">
                     {item.description}
                 </p>
 
-                {/* Rental Duration Picker */}
+                {/* OWNER TRUST CARD */}
+                <div className="mb-8 p-6 bg-gray-50 rounded-[2.5rem] border border-gray-100 flex flex-col gap-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-blue-600 font-black border border-gray-100 shadow-sm">
+                        {item.owner_name?.charAt(0)}
+                      </div>
+                      <div>
+                        <h4 className="font-black text-gray-900 leading-none">{item.owner_name}</h4>
+                        <div className="flex items-center gap-1.5 mt-1 text-amber-500">
+                          <Star size={12} fill="currentColor" />
+                          <span className="text-xs font-black text-gray-700">{Number(item.owner_rating || 0).toFixed(1)}</span>
+                          <span className="text-[10px] text-gray-400">({item.owner_reviews || 0} reviews)</span>
+                        </div>
+                      </div>
+                    </div>
+                    <Link to={`/user/${item.owner_id}`} className="text-[10px] font-black uppercase text-blue-600 bg-blue-50 px-4 py-2 rounded-xl hover:bg-blue-600 hover:text-white transition-all">
+                      View Profile
+                    </Link>
+                  </div>
+                  {item.owner_tc && (
+                    <div className="flex items-center gap-2 text-blue-600 bg-blue-100/30 p-2 rounded-xl border border-blue-100/50">
+                      <CheckCircle2 size={14} />
+                      <span className="text-[9px] font-black uppercase tracking-widest">Verified Identity</span>
+                    </div>
+                  )}
+                </div>
+
                 <div className="p-6 bg-blue-50 rounded-3xl border border-blue-100 space-y-4">
                   <div className="flex items-center justify-between">
                     <label className="text-sm font-black text-blue-900 uppercase">Duration (Days)</label>
                     <input 
-                      type="number" 
-                      min="1" 
-                      max="30"
-                      value={days}
+                      type="number" min="1" max="30" value={days}
                       onChange={(e) => setDays(e.target.value)}
                       className="w-20 p-2 rounded-xl border border-blue-200 text-center font-bold outline-none focus:ring-2 focus:ring-blue-500"
                     />
@@ -139,7 +155,6 @@ export default function ItemDetail() {
                 </div>
               </div>
 
-              {/* Action Area */}
               <div className="pt-8 mt-8 border-t border-gray-100 flex items-center justify-between">
                 <div>
                   <p className="text-xs text-gray-400 font-black uppercase mb-1">Daily Rate</p>
@@ -147,12 +162,12 @@ export default function ItemDetail() {
                 </div>
                 <button 
                   onClick={handleRent}
-                  disabled={isRenting}
+                  disabled={isRenting || item.status !== 'available'}
                   className={`px-10 py-4 rounded-2xl font-black text-lg transition shadow-xl ${
-                    isRenting ? 'bg-gray-400 cursor-not-allowed' : 'bg-gray-900 text-white hover:bg-blue-600 shadow-gray-200'
+                    (isRenting || item.status !== 'available') ? 'bg-gray-400 cursor-not-allowed' : 'bg-gray-900 text-white hover:bg-blue-600 shadow-gray-200'
                   }`}
                 >
-                  {isRenting ? 'Processing...' : 'Rent Now'}
+                  {item.status !== 'available' ? 'Rented' : isRenting ? 'Processing...' : 'Rent Now'}
                 </button>
               </div>
             </>

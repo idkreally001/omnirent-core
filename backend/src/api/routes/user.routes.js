@@ -9,10 +9,43 @@ const { verifyIdentity } = require('../../services/identity/identity.service');
 router.get('/profile', auth, async (req, res) => {
     try {
         const user = await pool.query(
-            "SELECT id, full_name, email, created_at, balance, tc_no FROM users WHERE id = $1", 
+            `SELECT u.id, u.full_name, u.email, u.created_at, u.balance, u.tc_no,
+                    COALESCE(AVG(rev.rating), 0) as avg_rating,
+                    COUNT(rev.id) as review_count
+             FROM users u
+             LEFT JOIN reviews rev ON u.id = rev.target_user_id
+             WHERE u.id = $1
+             GROUP BY u.id`, 
             [req.user.id]
         );
         res.json(user.rows[0]);
+    } catch (err) {
+        res.status(500).send("Server Error");
+    }
+});
+
+// 2. GET Public Profile (for other users to view) - NEW
+router.get('/public/:id', async (req, res) => {
+    try {
+        const profile = await pool.query(
+            `SELECT u.id, u.full_name, u.created_at, u.tc_no,
+                    COALESCE(AVG(rev.rating), 0) as avg_rating,
+                    COUNT(rev.id) as review_count
+             FROM users u
+             LEFT JOIN reviews rev ON u.id = rev.target_user_id
+             WHERE u.id = $1
+             GROUP BY u.id`, [req.params.id]
+        );
+
+        const reviews = await pool.query(
+            `SELECT r.rating, r.comment, r.created_at, u.full_name as reviewer_name
+             FROM reviews r
+             JOIN users u ON r.reviewer_id = u.id
+             WHERE r.target_user_id = $1
+             ORDER BY r.created_at DESC`, [req.params.id]
+        );
+
+        res.json({ user: profile.rows[0], reviews: reviews.rows });
     } catch (err) {
         res.status(500).send("Server Error");
     }
@@ -79,6 +112,24 @@ router.delete('/delete-account', auth, async (req, res) => {
 
         await pool.query("DELETE FROM users WHERE id = $1", [req.user.id]);
         res.json({ message: "Account deleted." });
+    } catch (err) {
+        res.status(500).send("Server Error");
+    }
+});
+
+
+// GET /api/user/my-reviews (Reviews left for ME)
+router.get('/my-reviews', auth, async (req, res) => {
+    try {
+        const result = await pool.query(
+            `SELECT r.rating, r.comment, r.created_at, u.full_name as reviewer_name
+             FROM reviews r
+             JOIN users u ON r.reviewer_id = u.id
+             WHERE r.target_user_id = $1
+             ORDER BY r.created_at DESC`,
+            [req.user.id]
+        );
+        res.json(result.rows);
     } catch (err) {
         res.status(500).send("Server Error");
     }
