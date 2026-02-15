@@ -17,6 +17,8 @@ import Profile from './pages/Profile';
 import Browse from './pages/Browse';
 import ListItem from './pages/ListItem';
 import ItemDetail from './pages/ItemDetail';
+import PublicProfile from './pages/PublicProfile';
+import ChatPage from './pages/ChatPage';
 
 // Import your guards
 import PublicRoute from './components/PublicRoute';
@@ -31,6 +33,7 @@ function App() {
           <Routes>
             {/* 1. Open Routes (Anyone can see) */}
             <Route path="/" element={<Home />} />
+            <Route path="/user/:id" element={<PublicProfile />} />
 
             {/* 2. Public-Only Routes (Redirect to Profile if logged in) */}
             <Route path="/login" element={
@@ -61,6 +64,11 @@ function App() {
                 <Profile />
               </PrivateRoute>
             } />
+            <Route path="/messages" element={
+  <PrivateRoute>
+    <ChatPage />
+  </PrivateRoute>
+} />
           </Routes>
         </main>
       </div>
