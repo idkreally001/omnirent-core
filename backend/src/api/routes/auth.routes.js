@@ -29,7 +29,7 @@ router.post('/login', async (req, res) => {
 
 // REGISTER ROUTE
 router.post('/register', async (req, res) => {
-    const { fullName, email, tcNo, password } = req.body;
+    const { fullName, email, password } = req.body;
     try {
         // 1. Check if user already exists
         const userExist = await pool.query("SELECT * FROM users WHERE email = $1", [email]);
@@ -42,8 +42,8 @@ router.post('/register', async (req, res) => {
 
         // 3. Save to database
         const newUser = await pool.query(
-            "INSERT INTO users (full_name, email, tc_no, password_hash) VALUES ($1, $2, $3, $4) RETURNING id, full_name, email",
-            [fullName, email, tcNo, passwordHash]
+            "INSERT INTO users (full_name, email, password_hash) VALUES ($1, $2, $3) RETURNING id, full_name, email",
+            [fullName, email, passwordHash]
         );
 
         // 4. Generate Token
