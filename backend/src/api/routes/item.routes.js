@@ -70,14 +70,19 @@ router.get('/', async (req, res) => {
     }
 });
 
-// 3. GET SINGLE ITEM
+// GET /api/items/:id (Updated to include Owner Trust)
 router.get('/:id', async (req, res) => {
     try {
         const item = await pool.query(
-            "SELECT items.*, users.full_name as owner_name FROM items JOIN users ON items.owner_id = users.id WHERE items.id = $1 AND items.is_deleted = FALSE", 
-            [req.params.id]
+            `SELECT i.*, u.full_name as owner_name, u.tc_no IS NOT NULL as owner_verified,
+                    COALESCE(AVG(r.rating), 0) as owner_rating,
+                    COUNT(r.id) as owner_reviews
+             FROM items i
+             JOIN users u ON i.owner_id = u.id
+             LEFT JOIN reviews r ON u.id = r.target_user_id
+             WHERE i.id = $1
+             GROUP BY i.id, u.id`, [req.params.id]
         );
-        if (item.rows.length === 0) return res.status(404).json({ error: "Item not found" });
         res.json(item.rows[0]);
     } catch (err) {
         res.status(500).send("Server Error");

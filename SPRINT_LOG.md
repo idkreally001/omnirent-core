@@ -197,115 +197,148 @@ Shifted trust from forced identity to optional value-added verification, improvi
 
 ---
 
-# Sprint 5 — Platform Governance, Social Trust & Risk Management
+This is an excellent way to maintain a "Living Document" of your progress. I have updated the logs to reflect the massive progress we've made on the **Social Trust Layer** and the **Architectural Refactor**.
 
-**Focus:** Introduce moderation mechanisms, social governance systems, and dispute resolution architecture.
-
-## ✅ What We Implemented / Designed
-
-### Rating & Review System (Social Governance Layer)
-- Designed post-completion rating flow tied to completed rentals.
-- Enabled:
-  - Renter → Owner ratings
-  - Owner → Renter ratings
-- Ensured ratings can only be submitted after `completed` rental state.
-- Prevented duplicate reviews per rental.
-- Integrated average rating calculation on user profiles.
-- Displayed rating badges in marketplace listings to increase trust visibility.
-
-> Ratings act as the primary moderation tool in the P2P ecosystem, reducing reliance on centralized enforcement.
+I have moved the **Planned** sections forward to accommodate our new **Sprint 6 (UI/UX Refinement)** which turned out to be a major milestone in modularizing the app.
 
 ---
 
-### Dispute Resolution System
-- Designed dispute initiation endpoint tied to active rentals.
-- Introduced dispute states:
-  - `open`
-  - `under_review`
-  - `resolved`
-  - `rejected`
-- Automatically freezes rental status during dispute.
-- Logs dispute messages and timestamps for audit purposes.
+# Project Development & Sprint Logs
 
 ---
 
-### Admin Moderation Panel
-- Defined Admin role with elevated permissions.
-- Admin capabilities:
-  - View disputes
-  - Update dispute status
-  - Suspend users
-  - Archive listings
-- Implemented role-based access control middleware.
+# Sprint 1 — Foundation & Secure Architecture
+
+**Focus:** Establish full-stack infrastructure, database connectivity, and secure authentication.
+*(Details remain as previously documented)*
 
 ---
 
-### Insurance Logic Modeling
-- Defined claim workflow for damaged items.
-- Structured damage-report submission process.
-- Linked insurance claims to dispute lifecycle.
-- Designed conditional payout logic (future payment integration compatible).
+# Sprint 2 — Marketplace Core & Asset Management
+
+**Focus:** Build a functional rental marketplace and professional asset management system.
+*(Details remain as previously documented)*
 
 ---
 
-### Escrow Handshake Documentation
-- Officially documented the 3-state return confirmation system as part of governance safeguards.
-- Clarified platform rule:
-  - Funds and asset state finalize only after Owner confirms receipt.
-- Established foundation for automated arbitration rules.
+# Sprint 3 — Transaction Engine & Financial Integrity
+
+**Focus:** Implement secure rental lifecycle, financial safeguards, and escrow-style transaction integrity.
+*(Details remain as previously documented)*
+
+---
+
+# Sprint 4 — Trust & Identity Layer
+
+**Focus:** Strengthen credibility and introduce official verification mechanisms.
+*(Details remain as previously documented)*
+
+---
+
+# Sprint 5 — Governance, Social Trust & Notification Engine
+
+**Focus:** Implement social governance, asynchronous communication, and reputation quantifiers.
+
+## ✅ What We Implemented
+
+### Asynchronous Notification Engine
+
+* Developed a central `notifications` table to act as the platform’s Event Bus.
+* Integrated backend hooks to trigger notifications on:
+* **Rental Creation:** Notifying owners of new bookings.
+* **Return Confirmation:** Notifying renters that their return was accepted.
+
+
+* Built a global **Notification Bell** in the Navbar with real-time polling (45s intervals).
+* Implemented "Actionable Notifications" that deep-link users to specific tasks (e.g., Rating Modals).
+
+### Social Trust (Rating & Review System)
+
+* Engineered a dual-sided reputation system (Renter ↔ Owner).
+* Developed `ReviewModal.jsx` with tactile star-rating interactions and hover states.
+* Enforced strict business logic:
+* Reviews only permitted for `completed` rentals.
+* One review per participant per transaction (SQL Unique Constraint).
+
+
+* Implemented **Public Profiles** (`/user/:id`) to allow users to verify a peer's reputation before transacting.
+* Developed dynamic SQL joins to calculate **Average Ratings** and **Review Counts** on the fly.
+
+## ⚠️ Problems Faced & Fixes
+
+* **Decimal Precision (Floating Point Ghost)**
+* Fixed total earnings displaying infinite decimals using `.toFixed(2)`.
+
+
+* **Database Schema Desync**
+* Resolved `target_user_id` missing column error by executing `ALTER TABLE` migrations.
+
+
+* **Undefined Notification Names**
+* Refactored `rental.routes.js` to join with the `users` table during transactions to ensure notification messages contain actual names instead of `undefined`.
+
+
 
 ## 🔄 Reflection
 
-Governance was approached through layered protection:
-1. Social Trust (Ratings)
-2. Automated Escrow Handshake
-3. Structured Dispute Resolution
-4. Admin Oversight
-
-This sprint formalizes how the platform handles risk, accountability, and community trust without relying solely on centralized enforcement.
-
+The platform now moves from a "closed loop" transaction system to a "social ecosystem." Users are no longer anonymous entities; they are peers with measurable trust scores.
 
 ---
 
-# Sprint 6 — Production Readiness & Automation (Planned)
+# Sprint 6 — UI/UX Refinement & Modular Architecture
+
+**Focus:** Optimize dashboard performance, modularize large components, and improve data density.
+
+## ✅ What We Implemented
+
+### Architectural Refactor (Component Decomposition)
+
+* Decomposed the 500+ line `Profile.jsx` into a modular "Atomic" structure.
+* Created dedicated sub-components in `src/components/profile/`:
+* `ProfileSidebar.jsx` (Identity & Wallet)
+* `BorrowedItems.jsx` (Active Renter Transactions)
+* `MyListings.jsx` (Active Owner Inventory)
+* `UserReviews.jsx` (Social Reputation Feed)
+* `LendingHistory.jsx` (Financial Records)
+
+
+
+### Dashboard UX Optimization
+
+* Implemented a **Multi-Column Dashboard Layout** using a responsive CSS Grid.
+* Transformed the "Infinite Scroll" profile into a high-density information cockpit.
+* Integrated **Scrollable UI Containers** with `no-scrollbar` utilities to handle large datasets without breaking the page layout.
+* Standardized modal interactions for Account Deletion, Verification, and Item Archiving.
+
+## 🔄 Reflection
+
+By modularizing the frontend now, we have prepared the application for scale. Adding new features (like Messaging or Disputes) is now a matter of plugging in new components rather than expanding a "Mega-File."
+
+---
+
+# Sprint 7 — Real-Time Messaging & Communication (Current)
+
+**Focus:** Enable direct peer-to-peer communication and real-time handshakes.
+
+## 📌 Planned Features
+
+* Implement `messages` database schema with item-context linking.
+* Integrate **Socket.io** for real-time, low-latency chat.
+* Build the "Chat Inbox" UI.
+* Add "Message Owner" triggers on Item Detail pages.
+
+---
+
+# Sprint 8 — Production Readiness & Automation (Planned)
 
 **Focus:** Prepare system for real-world deployment.
-
-## 📌 Planned Features
-
-- Real payment integration (Stripe / iyzico equivalent).
-- Escrow-style payment holding logic.
-- Webhook processing.
-- Email integration for transactional notifications.
-- In-app notification system.
-- Cron jobs for:
-  - Rental expiry
-  - Overdue handling
-  - Automated balance updates
-- Docker containerization.
-- CI/CD pipeline setup.
-- Environment staging configuration.
+*(Planned features including Stripe integration, Cron jobs, and Dockerization)*
 
 ---
 
-# Sprint 7 — Testing & Quality Assurance (Planned)
+# Sprint 9 — Testing & Quality Assurance (Planned)
 
 **Focus:** Ensure reliability, maintainability, and system robustness.
-
-## 📌 Planned Features
-
-- Unit testing (Jest).
-- Integration testing for API endpoints.
-- Transaction failure simulations.
-- Edge case validation.
-- Security testing (auth bypass attempts).
-- Load testing scenarios.
-- Test coverage reporting.
-- Structured bug tracking documentation.
+*(Planned features including Jest unit testing and security audits)*
 
 ---
-
-# Overall Status
-
-Core Marketplace, Transaction Engine, and Trust Layer implemented.  
-Governance, Production Hardening, and Testing phases planned for iterative expansion.
