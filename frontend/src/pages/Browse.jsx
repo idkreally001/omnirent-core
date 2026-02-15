@@ -12,6 +12,9 @@ export default function Browse() {
   const [category, setCategory] = useState('All');
   const [sort, setSort] = useState('newest');
   const [maxPrice, setMaxPrice] = useState(2000);
+  
+  // Get current user to prevent self-interactions
+  const currentUser = JSON.parse(localStorage.getItem('user'));
 
   const navigate = useNavigate();
   const categories = ['All', 'Tools', 'Electronics', 'Camping', 'Sports', 'Party'];
@@ -191,7 +194,8 @@ export default function Browse() {
                   </div>
                   
                   <div className="flex gap-3">
-                    {item.status !== 'rented' && (
+                    {/* Only show Message button if not rented AND not owned by current user */}
+                    {item.status !== 'rented' && item.owner_id !== currentUser?.id && (
                       <button 
                         onClick={() => navigate(`/messages?item=${item.id}&owner=${item.owner_id}`)}
                         className="p-4 rounded-2xl bg-gray-50 text-gray-400 hover:bg-gray-900 hover:text-white transition-all active:scale-95"
@@ -203,14 +207,15 @@ export default function Browse() {
 
                     <button 
                       onClick={() => navigate(`/item/${item.id}`)}
-                      disabled={item.status === 'rented'}
+                      // Disable Rent button if rented OR owned by current user
+                      disabled={item.status === 'rented' || item.owner_id === currentUser?.id}
                       className={`px-8 py-4 rounded-2xl font-black text-xs uppercase tracking-widest transition-all ${
-                          item.status === 'rented' 
+                          (item.status === 'rented' || item.owner_id === currentUser?.id)
                           ? 'bg-gray-100 text-gray-300 cursor-not-allowed' 
                           : 'bg-gray-900 text-white hover:bg-blue-600 hover:shadow-lg hover:shadow-blue-200'
                       }`}
                     >
-                      {item.status === 'rented' ? 'Unavailable' : 'Rent Now'}
+                      {item.status === 'rented' ? 'Unavailable' : item.owner_id === currentUser?.id ? 'Your Item' : 'Rent Now'}
                     </button>
                   </div>
                 </div>
