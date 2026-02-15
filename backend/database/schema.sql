@@ -28,6 +28,7 @@ CREATE TABLE IF NOT EXISTS rentals (
     id SERIAL PRIMARY KEY,
     item_id INTEGER REFERENCES items(id) ON DELETE CASCADE,
     renter_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    rental_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Added to match your psql output
     return_date TIMESTAMP NOT NULL,
     total_price DECIMAL(10, 2) NOT NULL,
     status VARCHAR(20) DEFAULT 'active', -- 'active', 'returned_by_renter', 'completed'
@@ -68,18 +69,22 @@ CREATE TABLE IF NOT EXISTS disputes (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );  
 
-
 -- 7. Messages: Peer-to-Peer Communication
 CREATE TABLE IF NOT EXISTS messages (
     id SERIAL PRIMARY KEY,
     sender_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
     receiver_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
-    item_id INTEGER REFERENCES items(id) ON DELETE CASCADE, -- Contextual linking
+    item_id INTEGER REFERENCES items(id) ON DELETE SET NULL, -- Better UX: Chat stays if item is deleted
     content TEXT NOT NULL,
     is_read BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     read_at TIMESTAMP
 );
 
--- Indexing for fast conversation loading
+--- PERFORMANCE INDEXES ---
+-- For fast conversation loading
 CREATE INDEX IF NOT EXISTS idx_messages_participants ON messages (sender_id, receiver_id);
+-- For fast notification badge counts
+CREATE INDEX IF NOT EXISTS idx_notifications_unread ON notifications (user_id) WHERE is_read = FALSE;
+-- For fast profile review loading
+CREATE INDEX IF NOT EXISTS idx_reviews_target ON reviews (target_user_id);
