@@ -19,15 +19,25 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:5173",
-    methods: ["GET", "POST", "PUT"] // Added PUT for read receipts
+    origin: allowedOrigins,
+    methods: ["GET", "POST", "PUT"],
+    credentials: true
   }
 });
+
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://omnirent-core.vercel.app"
+];
 
 const PORT = process.env.PORT || 5000;
 
 // 1. Middlewares
-app.use(cors());
+app.use(cors({
+  origin: allowedOrigins,
+  credentials: true
+}));
+
 app.use(express.json());
 
 // 2. ⚡️ SOCKET INJECTION MIDDLEWARE

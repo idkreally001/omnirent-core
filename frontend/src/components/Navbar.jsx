@@ -2,12 +2,8 @@ import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 // Added Trash2 to imports
 import { Bell, BellDot, Check, ShoppingBag, MessageCircle, MessageSquare, Trash2 } from 'lucide-react';
-import { io } from 'socket.io-client'; 
 import api from '../api/axios';
-
-const socket = io(import.meta.env.VITE_API_URL, {
-  withCredentials: true
-});
+import socket from '../socket';
 
 const Navbar = () => {
   const navigate = useNavigate();
