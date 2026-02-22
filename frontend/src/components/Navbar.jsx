@@ -5,7 +5,9 @@ import { Bell, BellDot, Check, ShoppingBag, MessageCircle, MessageSquare, Trash2
 import { io } from 'socket.io-client'; 
 import api from '../api/axios';
 
-const socket = io('http://localhost:5000');
+const socket = io(import.meta.env.VITE_API_URL, {
+  withCredentials: true
+});
 
 const Navbar = () => {
   const navigate = useNavigate();
