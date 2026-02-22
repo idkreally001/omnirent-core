@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { io } from 'socket.io-client';
+import socket from '../socket';
 import api from '../api/axios';
 import { 
   Send, 
@@ -12,7 +12,6 @@ import {
   CheckCheck 
 } from 'lucide-react';
 
-const socket = io('http://localhost:5000');
 
 export default function ChatPage() {
   const [searchParams] = useSearchParams();
