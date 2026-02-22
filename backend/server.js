@@ -3,6 +3,10 @@ const cors = require('cors');
 require('dotenv').config();
 const http = require('http');
 const { Server } = require('socket.io');
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://omnirent-core.vercel.app"
+];
 
 // Routes
 const authRoutes = require('./src/api/routes/auth.routes');
@@ -24,11 +28,6 @@ const io = new Server(server, {
     credentials: true
   }
 });
-
-const allowedOrigins = [
-  "http://localhost:5173",
-  "https://omnirent-core.vercel.app"
-];
 
 const PORT = process.env.PORT || 5000;
 
