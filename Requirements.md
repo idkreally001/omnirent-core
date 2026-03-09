@@ -1,3 +1,37 @@
+## **System Vision & Strategic Objectives**
+
+### **1. System Definition**
+
+OmniRent is a secure, full-stack peer-to-peer (P2P) rental marketplace designed to facilitate the exchange of assets between owners and renters. Built on a foundation of identity and trust, the system provides a modular architecture that integrates secure communication, financial escrow, and asset discovery into a single ecosystem.
+
+### **2. Strategic Objectives (Aims)**
+
+The project aims to modernize the collaborative economy by meeting the following high-level objectives:
+
+#### **2.1 Establishing Verified Trust**
+
+* The system shall serve as a "Trust Engine" by verifying user identities through a pluggable service-adapter architecture.
+
+
+* The system shall transition from a model of forced identity to a "Freemium Trust Model," allowing for friction-less onboarding while incentivizing verification for high-value transactions.
+
+#### **2.2 Professional Asset Management**
+
+* The system shall provide users with professional-grade tools to manage their physical inventory as a digital marketplace.
+* The system shall ensure absolute data persistence through soft-deletion strategies, allowing for a permanent audit trail of all listed assets.
+
+#### **2.3 Secure Transactional Integrity**
+
+* The system shall facilitate a secure "Escrow Handshake" to protect both the owner's assets and the renter's funds during the rental lifecycle.
+* The system shall utilize ACID-compliant database operations to guarantee that all state changes—especially financial ones—are atomic and consistent.
+
+#### **2.4 Social Governance & Communication**
+
+* The system shall foster a social ecosystem where reputation is quantified through a dual-sided review and governance system.
+* The system shall reduce transaction friction by enabling real-time, context-aware communication between peers directly within the asset-management interface.
+
+---
+
 ### **1. Functional Requirements (FR)**
 
 These define the core services the OmniRent system provides to the user.
