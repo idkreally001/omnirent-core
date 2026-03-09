@@ -56,7 +56,6 @@ These define the core services the OmniRent system provides to the user.
 * **FR-10:** The system shall restrict user reviews to only occur after a rental transaction has reached the "Completed" state.
 * **FR-11:** The system shall provide real-time peer-to-peer messaging within context-aware chat rooms for specific rental items.
 
----
 
 ### **2. Non-Functional Requirements (NFR)**
 
