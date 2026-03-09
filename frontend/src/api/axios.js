@@ -14,4 +14,17 @@ api.interceptors.request.use((config) => {
     return config;
 });
 
+
+// In frontend/src/api/axios.js
+api.interceptors.response.use(
+    (response) => response,
+    (error) => {
+        if (error.response && error.response.status === 401) {
+            localStorage.removeItem('token'); // Kill the zombie token
+            window.location.href = '/login';   // Force redirect to login
+        }
+        return Promise.reject(error);
+    }
+);
+
 export default api;
