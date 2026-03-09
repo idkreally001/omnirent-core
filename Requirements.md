@@ -1,5 +1,3 @@
----
-
 ### **1. Functional Requirements (FR)**
 
 These define the core services the OmniRent system provides to the user.
@@ -41,4 +39,3 @@ These define the quality attributes and constraints of the system.
 * **NFR-4 (Performance):** The discovery engine shall implement a 400ms debounce on search queries to minimize redundant server requests and maintain UI responsiveness.
 * **NFR-5 (Usability):** The system shall utilize responsive CSS Grid layouts and a modular UI architecture to ensure accessibility across various device types.
 
----
