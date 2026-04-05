@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS users (
     email VARCHAR(100) UNIQUE NOT NULL,
     tc_no VARCHAR(11) UNIQUE,
     password_hash TEXT NOT NULL,
-    balance DECIMAL(10, 2) DEFAULT 0.00,
+    balance INTEGER DEFAULT 0, -- Stored in Kuruş/Cents
     is_admin BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS items (
     owner_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
     title VARCHAR(255) NOT NULL,
     description TEXT,
-    price_per_day DECIMAL(10, 2) NOT NULL,
+    price_per_day INTEGER NOT NULL, -- Stored in Kuruş/Cents
     category VARCHAR(50),
     image_url TEXT,
     status VARCHAR(20) DEFAULT 'available',
@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS rentals (
     renter_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
     rental_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Added to match your psql output
     return_date TIMESTAMP NOT NULL,
-    total_price DECIMAL(10, 2) NOT NULL,
+    total_price INTEGER NOT NULL, -- Stored in Kuruş/Cents
     status VARCHAR(20) DEFAULT 'pending_handover', 
     -- 'pending_handover', 'active', 'returned_by_renter', 'completed'
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP

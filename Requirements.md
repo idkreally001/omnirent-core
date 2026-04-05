@@ -1,74 +1,84 @@
-## **System Vision & Strategic Objectives**
+# **OmniRent: Strategic Requirements Document**
 
-### **1. System Definition**
+## **1. System Vision & Strategic Objectives**
 
-OmniRent is a secure, full-stack peer-to-peer (P2P) rental marketplace designed to facilitate the exchange of assets between owners and renters. Built on a foundation of identity and trust, the system provides a modular architecture that integrates secure communication, financial escrow, and asset discovery into a single ecosystem.
+### **1.1 System Definition**
+OmniRent is a secure, full-stack peer-to-peer (P2P) rental marketplace designed to facilitate the high-trust exchange of physical assets. By integrating a modular architecture of identity verification, financial escrow, and real-time communication, OmniRent transitions the user experience from a model of "Ownership" to one of "Access".
 
-### **2. Strategic Objectives (Aims)**
-
-The project aims to modernize the collaborative economy by meeting the following high-level objectives:
-
-#### **2.1 Establishing Verified Trust**
-
-* The system shall serve as a "Trust Engine" by verifying user identities through a pluggable service-adapter architecture.
-
-
-* The system shall transition from a model of forced identity to a "Freemium Trust Model," allowing for friction-less onboarding while incentivizing verification for high-value transactions.
-
-#### **2.2 Professional Asset Management**
-
-* The system shall provide users with professional-grade tools to manage their physical inventory as a digital marketplace.
-* The system shall ensure absolute data persistence through soft-deletion strategies, allowing for a permanent audit trail of all listed assets.
-
-#### **2.3 Secure Transactional Integrity**
-
-* The system shall facilitate a secure "Escrow Handshake" to protect both the owner's assets and the renter's funds during the rental lifecycle.
-* The system shall utilize ACID-compliant database operations to guarantee that all state changes—especially financial ones—are atomic and consistent.
-
-#### **2.4 Social Governance & Communication**
-
-* The system shall foster a social ecosystem where reputation is quantified through a dual-sided review and governance system.
-* The system shall reduce transaction friction by enabling real-time, context-aware communication between peers directly within the asset-management interface.
+### **1.2 Strategic Objectives**
+* **Verified Trust Engine:** Move beyond forced identity to a "Freemium Trust Model," incentivizing verification for high-value exchanges.
+* **Transactional Integrity:** Guarantee absolute safety for both funds and assets through ACID-compliant escrow handshakes.
+* **Professional Governance:** Provide professional-grade inventory management tools with permanent audit trails via soft-deletion.
+* **Social Ecosystem:** Reduce friction through context-aware messaging and dual-sided reputation metrics.
 
 ---
 
-### **1. Functional Requirements (FR)**
+## **2. User Roles**
+* **Guest:** An unauthenticated user browsing the public marketplace.
+* **User:** A registered participant capable of funding their wallet.
+* **Owner:** A user listing their physical assets for rent.
+* **Renter:** A user borrowing assets and paying rental fees.
+* **Administrator:** A platform governor responsible for resolving disputes.
 
-These define the core services the OmniRent system provides to the user.
+---
 
-#### **1.1 Identity & Trust (Sprint 1)**
+## **3. Product Backlog (Agile User Stories)**
 
-* **FR-1:** The system shall provide a secure registration and login portal utilizing one-way password hashing via Bcryptjs.
-* **FR-2:** The system shall implement a "Freemium Trust Model" where identity verification (TC No) is optional for onboarding but required for high-trust status.
-* **FR-3:** The system shall award a "Verified" badge to users who successfully pass the Identity Service adapter logic.
-* **FR-4:** The system shall enforce a high-friction account deletion protocol requiring password re-verification.
+### **Module 1: Identity & Trust (Sprint 1 & 4)**
+* **User Story 1:** As a guest, I want to create a secure account, so that I can participate in the marketplace.
+    * **Acceptance Criteria:**
+        * Passwords are encrypted using one-way Bcryptjs hashing.
+        * The system utilizes JWT for stateless session management.
+        * Login attempts are rate-limited to prevent brute-force attacks.
+* **User Story 2:** As a user, I want to verify my identity using my TCKN, so that I can earn a "Verified" badge and access high-trust transactions.
+    * **Acceptance Criteria:**
+        * The system uses a mathematical Mod 11 checksum algorithm to validate Turkish Identity Numbers.
+        * Verification is optional for onboarding but required for high-trust status.
 
-#### **1.2 Asset Management & Discovery (Sprint 2)**
+### **Module 2: Asset Management & Discovery (Sprint 2 & 6)**
+* **User Story 3:** As an owner, I want to list my equipment with images and daily rates, so that I can monetize my idle assets.
+    * **Acceptance Criteria:**
+        * Owners can perform full CRUD operations on their listings.
+        * Daily rates are handled as integers to ensure mathematical precision.
+        * Images are compressed locally before being securely uploaded to Cloudinary.
+* **User Story 4:** As a renter, I want to search and filter the marketplace, so that I can find the specific tools I need quickly.
+    * **Acceptance Criteria:**
+        * Search queries utilize a 400ms debounce to maintain UI performance.
+        * Users can filter by category, price caps, and sorting parameters.
 
-* **FR-5:** The system shall allow users to Create, Read, Update, and Delete (CRUD) rental listings with support for image URLs.
-* **FR-6:** The system shall provide a marketplace discovery engine with multi-parameter filtering and server-side sorting.
-* **FR-7:** The system shall provide a "My Listings" dashboard that displays the real-time rental status of owned assets.
-* **FR-8:** The system shall implement "Soft Deletes" for assets to ensure transaction history is preserved in the database after removal from the public marketplace.
+### **Module 3: Transaction & Escrow (Sprint 3 & 8)**
+* **User Story 5:** As a participant, I want my funds and assets held in escrow, so that I am protected from fraud during the rental lifecycle.
+    * **Acceptance Criteria:**
+        * Rental creation is wrapped in a PostgreSQL transaction block to ensure atomicity.
+        * Funds are frozen in the system until the owner confirms the return of the asset.
+        * `FOR UPDATE` row-locking is used during balance updates to prevent double-spending.
 
-#### **1.3 Transactions & Communications (Sprints 3–5)**
+### **Module 4: Communication & Social Governance (Sprint 5 & 7)**
+* **User Story 6:** As a user, I want to receive real-time notifications, so that I am instantly aware of rental requests or status changes.
+    * **Acceptance Criteria:**
+        * The system utilizes an asynchronous Event Bus for system alerts.
+        * Actionable notifications deep-link the user directly to the required task.
+* **User Story 7:** As a renter or owner, I want to chat with my peer about a specific item, so that we can coordinate handovers easily.
+    * **Acceptance Criteria:**
+        * Messages are context-aware and linked to specific asset IDs.
+        * Read receipts (blue ticks) are updated in real-time using Focus/Blur socket logic.
 
-* **FR-9:** The system shall implement an Escrow Handshake with three states: Active, Returned, and Completed.
-* **FR-10:** The system shall restrict user reviews to only occur after a rental transaction has reached the "Completed" state.
-* **FR-11:** The system shall provide real-time peer-to-peer messaging within context-aware chat rooms for specific rental items.
+### **Module 5: Evidence & Dispute Resolution (Sprint 6, 8 & 9)**
+* **User Story 8:** As a participant, I want to log the condition of an asset during handover, so that I have evidence in case of a dispute.
+    * **Acceptance Criteria:**
+        * The system enforces pre-flight and post-flight photo uploads.
+        * Evidence images are linked to the specific `rental_id` and stored with timestamps.
+* **User Story 9:** As an administrator, I want to view side-by-side evidence, so that I can fairly resolve disputes and release escrow funds.
+    * **Acceptance Criteria:**
+        * Admins have a secure dashboard to view "Before & After" condition logs.
+        * Frozen escrow funds can only be released via Admin intervention if a dispute is open.
 
+---
 
-### **2. Non-Functional Requirements (NFR)**
+## **4. Non-Functional Requirements (Quality Attributes)**
 
-These define the quality attributes and constraints of the system.
-
-#### **2.1 Security & Reliability**
-
-* **NFR-1 (Security):** All backend API endpoints shall be protected by custom JWT (JSON Web Token) middleware to ensure stateless session integrity.
-* **NFR-2 (Reliability):** All financial and state-change operations (like rental creation) shall be wrapped in ACID-compliant PostgreSQL transaction blocks to prevent data corruption.
-* **NFR-3 (Integrity):** The system shall utilize row-locking (`FOR UPDATE`) during balance updates to prevent double-spending or race conditions.
-
-#### **2.2 Performance & Usability**
-
-* **NFR-4 (Performance):** The discovery engine shall implement a 400ms debounce on search queries to minimize redundant server requests and maintain UI responsiveness.
-* **NFR-5 (Usability):** The system shall utilize responsive CSS Grid layouts and a modular UI architecture to ensure accessibility across various device types.
-
+* **NFR-1 (Security):** All API endpoints require JWT authentication to ensure stateless session integrity.
+* **NFR-2 (Integrity):** All financial calculations must utilize integer math to prevent floating-point rounding errors.
+* **NFR-3 (Reliability):** Historical transaction records must be preserved via soft-deletion even if a listing is removed.
+* **NFR-4 (Defense):** The system must implement rate-limiting and image compression to protect server resources and cloud quotas.
+* **NFR-5 (Usability):** The interface must utilize responsive CSS Grid layouts for accessibility across mobile and desktop devices.
