@@ -39,7 +39,7 @@ export default function Browse() {
             search: searchTerm, 
             category: category !== 'All' ? category : undefined, 
             sort, 
-            maxPrice 
+            maxPrice: maxPrice * 100 // Multiply by 100: compare integer-to-integer in DB
           },
           signal: controller.signal
         });
@@ -92,7 +92,7 @@ export default function Browse() {
           <div className="w-full lg:w-1/3 px-4">
             <div className="flex justify-between items-center mb-2">
               <label className="text-[10px] font-black uppercase text-gray-400 tracking-widest flex items-center gap-2">
-                <Filter size={12} /> Max Price: <span className="text-blue-600">{maxPrice}₺</span>
+                <Filter size={12} /> Max Price: <span className="text-blue-600">{maxPrice.toFixed(2)}₺</span>
               </label>
             </div>
             <input 
@@ -198,7 +198,7 @@ export default function Browse() {
                   <div>
                     <span className="text-[10px] text-gray-400 font-black uppercase tracking-widest block mb-1">Daily Rate</span>
                     <span className={`text-3xl font-black ${item.status === 'rented' ? 'text-gray-200' : 'text-blue-600'}`}>
-                      {item.price_per_day}₺
+                      {(item.price_per_day / 100).toFixed(2)}₺
                     </span>
                   </div>
                   

@@ -103,7 +103,7 @@ export default function Home() {
                      <div className="p-6 flex flex-col flex-grow">
                          <h3 className="font-bold text-xl text-gray-900 line-clamp-1 mb-2 group-hover:text-blue-600 transition-colors">{item.title}</h3>
                          <div className="flex-grow mb-6">
-                           <p className="text-2xl font-black text-gray-900">{item.price_per_day}₺ <span className="text-sm text-gray-400 font-medium">/ day</span></p>
+                           <p className="text-2xl font-black text-gray-900">{(item.price_per_day / 100).toFixed(2)}₺ <span className="text-sm text-gray-400 font-medium">/ day</span></p>
                          </div>
                          <button 
                              onClick={() => navigate(`/item/${item.id}`)}
