@@ -14,6 +14,7 @@ import ReviewModal from '../components/ReviewModal';
 import UserReviews from '../components/profile/UserReviews';
 import PaymentModal from '../components/profile/PaymentModal';
 import ConditionUploadModal from '../components/profile/ConditionUploadModal';
+import DisputeModal from '../components/profile/DisputeModal';
 
 export default function Profile() {
   const [user, setUser] = useState(null);
@@ -27,6 +28,8 @@ export default function Profile() {
   const [evidenceRentalId, setEvidenceRentalId] = useState(null);
   const [evidenceAction, setEvidenceAction] = useState(null);
   const [activeReviewRental, setActiveReviewRental] = useState(null);
+  const [disputeRentalId, setDisputeRentalId] = useState(null);
+  const [showDisputeModal, setShowDisputeModal] = useState(false);
   const [itemToDelete, setItemToDelete] = useState(null);
   
   // FORM STATES
@@ -208,15 +211,22 @@ export default function Profile() {
     }
   };
 
-  const handleDispute = async (rentalId) => {
-    const reason = window.prompt("Please briefly explain why you are raising a dispute:");
-    if (!reason || !reason.trim()) return;
+  const handleDispute = (rentalId) => {
+    setDisputeRentalId(rentalId);
+    setShowDisputeModal(true);
+  };
 
+  const handleConfirmDispute = async (reason) => {
+    setIsLoading(true);
     try {
-      await api.post(`/rentals/${rentalId}/dispute`, { reason: reason.trim() });
+      await api.post(`/rentals/${disputeRentalId}/dispute`, { reason });
       showToast("Dispute ticket opened. Admin will review the photo logs.");
+      setShowDisputeModal(false);
+      setDisputeRentalId(null);
     } catch (err) {
       showToast(err.response?.data?.error || "Failed to submit dispute", "error");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -319,6 +329,14 @@ export default function Profile() {
           stage={evidenceAction === 'owner_confirm' ? 'return' : 'handover'}
           onClose={() => { setEvidenceRentalId(null); setEvidenceAction(null); }}
           onSuccess={handleEvidenceSuccess}
+        />
+      )}
+
+      {showDisputeModal && (
+        <DisputeModal 
+          onClose={() => { setShowDisputeModal(false); setDisputeRentalId(null); }}
+          onSubmit={handleConfirmDispute}
+          isLoading={isLoading}
         />
       )}
 
