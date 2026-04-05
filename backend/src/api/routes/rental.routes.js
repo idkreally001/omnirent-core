@@ -97,6 +97,10 @@ router.put('/:id/confirm-handover', auth, async (req, res) => {
 
         if (rental.rows.length === 0) throw new Error("Rental not found or not in 'pending_handover' state.");
 
+        // ESCROW FREEZE: Check if an active dispute exists
+        const disputeCheck = await client.query("SELECT id FROM disputes WHERE rental_id = $1 AND status = 'open'", [req.params.id]);
+        if (disputeCheck.rows.length > 0) throw new Error("Transaction frozen. Active dispute requires Administrator resolution first.");
+
         // Update rental to 'active'
         await client.query(
             "UPDATE rentals SET status = 'active' WHERE id = $1",
@@ -128,6 +132,10 @@ router.put('/:id/return', auth, async (req, res) => {
         );
 
         if (rental.rows.length === 0) throw new Error("Active rental not found or unauthorized.");
+
+        // ESCROW FREEZE: Check if an active dispute exists
+        const disputeCheck = await client.query("SELECT id FROM disputes WHERE rental_id = $1 AND status = 'open'", [req.params.id]);
+        if (disputeCheck.rows.length > 0) throw new Error("Transaction frozen. Active dispute requires Administrator resolution first.");
 
         // Update rental to 'returned_by_renter'
         await client.query(
@@ -271,6 +279,12 @@ router.post('/:id/dispute', auth, async (req, res) => {
         }
         if (status === 'completed') {
             return res.status(400).json({ error: "Cannot dispute a completely resolved rental" });
+        }
+
+        // PREVENT MULTIPLE DISPUTES
+        const existingDispute = await pool.query("SELECT id FROM disputes WHERE rental_id = $1 AND status = 'open'", [req.params.id]);
+        if (existingDispute.rows.length > 0) {
+            return res.status(400).json({ error: "An active dispute is already open for this transaction." });
         }
 
         await pool.query(
