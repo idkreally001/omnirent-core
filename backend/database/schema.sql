@@ -7,6 +7,8 @@ CREATE TABLE IF NOT EXISTS users (
     password_hash TEXT NOT NULL,
     balance DECIMAL(10, 2) DEFAULT 0.00,
     is_admin BOOLEAN DEFAULT FALSE,
+    is_email_verified BOOLEAN DEFAULT FALSE,
+    verification_token TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 

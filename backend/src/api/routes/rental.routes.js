@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const pool = require('../../db');
 const auth = require('../middleware/auth.middleware');
+const emailService = require('../../services/emailService');
 
 // POST /api/rentals
 router.post('/', auth, async (req, res) => {
@@ -12,17 +13,18 @@ router.post('/', auth, async (req, res) => {
     try {
         await client.query('BEGIN');
 
-        // 1. Fetch Item Details & Lock Row (FOR UPDATE prevents double-booking race conditions)
+        // 1. Fetch Item Details & Owner Email & Lock Row
         const dataRes = await client.query(
-            `SELECT i.owner_id, i.status, i.is_deleted, i.title, u.full_name as renter_name 
+            `SELECT i.owner_id, i.status, i.is_deleted, i.title, u.full_name as renter_name, o.full_name as owner_name, o.email as owner_email
              FROM items i 
              JOIN users u ON u.id = $2 
+             JOIN users o ON i.owner_id = o.id
              WHERE i.id = $1 FOR UPDATE`, 
             [itemId, renterId]
         );
         
         if (dataRes.rows.length === 0) throw new Error("Item or User not found");
-        const { owner_id, status, is_deleted, title, renter_name } = dataRes.rows[0];
+        const { owner_id, status, is_deleted, title, renter_name, owner_name, owner_email } = dataRes.rows[0];
 
         // 2. State & Safety Checks
         if (owner_id === renterId) throw new Error("You cannot rent your own item.");
@@ -35,7 +37,6 @@ router.post('/', auth, async (req, res) => {
         if (renterBalance < totalPrice) throw new Error(`Insufficient funds.`);
 
         // 4. Money Transfer (ESCROW)
-        // Deduct from renter. We DO NOT add to owner yet (held in system escrow implicitly).
         await client.query("UPDATE users SET balance = balance - $1 WHERE id = $2", [totalPrice, renterId]);
 
         // 5. Create Rental & Update Item
@@ -43,15 +44,19 @@ router.post('/', auth, async (req, res) => {
             "INSERT INTO rentals (item_id, renter_id, return_date, total_price, status) VALUES ($1, $2, $3, $4, 'pending_handover') RETURNING id",
             [itemId, renterId, returnDate, totalPrice]
         );
-        // We set item status to 'rented' immediately to remove it from catalog
         await client.query("UPDATE items SET status = 'rented' WHERE id = $1", [itemId]);
 
-        // 6. Notify the Owner (renter_name is now properly fetched from DB)
+        // 6. Notify the Owner (System Notification)
         const ownerNotificationMsg = `Great news! Your "${title}" has been rented by ${renter_name}.`;
         await client.query(
             "INSERT INTO notifications (user_id, type, message, related_id) VALUES ($1, $2, $3, $4)",
             [owner_id, 'ITEM_RENTED', ownerNotificationMsg, rentalRes.rows[0].id]
         );
+
+        // 📧 NEW: Notify Owner via Email
+        emailService.sendRentalRequestAlert(owner_email, owner_name, title, renter_name, totalPrice).catch(err => {
+            console.error("Owner alert email failed:", err);
+        });
 
         await client.query('COMMIT');
         res.json({ message: "Rental successful!" });
@@ -159,19 +164,22 @@ router.put('/:id/confirm-receipt', auth, async (req, res) => {
     try {
         await client.query('BEGIN');
 
-        // Verify the user owns the item and GET the renter_id for the notification
+        // Verify the user owns the item and GET the emails for receipts
         const rentalCheck = await client.query(
-            `SELECT r.id, r.item_id, r.renter_id, i.owner_id 
+            `SELECT r.id, r.item_id, r.renter_id, r.total_price, i.owner_id, i.title,
+                    u.full_name as renter_name, u.email as renter_email,
+                    o.full_name as owner_name, o.email as owner_email
              FROM rentals r 
              JOIN items i ON r.item_id = i.id 
+             JOIN users u ON r.renter_id = u.id
+             JOIN users o ON i.owner_id = o.id
              WHERE r.id = $1 AND r.status = 'returned_by_renter'`,
             [req.params.id]
         );
 
         if (rentalCheck.rows.length === 0) throw new Error("Rental not found or not in 'returned' state.");
         
-        // Destructure the data from the query result
-        const { item_id, renter_id, owner_id } = rentalCheck.rows[0];
+        const { item_id, renter_id, owner_id, total_price, title, renter_name, renter_email, owner_name, owner_email } = rentalCheck.rows[0];
 
         if (owner_id !== req.user.id) return res.status(403).json({ error: "Unauthorized" });
 
@@ -181,26 +189,26 @@ router.put('/:id/confirm-receipt', auth, async (req, res) => {
             [req.params.id]
         );
         if (disputeCheck.rows.length > 0) {
-            throw new Error("Escrow is currently frozen due to an active dispute. Platform logic is paused until an Administrator resolves the ticket.");
+            throw new Error("Escrow is currently frozen due to an active dispute.");
         }
 
-        // Get Escrow Funds
-        const rentDetails = await client.query("SELECT total_price FROM rentals WHERE id = $1", [req.params.id]);
-        const escrowAmount = rentDetails.rows[0].total_price;
-
         // Finalize: Release Escrow to Owner
-        await client.query("UPDATE users SET balance = balance + $1 WHERE id = $2", [escrowAmount, owner_id]);
+        await client.query("UPDATE users SET balance = balance + $1 WHERE id = $2", [total_price, owner_id]);
         
         // Finalize: Rental is completed, Item is available again
         await client.query("UPDATE rentals SET status = 'completed' WHERE id = $1", [req.params.id]);
         await client.query("UPDATE items SET status = 'available' WHERE id = $1", [item_id]);
 
-        // Trigger Notification for the Renter (renter_id is now defined!)
-        const notificationMsg = `Your return for item #${item_id} has been confirmed! Please rate the owner.`;
+        // Trigger Notification for the Renter
+        const notificationMsg = `Your return for "${title}" has been confirmed! Please rate the owner.`;
         await client.query(
             "INSERT INTO notifications (user_id, type, message, related_id) VALUES ($1, $2, $3, $4)",
             [renter_id, 'RETURN_CONFIRMED', notificationMsg, req.params.id]
         );
+
+        // 📧 NEW: Send Receipts (Renter gets it as a payment record, Owner as an earnings record)
+        emailService.sendRentalReceipt(renter_email, renter_name, 'Renter', title, total_price, req.params.id).catch(e => console.error(e));
+        emailService.sendRentalReceipt(owner_email, owner_name, 'Owner', title, total_price, req.params.id).catch(e => console.error(e));
 
         await client.query('COMMIT');
         res.json({ message: "Return confirmed! Item is back on the market." });

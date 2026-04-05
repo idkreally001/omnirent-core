@@ -5,6 +5,7 @@
 const request = require('supertest');
 const { app } = require('../server');
 const pool = require('../src/db');
+const authService = require('../src/services/auth.service');
 
 /**
  * Truncates all tables between tests for isolation.
@@ -19,12 +20,19 @@ const truncateAll = async () => {
 
 /**
  * Registers a test user and returns their token + user data.
+ * Auto-verifies the user to keep existing tests functional.
  */
 const createTestUser = async (fullName = 'Test User', email = 'test@test.com', password = 'Password123') => {
     const res = await request(app)
         .post('/api/auth/register')
         .send({ fullName, email, password });
-    return { token: res.body.token, user: res.body.user };
+    
+    // 📧 AUTO-VERIFY in DB for tests
+    await pool.query("UPDATE users SET is_email_verified = TRUE WHERE id = $1", [res.body.user.id]);
+    
+    // Manually generate token since registration no longer returns it
+    const token = authService.generateToken(res.body.user.id);
+    return { token, user: res.body.user };
 };
 
 /**

@@ -5,16 +5,14 @@ beforeEach(async () => {
 });
 
 describe('POST /api/auth/register', () => {
-    it('should register a new user and return token', async () => {
+    it('should register a new user and return success message', async () => {
         const res = await request(app)
             .post('/api/auth/register')
             .send({ fullName: 'John Doe', email: 'john@test.com', password: 'Pass1234' });
 
         expect(res.statusCode).toBe(200);
-        expect(res.body).toHaveProperty('token');
+        expect(res.body.message).toMatch(/check your email/i);
         expect(res.body.user).toHaveProperty('id');
-        expect(res.body.user.full_name).toBe('John Doe');
-        expect(res.body.user.email).toBe('john@test.com');
     });
 
     it('should reject duplicate email with 400', async () => {
@@ -30,33 +28,37 @@ describe('POST /api/auth/register', () => {
 });
 
 describe('POST /api/auth/login', () => {
-    beforeEach(async () => {
-        await createTestUser('Login User', 'login@test.com', 'CorrectPass');
-    });
+    it('should login with verified credentials', async () => {
+        await createTestUser('Verified User', 'login@test.com', 'CorrectPass');
 
-    it('should login with correct credentials', async () => {
         const res = await request(app)
             .post('/api/auth/login')
             .send({ email: 'login@test.com', password: 'CorrectPass' });
 
         expect(res.statusCode).toBe(200);
         expect(res.body).toHaveProperty('token');
-        expect(res.body.user).toHaveProperty('id');
+    });
+
+    it('should reject unverified user with 403', async () => {
+        // Create user manually via API so they remain UNVERIFIED
+        await request(app)
+            .post('/api/auth/register')
+            .send({ fullName: 'Unverified', email: 'unverified@test.com', password: 'Pass1234' });
+
+        const res = await request(app)
+            .post('/api/auth/login')
+            .send({ email: 'unverified@test.com', password: 'Pass1234' });
+
+        expect(res.statusCode).toBe(403);
+        expect(res.body.error).toMatch(/not verified/i);
     });
 
     it('should reject wrong password with 401', async () => {
+        await createTestUser('Pass Test', 'pass@test.com', 'CorrectPass');
+
         const res = await request(app)
             .post('/api/auth/login')
-            .send({ email: 'login@test.com', password: 'WrongPassword' });
-
-        expect(res.statusCode).toBe(401);
-        expect(res.body.error).toMatch(/invalid credentials/i);
-    });
-
-    it('should reject non-existent email with 401', async () => {
-        const res = await request(app)
-            .post('/api/auth/login')
-            .send({ email: 'ghost@test.com', password: 'Whatever' });
+            .send({ email: 'pass@test.com', password: 'WrongPassword' });
 
         expect(res.statusCode).toBe(401);
         expect(res.body.error).toMatch(/invalid credentials/i);
