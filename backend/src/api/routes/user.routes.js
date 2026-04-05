@@ -124,7 +124,7 @@ router.delete('/delete-account', auth, async (req, res) => {
         if (userResult.rows.length === 0) return res.status(404).json({ error: "User not found" });
 
         const isMatch = await bcrypt.compare(password, userResult.rows[0].password_hash);
-        if (!isMatch) return res.status(401).json({ error: "Incorrect password." });
+        if (!isMatch) return res.status(400).json({ error: "Incorrect password." });
 
         await pool.query("DELETE FROM users WHERE id = $1", [req.user.id]);
         res.json({ message: "Account deleted." });
