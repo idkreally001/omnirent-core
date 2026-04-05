@@ -6,17 +6,22 @@ import { User, Star, Calendar, CheckCircle2, MessageSquare } from 'lucide-react'
 export default function PublicProfile() {
   const { id } = useParams();
   const [data, setData] = useState(null);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchPublicData = async () => {
       try {
         const res = await api.get(`/user/public/${id}`);
         setData(res.data);
-      } catch (err) { console.error(err); }
+      } catch (err) { 
+        console.error(err); 
+        setError("User profile not found or does not exist.");
+      }
     };
     fetchPublicData();
   }, [id]);
 
+  if (error) return <div className="text-center mt-20 font-black text-red-500 text-sm uppercase tracking-widest">{error}</div>;
   if (!data) return <div className="text-center mt-20 animate-pulse font-black text-gray-400 text-sm uppercase tracking-widest">Loading Trust Profile...</div>;
 
   const { user, reviews } = data;

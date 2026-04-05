@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const rateLimit = require('express-rate-limit');
 require('dotenv').config();
 const http = require('http');
 const { Server } = require('socket.io');
@@ -16,6 +17,7 @@ const rentalRoutes = require('./src/api/routes/rental.routes');
 const notificationRoutes = require('./src/api/routes/notification.routes');
 const reviewRoutes = require('./src/api/routes/review.routes');
 const messageRoutes = require('./src/api/routes/message.routes');
+const adminRoutes = require('./src/api/routes/admin.routes');
 
 const initDB = require('./src/db/init');
 
@@ -45,13 +47,26 @@ app.use((req, res, next) => {
   next();
 });
 
-// 3. Logging
-app.use((req, res, next) => {
-    console.log(`Incoming Request: ${req.method} ${req.url}`);
-    next();
+// 3. Logging (Disabled to reduce noise)
+// app.use((req, res, next) => {
+//     console.log(`Incoming Request: ${req.method} ${req.url}`);
+//     next();
+// });
+
+// 4. Rate Limiting (The "Wall")
+// Limits each IP to 150 requests per 15 minutes window
+const apiLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, 
+    max: 150, 
+    message: { error: "Too many requests from this IP, please try again after 15 minutes." },
+    standardHeaders: true, 
+    legacyHeaders: false, 
 });
 
-// 4. Routes
+// Apply rate limiter to all API routes
+app.use('/api/', apiLimiter);
+
+// 5. Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/items', itemRoutes);
@@ -59,6 +74,7 @@ app.use('/api/rentals', rentalRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/messages', messageRoutes);
+app.use('/api/admin', adminRoutes);
 
 // 5. Socket Logic
 io.on('connection', (socket) => {

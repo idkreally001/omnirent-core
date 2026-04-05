@@ -9,9 +9,10 @@ const { verifyIdentity } = require('../../services/identity/identity.service');
 router.get('/profile', auth, async (req, res) => {
     try {
         const user = await pool.query(
-            `SELECT u.id, u.full_name, u.email, u.created_at, u.balance, u.tc_no,
+            `SELECT u.id, u.full_name, u.email, u.created_at, u.balance, u.tc_no, u.is_admin,
                     COALESCE(AVG(rev.rating), 0) as avg_rating,
-                    COUNT(rev.id) as review_count
+                    COUNT(rev.id) as review_count,
+                    (SELECT COALESCE(SUM(r.total_price), 0) FROM rentals r JOIN items i ON r.item_id = i.id WHERE i.owner_id = u.id AND r.status IN ('active', 'returned_by_renter')) as pending_escrow
              FROM users u
              LEFT JOIN reviews rev ON u.id = rev.target_user_id
              WHERE u.id = $1
@@ -26,6 +27,11 @@ router.get('/profile', auth, async (req, res) => {
 
 // 2. GET Public Profile (for other users to view) - NEW
 router.get('/public/:id', async (req, res) => {
+    const userId = parseInt(req.params.id, 10);
+    if (isNaN(userId)) {
+        return res.status(400).json({ error: "Invalid User Profile ID." });
+    }
+
     try {
         const profile = await pool.query(
             `SELECT u.id, u.full_name, u.created_at, u.tc_no,
@@ -34,15 +40,19 @@ router.get('/public/:id', async (req, res) => {
              FROM users u
              LEFT JOIN reviews rev ON u.id = rev.target_user_id
              WHERE u.id = $1
-             GROUP BY u.id`, [req.params.id]
+             GROUP BY u.id`, [userId]
         );
+        
+        if (profile.rows.length === 0) {
+            return res.status(404).json({ error: "User not found" });
+        }
 
         const reviews = await pool.query(
             `SELECT r.rating, r.comment, r.created_at, u.full_name as reviewer_name
              FROM reviews r
              JOIN users u ON r.reviewer_id = u.id
              WHERE r.target_user_id = $1
-             ORDER BY r.created_at DESC`, [req.params.id]
+             ORDER BY r.created_at DESC`, [userId]
         );
 
         res.json({ user: profile.rows[0], reviews: reviews.rows });
@@ -130,6 +140,29 @@ router.get('/my-reviews', auth, async (req, res) => {
             [req.user.id]
         );
         res.json(result.rows);
+    } catch (err) {
+        res.status(500).send("Server Error");
+    }
+});
+
+// POST /api/user/escalate (Become Admin using a secret key)
+router.post('/escalate', auth, async (req, res) => {
+    const { secret } = req.body;
+    
+    const validSecret = process.env.ADMIN_SECRET;
+    
+    // Server misconfiguration defense: do not allow escalation if no secret is set
+    if (!validSecret) {
+        return res.status(500).json({ error: "Administrator escalation is not configured on this server." });
+    }
+    
+    if (secret !== validSecret) {
+        return res.status(401).json({ error: "Invalid administrator secret key." });
+    }
+
+    try {
+        await pool.query("UPDATE users SET is_admin = true WHERE id = $1", [req.user.id]);
+        res.json({ message: "Privileges escalated. You are now an Administrator." });
     } catch (err) {
         res.status(500).send("Server Error");
     }

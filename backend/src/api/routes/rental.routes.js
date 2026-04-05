@@ -33,9 +33,9 @@ router.post('/', auth, async (req, res) => {
         const renterBalance = parseFloat(renterRes.rows[0].balance);
         if (renterBalance < totalPrice) throw new Error(`Insufficient funds.`);
 
-        // 4. Money Transfer
+        // 4. Money Transfer (ESCROW)
+        // Deduct from renter. We DO NOT add to owner yet (held in system escrow implicitly).
         await client.query("UPDATE users SET balance = balance - $1 WHERE id = $2", [totalPrice, renterId]);
-        await client.query("UPDATE users SET balance = balance + $1 WHERE id = $2", [totalPrice, owner_id]);
 
         // 5. Create Rental & Update Item
         const rentalRes = await client.query(
@@ -136,6 +136,13 @@ router.put('/:id/confirm-receipt', auth, async (req, res) => {
 
         if (owner_id !== req.user.id) return res.status(403).json({ error: "Unauthorized" });
 
+        // Get Escrow Funds
+        const rentDetails = await client.query("SELECT total_price FROM rentals WHERE id = $1", [req.params.id]);
+        const escrowAmount = rentDetails.rows[0].total_price;
+
+        // Finalize: Release Escrow to Owner
+        await client.query("UPDATE users SET balance = balance + $1 WHERE id = $2", [escrowAmount, owner_id]);
+        
         // Finalize: Rental is completed, Item is available again
         await client.query("UPDATE rentals SET status = 'completed' WHERE id = $1", [req.params.id]);
         await client.query("UPDATE items SET status = 'available' WHERE id = $1", [item_id]);
@@ -174,6 +181,73 @@ router.get('/my-lendings', auth, async (req, res) => {
         res.json(result.rows);
     } catch (err) {
         console.error("Lending History Error:", err.message);
+        res.status(500).send("Server Error");
+    }
+});
+
+// POST /api/rentals/:id/evidence -> Upload pre-flight / post-flight condition images
+router.post('/:id/evidence', auth, async (req, res) => {
+    let { images, stage } = req.body;
+    if (!images || !Array.isArray(images) || images.length === 0) {
+        return res.status(400).json({ error: "No images provided" });
+    }
+    if (!['handover', 'return'].includes(stage)) {
+        return res.status(400).json({ error: "Invalid stage. Must be 'handover' or 'return'" });
+    }
+
+    try {
+        const insertPromises = images.map(url => 
+            pool.query(
+                "INSERT INTO rental_evidence (rental_id, uploaded_by, stage, image_url) VALUES ($1, $2, $3, $4)",
+                [req.params.id, req.user.id, stage, url]
+            )
+        );
+        await Promise.all(insertPromises);
+        res.json({ message: "Evidence uploaded successfully" });
+    } catch (err) {
+        console.error("Evidence Upload Error:", err.message);
+        res.status(500).send("Server Error");
+    }
+});
+
+// POST /api/rentals/:id/dispute -> Raise a dispute
+router.post('/:id/dispute', auth, async (req, res) => {
+    const { reason } = req.body;
+    if (!reason) return res.status(400).json({ error: "Dispute reason is required" });
+
+    try {
+        // Verify user is involved in rental
+        const rentalCheck = await pool.query(
+            `SELECT r.id, i.owner_id, r.renter_id, r.status 
+             FROM rentals r JOIN items i ON r.item_id = i.id 
+             WHERE r.id = $1`, [req.params.id]
+        );
+        
+        if (rentalCheck.rows.length === 0) return res.status(404).json({ error: "Rental not found" });
+        const { owner_id, renter_id, status } = rentalCheck.rows[0];
+        
+        if (req.user.id !== owner_id && req.user.id !== renter_id) {
+            return res.status(403).json({ error: "Unauthorized" });
+        }
+        if (status === 'completed') {
+            return res.status(400).json({ error: "Cannot dispute a completely resolved rental" });
+        }
+
+        await pool.query(
+            "INSERT INTO disputes (rental_id, raised_by, reason) VALUES ($1, $2, $3)",
+            [req.params.id, req.user.id, reason]
+        );
+
+        // Notify all admins about the new dispute
+        const adminNotificationMsg = `🚨 DISPUTE RAISED on Rental #${req.params.id}. Evidence required.`;
+        await pool.query(`
+            INSERT INTO notifications (user_id, type, message, related_id)
+            SELECT id, 'DISPUTE_ESCALATION', $1, $2 FROM users WHERE is_admin = true
+        `, [adminNotificationMsg, req.params.id]);
+
+        res.json({ message: "Dispute raised successfully. An admin will review the evidence." });
+    } catch (err) {
+        console.error("Dispute Error:", err.message);
         res.status(500).send("Server Error");
     }
 });

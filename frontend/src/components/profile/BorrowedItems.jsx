@@ -1,6 +1,10 @@
-import { ShoppingBag, Clock, CheckCircle2, AlertCircle } from 'lucide-react';
+import { ShoppingBag, Clock, CheckCircle2, AlertCircle, AlertTriangle } from 'lucide-react';
 
-export default function BorrowedItems({ myRentals, onReturn }) {
+export default function BorrowedItems({ myRentals, onReturn, onDispute }) {
+  const isOverdue = (returnDate, status) => {
+    return status === 'active' && new Date(returnDate) < new Date();
+  };
+
   const activeRentals = myRentals.filter(r => r.status === 'active' || r.status === 'returned_by_renter');
   const historyRentals = myRentals.filter(r => r.status === 'completed');
 
@@ -23,7 +27,7 @@ export default function BorrowedItems({ myRentals, onReturn }) {
             <div className="space-y-4">
                <h4 className="text-[10px] font-black uppercase text-blue-600 tracking-widest mb-2">Currently Borrowing</h4>
                {activeRentals.map(rental => (
-                 <RentalCard key={rental.id} rental={rental} onReturn={() => onReturn(rental.id)} isActive={true} />
+                 <RentalCard key={rental.id} rental={rental} onReturn={() => onReturn(rental.id)} onDispute={() => onDispute(rental.id)} isActive={true} />
                ))}
             </div>
           )}
@@ -42,8 +46,9 @@ export default function BorrowedItems({ myRentals, onReturn }) {
   );
 }
 
-function RentalCard({ rental, onReturn, isActive }) {
+function RentalCard({ rental, onReturn, onDispute, isActive }) {
   const isPending = rental.status === 'returned_by_renter';
+  const isOverdue = isActive && new Date(rental.return_date) < new Date();
   return (
     <div className={`flex items-center justify-between p-4 rounded-2xl border transition-all ${isPending ? 'bg-orange-50 border-orange-200 opacity-80' : isActive ? 'bg-gray-50 border-gray-100 hover:border-blue-100' : 'bg-gray-50/50 border-gray-100 opacity-60'}`}>
       <div className="flex items-center gap-4">
@@ -52,23 +57,28 @@ function RentalCard({ rental, onReturn, isActive }) {
         </div>
         <div>
           <p className="font-bold text-gray-900 text-sm line-clamp-1">{rental.title}</p>
-          <div className="flex items-center gap-2 text-[10px] text-gray-500 font-bold uppercase">
-            {isPending ? <AlertCircle size={12} className="text-orange-500" /> : isActive ? <Clock size={12} /> : <CheckCircle2 size={12} />}
-            {isPending ? <span className="text-orange-600">Pending Confirmation</span> : isActive ? `Return: ${new Date(rental.return_date).toLocaleDateString()}` : `Returned`}
+          <div className={`flex items-center gap-2 text-[10px] font-bold uppercase ${isOverdue ? 'text-red-500' : 'text-gray-500'}`}>
+            {isPending ? <AlertCircle size={12} className="text-orange-500" /> : isOverdue ? <AlertCircle size={12} className="animate-pulse" /> : isActive ? <Clock size={12} /> : <CheckCircle2 size={12} />}
+            {isPending ? <span className="text-orange-600">Pending Confirmation</span> : isOverdue ? <span>OVERDUE! Return ASAP</span> : isActive ? `Return: ${new Date(rental.return_date).toLocaleDateString()}` : `Returned`}
           </div>
         </div>
       </div>
       <div className="text-right flex flex-col items-end gap-2">
         <div>
           <p className="text-xs font-black text-gray-900">{rental.total_price}₺</p>
-          <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded ${isActive ? 'text-green-600 bg-green-100' : 'text-gray-500 bg-gray-200'}`}>
-            {isPending ? 'Pending' : isActive ? 'Active' : 'Completed'}
+          <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded ${isOverdue ? 'text-white bg-red-500 shadow-lg shadow-red-200 animate-pulse' : isPending ? 'text-orange-600 bg-orange-100' : isActive ? 'text-green-600 bg-green-100' : 'text-gray-500 bg-gray-200'}`}>
+            {isOverdue ? 'OVERDUE' : isPending ? 'Pending' : isActive ? 'Active' : 'Completed'}
           </span>
         </div>
         {!isPending && isActive && (
-          <button onClick={onReturn} className="text-[10px] font-black uppercase text-blue-600 hover:text-white bg-blue-50 hover:bg-blue-600 px-3 py-1.5 rounded-lg transition-all shadow-sm">
-            Return Item
-          </button>
+          <div className="flex gap-2">
+            <button onClick={onDispute} className="text-[10px] font-black uppercase text-red-600 hover:bg-red-50 px-2 py-1.5 rounded-lg transition-all shadow-sm flex items-center justify-center">
+              <AlertTriangle size={14} />
+            </button>
+            <button onClick={onReturn} className="text-[10px] font-black uppercase text-blue-600 hover:text-white bg-blue-50 hover:bg-blue-600 px-3 py-1.5 rounded-lg transition-all shadow-sm">
+              Return Item
+            </button>
+          </div>
         )}
       </div>
     </div>

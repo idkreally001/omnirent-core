@@ -12,6 +12,8 @@ import LendingHistory from '../components/profile/LendingHistory';
 import VerificationModal from '../components/profile/VerificationModal';
 import ReviewModal from '../components/ReviewModal'; 
 import UserReviews from '../components/profile/UserReviews';
+import PaymentModal from '../components/profile/PaymentModal';
+import ConditionUploadModal from '../components/profile/ConditionUploadModal';
 
 export default function Profile() {
   const [user, setUser] = useState(null);
@@ -21,6 +23,9 @@ export default function Profile() {
   // MODAL STATES
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showVerifyModal, setShowVerifyModal] = useState(false);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [evidenceRentalId, setEvidenceRentalId] = useState(null);
+  const [evidenceAction, setEvidenceAction] = useState(null);
   const [activeReviewRental, setActiveReviewRental] = useState(null);
   const [itemToDelete, setItemToDelete] = useState(null);
   
@@ -62,7 +67,9 @@ export default function Profile() {
       setMyReviews(reviewsRes.data);
     } catch (err) { 
       console.error("Session expired or fetch failed", err);
-      window.location.href = '/login'; 
+      // Removed hard redirect to /login to prevent infinite loops on 500 Server Errors. 
+      // 401 Unauthorized errors are handled securely by the global Axios interceptor.
+      showToast("System error: Could not fetch profile data.", "error");
     }
   };
 
@@ -90,13 +97,16 @@ export default function Profile() {
     window.location.href = '/'; 
   };
 
-  const handleAddFunds = async () => {
+  const handleAddFundsSuccess = async (amount) => {
     try {
-      await api.post('/user/add-funds', { amount: 500 });
-      setUser(prev => ({ ...prev, balance: Number(prev.balance) + 500 }));
-      showToast("500₺ added to wallet!");
+      await api.post('/user/add-funds', { amount });
+      setUser(prev => ({ ...prev, balance: Number(prev.balance) + amount }));
+      setShowPaymentModal(false);
+      showToast(`${amount}₺ added to balance!`);
     } catch (err) {
-      showToast("Failed to add funds", "error");
+      showToast("Failed to process payment with our gateway.", "error");
+    } finally {
+      setIsLoading(false); // Clean up loading state coming from modal
     }
   };
 
@@ -146,6 +156,11 @@ export default function Profile() {
     }
   };
 
+  const handleInitiateReturn = (rentalId) => {
+    setEvidenceRentalId(rentalId);
+    setEvidenceAction('renter_return');
+  };
+
   const handleReturn = async (rentalId) => {
     try {
       await api.put(`/rentals/${rentalId}/return`);
@@ -158,6 +173,21 @@ export default function Profile() {
     }
   };
 
+  const handleInitiateConfirmReceipt = (rentalId) => {
+    setEvidenceRentalId(rentalId);
+    setEvidenceAction('owner_confirm');
+  };
+
+  const handleEvidenceSuccess = async () => {
+    if (evidenceAction === 'renter_return') {
+       await handleReturn(evidenceRentalId);
+    } else if (evidenceAction === 'owner_confirm') {
+       await handleConfirmReceipt(evidenceRentalId);
+    }
+    setEvidenceRentalId(null);
+    setEvidenceAction(null);
+  };
+
   const handleConfirmReceipt = async (rentalId) => {
     try {
       await api.put(`/rentals/${rentalId}/confirm-receipt`);
@@ -165,6 +195,18 @@ export default function Profile() {
       fetchProfileData();
     } catch (err) {
       showToast("Failed to confirm receipt", "error");
+    }
+  };
+
+  const handleDispute = async (rentalId) => {
+    const reason = window.prompt("Please briefly explain why you are raising a dispute:");
+    if (!reason || !reason.trim()) return;
+
+    try {
+      await api.post(`/rentals/${rentalId}/dispute`, { reason: reason.trim() });
+      showToast("Dispute ticket opened. Admin will review the photo logs.");
+    } catch (err) {
+      showToast(err.response?.data?.error || "Failed to submit dispute", "error");
     }
   };
 
@@ -183,7 +225,7 @@ export default function Profile() {
         <div className="md:col-span-4 lg:col-span-3">
           <ProfileSidebar 
             user={user} 
-            onAddFunds={handleAddFunds} 
+            onAddFunds={() => setShowPaymentModal(true)} 
             onVerifyClick={() => setShowVerifyModal(true)} 
             onLogout={handleLogout} 
             onDeleteClick={() => setShowDeleteModal(true)} 
@@ -198,11 +240,12 @@ export default function Profile() {
           
           {/* Main Grid: Active Business */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <BorrowedItems myRentals={myRentals} onReturn={handleReturn} />
+            <BorrowedItems myRentals={myRentals} onReturn={handleInitiateReturn} onDispute={handleDispute} />
             <MyListings 
               myItems={myItems} 
               onItemDeleteClick={setItemToDelete} 
-              onConfirmReceipt={handleConfirmReceipt} 
+              onConfirmReceipt={handleInitiateConfirmReceipt} 
+              onDispute={handleDispute}
             />
           </div>
 
@@ -227,6 +270,15 @@ export default function Profile() {
 
       {/* --- MODALS & NOTIFICATIONS --- */}
       
+      {showPaymentModal && (
+        <PaymentModal
+           onClose={() => setShowPaymentModal(false)}
+           onSuccess={handleAddFundsSuccess}
+           isLoading={isLoading}
+           setIsLoading={setIsLoading}
+        />
+      )}
+
       {showVerifyModal && (
         <VerificationModal 
           onClose={() => setShowVerifyModal(false)}
@@ -243,6 +295,15 @@ export default function Profile() {
           itemTitle={activeReviewRental.title}
           onClose={() => { setActiveReviewRental(null); setSearchParams({}); }}
           onSuccess={handleReviewSuccess}
+        />
+      )}
+
+      {evidenceRentalId && (
+        <ConditionUploadModal 
+          rentalId={evidenceRentalId}
+          stage={evidenceAction === 'owner_confirm' ? 'return' : 'handover'}
+          onClose={() => { setEvidenceRentalId(null); setEvidenceAction(null); }}
+          onSuccess={handleEvidenceSuccess}
         />
       )}
 

@@ -150,26 +150,50 @@ Messaging reduced friction between users, transforming the platform into a true 
 
 ---
 
-# Sprint 6 — The Production Readiness Module (Current)
+# Sprint 6 — The Production Readiness Module
 
-**Focus:** Optimize dashboard performance, modularize architecture, and prepare system for real-world deployment.
+**Focus:** Optimize dashboard performance, secure asset condition, and integrate formal governance models for enterprise deployment.
 
 ## ✅ What We Implemented
 
-### Component Decomposition & UI Scaling
+### Governance & Dispute Resolution
+* **Trust & Safety Engine:** Built a dedicated `/admin` dashboard protected by a bespoke backend validation middleware.
+* **Dispute Escalation:** Implemented decision-grade logic where admins judge Side-by-Side "Before & After" photo condition logs to finalize escrow outcomes.
 
-* Decomposed monolithic pages into an atomic structure (`ProfileSidebar.jsx`, `MyListings.jsx`, `LendingHistory.jsx`).
-* Implemented a Multi-Column Dashboard using responsive CSS Grid and `no-scrollbar` utility containers.
-* Standardized modals across the platform.
+### Media & Asset Evidence
+* **Condition Logging:** Enforced users (Renters & Owners) to log the physical state of equipment during handovers and returns.
+* **Canvas Compression:** Developed a browser-native image compression utility (`imageCompression.js`) to minimize high-resolution file weight before Cloudinary persistence.
 
-## 📌 Planned Features
+### UX Scaling & Real-World Simulation
+* **Mock Checkout Flow:** Created a premium-feel `PaymentModal` with card masking and MM/YY validation templates.
+* **Component Refactor:** Decomposed the profile into an atomic structure of reusable atoms, including `ProfileSidebar.jsx` and `MyListings.jsx`.
 
-* Implement formal Dispute Resolution dashboard.
-* Integrate real payment processing (Stripe/PayPal Mock).
-* Add "Typing..." indicators to real-time chat.
+## ⚠️ Problems Faced & Fixes
+* **Network Payload Congestion:** Solved via frontend-side Canvas resizing and quality reduction.
+* **Action State Management:** Stabilized complex profile state machine using localized modal coordination logic in `Profile.jsx`.
+* **Database Schema Synchronization:** Fixed 500 errors by writing a hotfix migration script to add missing schema fields (`resolution`, `admin_notes`) that initial `CREATE TABLE IF NOT EXISTS` commands had bypassed.
+* **Wildcard Routing Collisions:** Prevented React Router from directing edge-case URLs into numeric backend query paths, mitigating DB casting errors through explicit integer checking and Error Boundaries.
+* **Privilege Escalation Exposure:** Hardened the admin upgrade endpoint by entirely decoupling the static master-key and relying on strict `.env` dependency parsing.
 
 ## 🔄 Reflection
+The system is now vertically scaled to handle complex P2P marketplaces with high friction, high trust, and high credibility requirements. Ready for final evaluation.
 
-Modularizing the frontend has prepared the application for scale, making it easy to plug in the remaining enterprise-level features.
+---
+
+# Sprint 7 — Defense in Depth & Quota Protection
+
+**Focus:** Neutralize edge-case exploits, protect cloud quotas, and block automated abuse.
+
+## ✅ What We Implemented
+
+### Infrastructure Protection
+* **Rate Limiting (DoS Defense):** Configured Express middleware to cap API traffic (150 requests per 15 minutes per IP), immediately walling off brute-force testing and web-scraping bots.
+* **Canvas Pre-Processing:** Upgraded the listing creation flow (`ListItem.jsx`) to a Cloudinary-powered drag-and-drop zone. High-fidelity images are flattened and compressed locally in the browser to strictly prevent adversaries from intentionally depleting free-tier S3/Cloud Storage limits.
+
+### Session Resilience
+* **Zero-Trust Identity Sync:** Hardened the backend JWT decoder middleware (`auth.middleware.js`). Valid tokens are now secondary-checked against the PostgreSQL runtime memory. The system now cleanly catches and flushes "Zombie Tokens" (sessions belonging to deleted/wiped users), completely eliminating infinite loop UI crashing.
+
+## 🔄 Reflection
+The architecture is now robust not just against happy paths, but against adversarial interaction.
 
 ---

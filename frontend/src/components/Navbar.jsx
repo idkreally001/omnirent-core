@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-// Added Trash2 to imports
-import { Bell, BellDot, Check, ShoppingBag, MessageCircle, MessageSquare, Trash2 } from 'lucide-react';
+// Added Trash2, ShieldCheck, Search to imports
+import { Bell, BellDot, Check, ShoppingBag, MessageCircle, MessageSquare, Trash2, ShieldCheck, Search } from 'lucide-react';
 import api from '../api/axios';
 import socket from '../socket';
 
@@ -12,6 +12,15 @@ const Navbar = () => {
 
   const [notifications, setNotifications] = useState([]);
   const [showNotifs, setShowNotifs] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const handleGlobalSearch = (e) => {
+    e.preventDefault();
+    if(searchQuery.trim()) {
+      navigate(`/browse?search=${encodeURIComponent(searchQuery)}`);
+      setSearchQuery("");
+    }
+  };
 
   const fetchNotifications = async () => {
     if (!token) return;
@@ -103,10 +112,30 @@ const Navbar = () => {
           </Link>
 
           <div className="flex items-center space-x-6 text-sm font-medium">
+            <form onSubmit={handleGlobalSearch} className="hidden md:flex relative items-center">
+              <Search className="absolute left-3 text-gray-400" size={16} />
+              <input 
+                type="text" 
+                placeholder="Search rentals..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-9 pr-4 py-2 bg-gray-50 border border-gray-100 rounded-full text-xs font-bold w-48 focus:w-64 transition-all outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </form>
+
             <Link to="/browse" className="text-gray-600 hover:text-blue-600 transition hidden sm:block">Browse</Link>
             
             {token ? (
               <div className="flex items-center gap-5 pl-4 border-l border-gray-200">
+                {user?.is_admin && (
+                  <Link 
+                    to="/admin" 
+                    title="Admin Dashboard"
+                    className="p-2 text-red-500 hover:text-white hover:bg-red-500 rounded-xl transition-colors"
+                  >
+                    <ShieldCheck size={20} />
+                  </Link>
+                )}
                 <Link 
                   to="/messages" 
                   className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-colors"
