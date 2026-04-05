@@ -12,21 +12,22 @@ router.post('/', auth, async (req, res) => {
     try {
         await client.query('BEGIN');
 
-        // 1. Fetch Item Title, Owner ID, AND the Renter's Full Name
+        // 1. Fetch Item Details & Lock Row (FOR UPDATE prevents double-booking race conditions)
         const dataRes = await client.query(
-            `SELECT i.owner_id, i.status, i.title, u.full_name as renter_name 
+            `SELECT i.owner_id, i.status, i.is_deleted, i.title, u.full_name as renter_name 
              FROM items i 
              JOIN users u ON u.id = $2 
-             WHERE i.id = $1`, 
+             WHERE i.id = $1 FOR UPDATE`, 
             [itemId, renterId]
         );
         
         if (dataRes.rows.length === 0) throw new Error("Item or User not found");
-        const { owner_id, status, title, renter_name } = dataRes.rows[0];
+        const { owner_id, status, is_deleted, title, renter_name } = dataRes.rows[0];
 
-        // 2. Checks
-        if (owner_id === renterId) throw new Error("Cannot rent your own item");
-        if (status !== 'available') throw new Error("Item is not available");
+        // 2. State & Safety Checks
+        if (owner_id === renterId) throw new Error("You cannot rent your own item.");
+        if (is_deleted) throw new Error("This item has been archived by the owner.");
+        if (status !== 'available') throw new Error("This item is currently unavailable or already rented.");
 
         // 3. Wallet Logic (Fetch & Lock)
         const renterRes = await client.query("SELECT balance FROM users WHERE id = $1 FOR UPDATE", [renterId]);
