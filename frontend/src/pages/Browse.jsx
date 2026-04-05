@@ -1,18 +1,27 @@
 import { useEffect, useState } from 'react';
 import api from '../api/axios';
 import { Search, Package, X, Clock, Filter, ArrowUpDown, MessageSquare } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
 export default function Browse() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [searchParams] = useSearchParams();
   
   // DISCOVERY STATES
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState(searchParams.get('search') || '');
   const [category, setCategory] = useState('All');
   const [sort, setSort] = useState('newest');
   const [maxPrice, setMaxPrice] = useState(2000);
   
+  // Sync URL search params with local state when Nav search triggers
+  useEffect(() => {
+    const query = searchParams.get('search');
+    if (query !== null) {
+      setSearchTerm(query);
+    }
+  }, [searchParams]);
+
   // Get current user to prevent self-interactions
   const currentUser = JSON.parse(localStorage.getItem('user'));
 

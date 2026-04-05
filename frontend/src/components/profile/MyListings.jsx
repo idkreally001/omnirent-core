@@ -1,6 +1,6 @@
-import { Package, Trash2, AlertCircle, User, Clock } from 'lucide-react';
+import { Package, Trash2, AlertCircle, User, Clock, AlertTriangle } from 'lucide-react';
 
-export default function MyListings({ myItems, onItemDeleteClick, onConfirmReceipt }) {
+export default function MyListings({ myItems, onItemDeleteClick, onConfirmReceipt, onDispute }) {
   return (
     <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-8">
       <div className="flex justify-between items-center mb-6">
@@ -53,12 +53,20 @@ export default function MyListings({ myItems, onItemDeleteClick, onConfirmReceip
                           <div className="flex items-center gap-2 text-orange-700 font-black text-[10px] uppercase">
                               <AlertCircle size={14} /> Action Required
                           </div>
-                          <button 
-                            onClick={() => onConfirmReceipt(item.active_rental_id)}
-                            className="bg-orange-600 text-white px-4 py-2 rounded-xl text-[10px] font-black uppercase shadow-lg shadow-orange-100 hover:bg-orange-700 transition"
-                          >
-                            Confirm Receipt
-                          </button>
+                          <div className="flex gap-2">
+                            <button 
+                              onClick={() => onDispute(item.active_rental_id)}
+                              className="bg-red-50 text-red-600 px-3 py-2 rounded-xl border border-red-200 hover:bg-red-100 transition flex items-center justify-center"
+                            >
+                              <AlertTriangle size={14} />
+                            </button>
+                            <button 
+                              onClick={() => onConfirmReceipt(item.active_rental_id)}
+                              className="bg-orange-600 text-white px-4 py-2 rounded-xl text-[10px] font-black uppercase shadow-lg shadow-orange-100 hover:bg-orange-700 transition"
+                            >
+                              Confirm Receipt
+                            </button>
+                          </div>
                       </div>
                     ) : (
                       <div className="flex justify-between items-center text-[10px]">

@@ -6,6 +6,7 @@ CREATE TABLE IF NOT EXISTS users (
     tc_no VARCHAR(11),
     password_hash TEXT NOT NULL,
     balance DECIMAL(10, 2) DEFAULT 0.00,
+    is_admin BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -65,6 +66,7 @@ CREATE TABLE IF NOT EXISTS disputes (
     raised_by INTEGER REFERENCES users(id),
     reason TEXT NOT NULL,
     status VARCHAR(20) DEFAULT 'open',
+    resolution VARCHAR(50), 
     admin_notes TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );  
@@ -79,6 +81,16 @@ CREATE TABLE IF NOT EXISTS messages (
     is_read BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     read_at TIMESTAMP
+);
+
+-- 8. Rental Evidence: Pre-Flight & Post-Flight Condition Logs
+CREATE TABLE IF NOT EXISTS rental_evidence (
+    id SERIAL PRIMARY KEY,
+    rental_id INTEGER REFERENCES rentals(id) ON DELETE CASCADE,
+    uploaded_by INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    stage VARCHAR(20) NOT NULL, -- 'handover' or 'return'
+    image_url TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 --- PERFORMANCE INDEXES ---

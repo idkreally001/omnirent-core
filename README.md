@@ -10,20 +10,22 @@ OmniRent is a high-trust, peer-to-peer (P2P) rental platform designed to transit
 
 The OmniRent platform is developed using a highly scalable, 6-module Agile architecture. Each module operates with distinct independence and objective-driven logic:
 
-1. **The Identity & Trust Module:** A secure onboarding system featuring JWT authentication, `bcryptjs` encryption, and a pluggable Service-Adapter pattern for mock vs. real government ID verification.
-2. **The Asset Management & Discovery Module:** A dynamic digital catalog featuring real-time live feeds, multi-parameter filtering, debounced search querying, and soft-delete historical preservation.
-3. **The Transaction & Escrow Module:** An ACID-compliant financial engine utilizing PostgreSQL `BEGIN/COMMIT` blocks and `FOR UPDATE` row locking to prevent double-booking and ensure secure 3-state escrow handshakes.
-4. **The Notification & Governance Module:** An asynchronous Event Bus powering real-time alerts, deep-linked actionable tasks, and a self-cleaning dual-sided social trust (rating) system.
+1. **The Identity & Trust Module:** A secure onboarding system featuring JWT authentication, mathematically accurate TCKN validation algorithms, and a pluggable Service-Adapter pattern.
+2. **The Asset Management & Discovery Module:** A dynamic digital catalog featuring real-time live feeds, multi-parameter filtering, debounced global search querying, and soft-delete historical preservation.
+3. **The Transaction & Escrow Module:** An ACID-compliant financial engine utilizing PostgreSQL `BEGIN/COMMIT` blocks securely freezing transaction funds in system proxy. Eliminates risk by holding funds until the owner and renter mutually verify condition and transfer.
+4. **The Notification & Governance Module:** An asynchronous Event Bus powering real-time system alerts, deep-linked actionable tasks, and real-time Admin Dispute broadcasts.
 5. **The Real-Time Communication Module:** A low-latency Socket.io messaging layer featuring context-aware inboxes linked to specific assets, and "Focus/Blur" logic for instant Read Receipts (blue ticks).
-6. **The Production Readiness Module:** A responsive, multi-column CSS Grid interface prepared for enterprise scaling, including scaffolded endpoints for Dispute Resolution and third-party payment gateways (Stripe/PayPal).
+6. **The Production Readiness Module:** A responsive, multi-column CSS Grid interface prepared for enterprise scaling. Includes a robust **Dispute Engine** where administrators compare condition-logging evidence to release escrow holds.
+7. **The Media & Asset Evidence Module:** A browser-native image compression system using HTML5 Canvas to optimize high-resolution proof-of-condition photos before uploading them to Cloudinary.
 
 ---
 
 ## 🛠 Tech Stack
 
-* **Frontend:** React (Vite) + Tailwind CSS + Lucide Icons
+* **Frontend:** React (Vite) + Vanilla CSS + Lucide Icons
 * **Backend:** Node.js (Express) + JWT Authentication
 * **Real-Time Layer:** Socket.io (Bi-directional communication)
+* **Media Storage:** Cloudinary (Unsigned Upload Preset)
 * **Database:** PostgreSQL 17 (Relational Schema with strict constraints)
 * **Architecture Patterns:** Service-Adapter Pattern, Event-Driven Hooks, Component Decomposition
 
@@ -74,22 +76,28 @@ This initializes the relational database schema, tables, and necessary triggers.
 
 ---
 
-### Run the Development Environment
+---
 
-#### Backend (from `/backend`)
+### ⚡️ Run the Entire Platform (Simultanous)
 
-The backend relies on atomic startup logic and auto-syncs the database.
+You can spin up both the **Frontend** and **Backend** with a single command from the root folder:
 
 ```bash
 npm run dev
-
 ```
 
-#### Frontend (from `/frontend`)
+*(On Windows, you can also simply double-click `run_omnirent.bat`)*
 
+#### Manual Execution
+
+##### Backend (from `/backend`)
+```bash
+npm start
+```
+
+##### Frontend (from `/frontend`)
 ```bash
 npm run dev
-
 ```
 
 ---
@@ -99,4 +107,6 @@ npm run dev
 OmniRent takes data integrity and peer safety seriously:
 
 * **Service-Adapter Verification:** Enables seamless transitions between mock development environments and production-grade API integrations.
-* **High-Friction Data Management:** Includes password-verified account deletion and owner-protected inventory guards to prevent accidental data loss during active transactions.
+* **Escrow Financial Freezes:** Total risk mitigation by holding rental funds securely in the background, only routing to the vendor upon confirmed asset recovery or Administrative intervention. 
+* **High-Friction Target Constraints:** Strict system architecture prevents deletion of active rental records or ongoing dispute files, ensuring comprehensive audit logs.
+* **Denial of Wallet & DoS Defenses:** Implements `express-rate-limit` middleware (to block bot swarms and scrapers) alongside browser-native Canvas compression (to prevent massive files from draining cloud bucket space).

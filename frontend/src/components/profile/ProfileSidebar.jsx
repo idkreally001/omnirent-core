@@ -40,13 +40,21 @@ export default function ProfileSidebar({ user, onAddFunds, onVerifyClick, onLogo
       
       {/* WALLET SECTION */}
       <div className="mt-6 p-4 bg-gray-900 rounded-2xl text-white shadow-lg shadow-gray-200">
-        <p className="text-xs text-gray-400 font-bold uppercase tracking-widest mb-1">Wallet Balance</p>
+        <p className="text-xs text-gray-400 font-bold uppercase tracking-widest mb-1">Available Balance</p>
         <div className="text-3xl font-black text-green-400">{Number(user.balance || 0).toFixed(2)}₺</div>
+        
+        {Number(user.pending_escrow) > 0 && (
+          <div className="mt-3 py-2 border-t border-gray-700/50">
+            <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-0.5">Pending Escrow</p>
+            <div className="text-lg font-black text-yellow-500">{Number(user.pending_escrow || 0).toFixed(2)}₺</div>
+          </div>
+        )}
+
         <button 
           onClick={onAddFunds}
           className="mt-3 w-full py-2 bg-gray-700 hover:bg-gray-600 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2"
         >
-          <span>+ Add 500₺</span>
+          <span>+ Add Funds</span>
         </button>
       </div>
       

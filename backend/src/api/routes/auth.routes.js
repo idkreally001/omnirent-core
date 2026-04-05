@@ -19,7 +19,7 @@ router.post('/login', async (req, res) => {
         }
 
         const token = authService.generateToken(user.rows[0].id);
-        res.json({ token, user: { id: user.rows[0].id, name: user.rows[0].full_name } });
+        res.json({ token, user: { id: user.rows[0].id, name: user.rows[0].full_name, is_admin: user.rows[0].is_admin } });
         
     } catch (err) {
         res.status(500).send("Server Error");

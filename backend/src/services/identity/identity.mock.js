@@ -1,27 +1,57 @@
 // C:\Users\Islam\Desktop\Development\OMNIRENT\omnirent-core\backend\src\services\identity\identity.mock.js
 
 const verify = async (fullName, tcNo) => {
-    // Professional Mock: Simulating a 500ms API delay
+    // Simulating API delay for realism
     return new Promise((resolve) => {
         setTimeout(() => {
-            console.log(`[MOCK SERVICE] Verifying: ${fullName} with TC: ${tcNo}`);
+            console.log(`[IDENTITY SERVICE] Verifying mathematically: ${fullName} with TC: ${tcNo}`);
 
-            // Logic: Let's make it fail if the TC starts with "0" (common validation rule)
-            // or if it's a specific "test failure" number.
-            if (tcNo.startsWith('0')) {
+            if (!tcNo || tcNo.length !== 11 || isNaN(tcNo)) {
+                return resolve({ 
+                    success: false, 
+                    message: "Invalid TC Number format. Must be 11 numeric digits." 
+                });
+            }
+
+            if (tcNo[0] === '0') {
                 return resolve({ 
                     success: false, 
                     message: "Invalid TC Number. Official records show this number cannot start with zero." 
                 });
             }
 
-            // Default success for any other 11-digit number
+            const digits = tcNo.split('').map(Number);
+            
+            // Validation Algorithm Part 1 (10th digit check)
+            const sumOdds = digits[0] + digits[2] + digits[4] + digits[6] + digits[8];
+            const sumEvens = digits[1] + digits[3] + digits[5] + digits[7];
+            
+            const calcDigit10 = ((sumOdds * 7) - sumEvens) % 10;
+            if (calcDigit10 !== digits[9]) {
+                return resolve({
+                    success: false,
+                    message: "Identity Algorithm Mismatch. The TC number provided is cryptographically invalid (Digit 10 fail)."
+                });
+            }
+
+            // Validation Algorithm Part 2 (11th digit check)
+            const sumFirst10 = digits.slice(0, 10).reduce((acc, val) => acc + val, 0);
+            const calcDigit11 = sumFirst10 % 10;
+
+            if (calcDigit11 !== digits[10]) {
+                return resolve({
+                    success: false,
+                    message: "Identity Algorithm Mismatch. The TC number provided is cryptographically invalid (Digit 11 fail)."
+                });
+            }
+
+            // If it passes all math rules, we accept it
             resolve({ 
                 success: true, 
-                status: 'VERIFIED_MOCK',
-                provider: 'OmniRent Mock KPS'
+                status: 'VERIFIED_MATHEMATICAL',
+                provider: 'OmniRent Math Algorithm'
             });
-        }, 500);
+        }, 800); // 800ms to feel realistic
     });
 };
 

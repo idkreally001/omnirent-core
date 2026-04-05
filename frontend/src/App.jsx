@@ -19,6 +19,7 @@ import ListItem from './pages/ListItem';
 import ItemDetail from './pages/ItemDetail';
 import PublicProfile from './pages/PublicProfile';
 import ChatPage from './pages/ChatPage';
+import AdminDashboard from './pages/AdminDashboard';
 
 // Import your guards
 import PublicRoute from './components/PublicRoute';
@@ -65,10 +66,15 @@ function App() {
               </PrivateRoute>
             } />
             <Route path="/messages" element={
-  <PrivateRoute>
-    <ChatPage />
-  </PrivateRoute>
-} />
+              <PrivateRoute>
+                <ChatPage />
+              </PrivateRoute>
+            } />
+            <Route path="/admin" element={
+              <PrivateRoute>
+                <AdminDashboard />
+              </PrivateRoute>
+            } />
           </Routes>
         </main>
       </div>
