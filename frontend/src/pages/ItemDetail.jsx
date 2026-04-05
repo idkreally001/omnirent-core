@@ -185,7 +185,7 @@ export default function ItemDetail() {
                   </div>
                   <div className="flex justify-between text-blue-800 text-sm font-bold pt-3 border-t border-blue-100/50">
                     <span className="opacity-60">Total Estimated Price</span>
-                    <span className="text-lg font-black">{(item.price_per_day * days).toFixed(2)}₺</span>
+                    <span className="text-lg font-black">{((item.price_per_day / 100) * days).toFixed(2)}₺</span>
                   </div>
                 </div>
               </div>
@@ -194,7 +194,7 @@ export default function ItemDetail() {
               <div className="pt-8 mt-8 border-t border-gray-100 flex items-center justify-between">
                 <div>
                   <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest mb-1">Daily Rate</p>
-                  <p className="text-4xl font-black text-blue-600 tracking-tight">{item.price_per_day}₺</p>
+                  <p className="text-4xl font-black text-blue-600 tracking-tight">{(item.price_per_day / 100).toFixed(2)}₺</p>
                   <div className="flex items-start gap-2 mt-4 max-w-[250px]">
                     <ShieldCheck size={14} className="text-gray-400 shrink-0 mt-0.5" />
                     <p className="text-[9px] text-gray-400 font-bold leading-tight">
