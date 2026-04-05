@@ -153,4 +153,9 @@ const startApp = async () => {
     }
 };
 
-startApp();
+// Only auto-start when run directly (not when imported by tests)
+if (require.main === module) {
+    startApp();
+}
+
+module.exports = { app, server, io };
