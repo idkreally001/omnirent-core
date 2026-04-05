@@ -198,6 +198,16 @@ export default function Profile() {
     }
   };
 
+  const handleConfirmHandover = async (rentalId) => {
+    try {
+      await api.put(`/rentals/${rentalId}/confirm-handover`);
+      showToast("Handover confirmed! Rental is now active.");
+      fetchProfileData();
+    } catch (err) {
+      showToast(err.response?.data?.error || "Handover confirmation failed", "error");
+    }
+  };
+
   const handleDispute = async (rentalId) => {
     const reason = window.prompt("Please briefly explain why you are raising a dispute:");
     if (!reason || !reason.trim()) return;
@@ -240,7 +250,12 @@ export default function Profile() {
           
           {/* Main Grid: Active Business */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <BorrowedItems myRentals={myRentals} onReturn={handleInitiateReturn} onDispute={handleDispute} />
+            <BorrowedItems 
+              myRentals={myRentals} 
+              onReturn={handleInitiateReturn} 
+              onConfirmHandover={handleConfirmHandover}
+              onDispute={handleDispute} 
+            />
             <MyListings 
               myItems={myItems} 
               onItemDeleteClick={setItemToDelete} 

@@ -68,8 +68,15 @@ export default function MyListings({ myItems, onItemDeleteClick, onConfirmReceip
                             </button>
                           </div>
                       </div>
-                    ) : (
-                      <div className="flex justify-between items-center text-[10px]">
+                     ) : item.rental_status === 'pending_handover' ? (
+                        <div className="flex justify-between items-center bg-blue-50/50 p-3 rounded-xl border border-blue-100 w-full">
+                           <div className="flex items-center gap-2 text-blue-700 font-black text-[10px] uppercase">
+                               <Clock size={14} className="animate-spin-slow" /> Awaiting Handover Confirmation
+                           </div>
+                           <p className="text-[10px] font-bold text-blue-600">Give item to {item.renter_name || 'User'}</p>
+                        </div>
+                     ) : (
+                       <div className="flex justify-between items-center text-[10px]">
                           <div className="flex items-center gap-2 text-gray-500 font-bold">
                               <User size={12} />
                               <span>Renter: {item.renter_name || 'User'}</span>
