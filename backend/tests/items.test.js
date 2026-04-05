@@ -48,14 +48,14 @@ describe('GET /api/items', () => {
 
     it('should filter items by search query', async () => {
         const { token } = await createTestUser('Searcher', 'search@test.com');
-        await createTestItem(token, { title: 'Garden Hose' });
-        await createTestItem(token, { title: 'Power Drill' });
+        await createTestItem(token, { title: 'Garden Hose', description: 'A green garden hose' });
+        await createTestItem(token, { title: 'Power Drill', description: 'A cordless power drill' });
 
-        const res = await request(app).get('/api/items?search=drill');
+        const res = await request(app).get('/api/items?search=hose');
 
         expect(res.statusCode).toBe(200);
         expect(res.body.length).toBe(1);
-        expect(res.body[0].title).toBe('Power Drill');
+        expect(res.body[0].title).toBe('Garden Hose');
     });
 
     it('should filter items by category', async () => {

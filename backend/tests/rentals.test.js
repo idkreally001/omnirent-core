@@ -176,7 +176,8 @@ describe('Rental Lifecycle — Full State Machine', () => {
             .put(`/api/rentals/${rentalId}/confirm-receipt`)
             .set('Authorization', `Bearer ${renter.token}`);
 
-        expect(res.statusCode).toBe(400); // falls through the "rental not found" check
+        // Route explicitly checks owner_id and returns 403 for non-owners
+        expect(res.statusCode).toBe(403);
     });
 });
 
