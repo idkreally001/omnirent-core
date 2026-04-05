@@ -188,6 +188,10 @@ export default function Profile() {
        await handleConfirmReceipt(evidenceRentalId);
     } else if (evidenceAction === 'renter_handover') {
        await handleConfirmHandover(evidenceRentalId);
+    } else if (evidenceAction === 'owner_dispute') {
+       // Photo evidence successfully logged! Now open text modal for the dispute reason.
+       setDisputeRentalId(evidenceRentalId);
+       setShowDisputeModal(true);
     }
     setEvidenceRentalId(null);
     setEvidenceAction(null);
@@ -221,6 +225,12 @@ export default function Profile() {
   const handleDispute = (rentalId) => {
     setDisputeRentalId(rentalId);
     setShowDisputeModal(true);
+  };
+
+  const handleInitiateOwnerDispute = (rentalId) => {
+    // Force the owner to take Post-Flight photos BEFORE they can submit the text dispute
+    setEvidenceRentalId(rentalId);
+    setEvidenceAction('owner_dispute');
   };
 
   const handleConfirmDispute = async (reason) => {
@@ -277,7 +287,7 @@ export default function Profile() {
               myItems={myItems} 
               onItemDeleteClick={setItemToDelete} 
               onConfirmReceipt={handleInitiateConfirmReceipt} 
-              onDispute={handleDispute}
+              onDispute={handleInitiateOwnerDispute}
             />
           </div>
 
@@ -333,7 +343,7 @@ export default function Profile() {
       {evidenceRentalId && (
         <ConditionUploadModal 
           rentalId={evidenceRentalId}
-          stage={(evidenceAction === 'renter_return' || evidenceAction === 'owner_confirm') ? 'return' : 'handover'}
+          stage={(evidenceAction === 'renter_return' || evidenceAction === 'owner_confirm' || evidenceAction === 'owner_dispute') ? 'return' : 'handover'}
           onClose={() => { setEvidenceRentalId(null); setEvidenceAction(null); }}
           onSuccess={handleEvidenceSuccess}
         />
