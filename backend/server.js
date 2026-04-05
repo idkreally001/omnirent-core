@@ -4,10 +4,10 @@ const rateLimit = require('express-rate-limit');
 require('dotenv').config();
 const http = require('http');
 const { Server } = require('socket.io');
-// Parse comma-separated origins from .env, fallback to localhost for dev
-const allowedOrigins = process.env.ALLOWED_ORIGINS 
-  ? process.env.ALLOWED_ORIGINS.split(',') 
-  : ["http://localhost:5173"];
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://omnirent-core.vercel.app"
+];
 
 // Routes
 const authRoutes = require('./src/api/routes/auth.routes');
@@ -18,7 +18,6 @@ const notificationRoutes = require('./src/api/routes/notification.routes');
 const reviewRoutes = require('./src/api/routes/review.routes');
 const messageRoutes = require('./src/api/routes/message.routes');
 const adminRoutes = require('./src/api/routes/admin.routes');
-const uploadRoutes = require('./src/api/routes/upload.routes');
 
 const initDB = require('./src/db/init');
 
@@ -76,7 +75,6 @@ app.use('/api/notifications', notificationRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/messages', messageRoutes);
 app.use('/api/admin', adminRoutes);
-app.use('/api', uploadRoutes);
 
 // 5. Socket Logic
 io.on('connection', (socket) => {
@@ -107,15 +105,6 @@ io.on('connection', (socket) => {
   socket.on('disconnect', () => {
     console.log('User Disconnected');
   });
-});
-
-// --- Global Error Handler ---
-app.use((err, req, res, next) => {
-    console.error("🔥 Uncaught Exception:", err.stack);
-    res.status(500).json({ 
-        error: "Internal Server Error", 
-        message: process.env.NODE_ENV === 'development' ? err.message : "Something went wrong" 
-    });
 });
 
 // 6. Atomic Startup
