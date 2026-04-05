@@ -186,6 +186,8 @@ export default function Profile() {
        await handleReturn(evidenceRentalId);
     } else if (evidenceAction === 'owner_confirm') {
        await handleConfirmReceipt(evidenceRentalId);
+    } else if (evidenceAction === 'renter_handover') {
+       await handleConfirmHandover(evidenceRentalId);
     }
     setEvidenceRentalId(null);
     setEvidenceAction(null);
@@ -199,6 +201,11 @@ export default function Profile() {
     } catch (err) {
       showToast("Failed to confirm receipt", "error");
     }
+  };
+
+  const handleInitiateHandover = (rentalId) => {
+    setEvidenceRentalId(rentalId);
+    setEvidenceAction('renter_handover');
   };
 
   const handleConfirmHandover = async (rentalId) => {
@@ -263,7 +270,7 @@ export default function Profile() {
             <BorrowedItems 
               myRentals={myRentals} 
               onReturn={handleInitiateReturn} 
-              onConfirmHandover={handleConfirmHandover}
+              onConfirmHandover={handleInitiateHandover}
               onDispute={handleDispute} 
             />
             <MyListings 
@@ -326,7 +333,7 @@ export default function Profile() {
       {evidenceRentalId && (
         <ConditionUploadModal 
           rentalId={evidenceRentalId}
-          stage={evidenceAction === 'owner_confirm' ? 'return' : 'handover'}
+          stage={(evidenceAction === 'renter_return' || evidenceAction === 'owner_confirm') ? 'return' : 'handover'}
           onClose={() => { setEvidenceRentalId(null); setEvidenceAction(null); }}
           onSuccess={handleEvidenceSuccess}
         />
