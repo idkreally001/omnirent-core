@@ -131,6 +131,42 @@ io.on('connection', (socket) => {
   });
 });
 
+// --- NEW: Intelligent Health Check ---
+app.get('/api/health', async (req, res) => {
+    const healthcheck = {
+        uptime: process.uptime(),
+        message: 'All systems operational',
+        timestamp: Date.now(),
+        database: 'Checking...'
+    };
+    try {
+        // Test the database connection
+        const pool = require('./src/db');
+        await pool.query('SELECT 1');
+        healthcheck.database = 'Connected';
+        
+        // If human visited via browser, send a nice simple text/html
+        if (req.headers['accept']?.includes('text/html')) {
+            return res.send(`
+                <body style="font-family: sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; background: #f0f7ff;">
+                    <div style="text-align: center; background: white; padding: 2rem; border-radius: 20px; shadow: 0 10px 15px -3px rgba(0,0,0,0.1);">
+                        <h1 style="color: #059669;">Ô£à Systems Operational</h1>
+                        <p style="color: #6b7280;">OmniRent Engine is running smoothly.</p>
+                        <hr style="border: 0; border-top: 1px solid #e5e7eb; margin: 1rem 0;">
+                        <small style="color: #9ca3af;">Uptime: ${Math.floor(healthcheck.uptime)}s | DB: ${healthcheck.database}</small>
+                    </div>
+                </body>
+            `);
+        }
+        
+        res.status(200).send(healthcheck);
+    } catch (e) {
+        healthcheck.message = e.message;
+        healthcheck.database = 'Disconnected';
+        res.status(503).send(healthcheck);
+    }
+});
+
 // --- NEW: Global Error Handler ---
 app.use((err, req, res, next) => {
     console.error("🔥 Uncaught Exception:", err.stack);
