@@ -38,12 +38,13 @@ export default function Register() {
         <input type="email" placeholder="Email Address" className="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none" onChange={(e) => setFormData({...formData, email: e.target.value})} required />
         <input type="password" placeholder="Password" className="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none" onChange={(e) => setFormData({...formData, password: e.target.value})} required />
 
-        {/*<div className="p-4 bg-blue-50 rounded-2xl flex gap-3 items-start">
-          <ShieldCheck className="text-blue-600 shrink-0" size={20} />
-          <p className="text-xs text-blue-800 font-medium">Verified using secure NVI service.</p>
-        </div>*/}
+        <div className="p-4 bg-gray-50 border border-gray-100 rounded-2xl">
+          <p className="text-[10px] text-gray-500 font-medium leading-relaxed">
+            By creating an account, you agree to OmniRent's <Link to="/terms" className="text-blue-600 font-bold hover:underline">Terms of Service</Link>, <Link to="/privacy" className="text-blue-600 font-bold hover:underline">Privacy Policy</Link>, and <Link to="/usage" className="text-blue-600 font-bold hover:underline">Usage Agreement</Link>. You also consent to our Identity Uniqueness Verification process.
+          </p>
+        </div>
 
-        <button className="w-full bg-blue-600 text-white py-4 rounded-2xl font-bold text-lg hover:bg-blue-700 transition">
+        <button className="w-full bg-blue-600 text-white py-4 rounded-2xl font-black text-sm uppercase tracking-widest hover:bg-blue-700 transition shadow-lg shadow-blue-100">
           Create Account
         </button>
 

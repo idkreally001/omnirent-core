@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import api from '../api/axios';
-import { PackagePlus, ArrowRight, UploadCloud, CheckCircle2 } from 'lucide-react';
+import { PackagePlus, ArrowRight, UploadCloud, CheckCircle2, ShieldCheck } from 'lucide-react';
 import { compressImage, uploadToCloudinary } from '../utils/imageCompression';
 
 export default function ListItem() {
@@ -138,10 +138,17 @@ export default function ListItem() {
           />
         </div>
 
+        <div className="p-4 bg-gray-50 border border-gray-100 rounded-2xl flex items-start gap-3 mt-6">
+          <ShieldCheck size={20} className="text-gray-400 shrink-0 mt-0.5" />
+          <p className="text-[10px] text-gray-500 font-medium leading-relaxed">
+            By publishing this listing, you confirm that you legally own this asset and agree to OmniRent's <Link to="/usage" className="text-blue-600 font-bold hover:underline">Usage Agreement</Link>. You also agree to adhere to the photographic evidence guidelines mandated by the Trust & Safety Engine during handovers.
+          </p>
+        </div>
+
         <button 
           disabled={isUploading}
-          className={`w-full py-4 rounded-2xl font-bold text-lg flex items-center justify-center gap-2 group transition
-            ${isUploading ? 'bg-gray-300 text-gray-500 cursor-not-allowed' : 'bg-gray-900 text-white hover:bg-blue-600'}`}>
+          className={`w-full py-4 mt-6 rounded-2xl font-bold text-lg flex items-center justify-center gap-2 group transition
+            ${isUploading ? 'bg-gray-300 text-gray-500 cursor-not-allowed' : 'bg-gray-900 text-white hover:bg-blue-600 shadow-xl shadow-gray-200'}`}>
           {isUploading ? 'Wait for upload...' : <>Publish Listing <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" /></>}
         </button>
       </form>
