@@ -11,8 +11,8 @@ router.get('/disputes', auth, adminAuth, async (req, res) => {
             `SELECT d.id, d.reason, d.status, d.resolution, d.admin_notes, d.created_at,
                     r.id as rental_id, r.total_price, r.status as rental_status,
                     i.title as item_title,
-                    u_owner.full_name as owner_name,
-                    u_renter.full_name as renter_name,
+                    u_owner.id as owner_id, u_owner.full_name as owner_name,
+                    u_renter.id as renter_id, u_renter.full_name as renter_name,
                     u_raiser.full_name as raiser_name
              FROM disputes d
              JOIN rentals r ON d.rental_id = r.id
