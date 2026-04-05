@@ -3,8 +3,19 @@ const router = express.Router();
 const pool = require('../../db');
 const authService = require('../../services/auth.service');
 
+const rateLimit = require('express-rate-limit');
+
+// Strict limiter: Only 5 login attempts per 15 minutes per IP
+const loginLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, 
+    max: 5, 
+    message: { error: "Too many login attempts. Please try again in 15 minutes." },
+    standardHeaders: true,
+    legacyHeaders: false,
+});
+
 // LOGIN ROUTE
-router.post('/login', async (req, res) => {
+router.post('/login', loginLimiter, async (req, res) => {
     const { email, password } = req.body;
     try {
         const user = await pool.query("SELECT * FROM users WHERE email = $1", [email]);

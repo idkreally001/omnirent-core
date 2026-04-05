@@ -4,10 +4,10 @@ const rateLimit = require('express-rate-limit');
 require('dotenv').config();
 const http = require('http');
 const { Server } = require('socket.io');
-const allowedOrigins = [
-  "http://localhost:5173",
-  "https://omnirent-core.vercel.app"
-];
+// Parse comma-separated origins from .env, fallback to localhost for dev
+const allowedOrigins = process.env.ALLOWED_ORIGINS 
+  ? process.env.ALLOWED_ORIGINS.split(',') 
+  : ["http://localhost:5173"];
 
 // Routes
 const authRoutes = require('./src/api/routes/auth.routes');
@@ -66,6 +66,30 @@ const apiLimiter = rateLimit({
 // Apply rate limiter to all API routes
 app.use('/api/', apiLimiter);
 
+// NEW: Cloudinary secure signature upload route
+const verifyToken = require('./src/api/middleware/auth.middleware');
+const cloudinary = require('cloudinary').v2;
+
+app.get('/api/upload-signature', verifyToken, (req, res) => {
+  try {
+    const timestamp = Math.round((new Date).getTime() / 1000);
+    const signature = cloudinary.utils.api_sign_request(
+      { timestamp }, 
+      process.env.CLOUDINARY_API_SECRET
+    );
+    
+    res.json({
+      signature,
+      timestamp,
+      cloudName: process.env.CLOUDINARY_CLOUD_NAME,
+      apiKey: process.env.CLOUDINARY_API_KEY
+    });
+  } catch (error) {
+    console.error("Signature Error:", error);
+    res.status(500).json({ error: "Failed to generate signature" });
+  }
+});
+
 // 5. Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/user', userRoutes);
@@ -105,6 +129,15 @@ io.on('connection', (socket) => {
   socket.on('disconnect', () => {
     console.log('User Disconnected');
   });
+});
+
+// --- NEW: Global Error Handler ---
+app.use((err, req, res, next) => {
+    console.error("🔥 Uncaught Exception:", err.stack);
+    res.status(500).json({ 
+        error: "Internal Server Error", 
+        message: process.env.NODE_ENV === 'development' ? err.message : "Something went wrong" 
+    });
 });
 
 // 6. Atomic Startup
