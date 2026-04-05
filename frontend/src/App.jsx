@@ -61,10 +61,10 @@ function App() {
 
 
             <Route path="/list-item" element={
-  <PrivateRoute>
-    <ListItem />
-  </PrivateRoute>
-} />
+              <PrivateRoute>
+                <ListItem />
+              </PrivateRoute>
+            } />
 
             {/* 3. Private Routes (Redirect to Login if logged out) */}
             <Route path="/profile" element={

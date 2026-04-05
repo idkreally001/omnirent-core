@@ -1,3 +1,6 @@
+require("./src/instrument");
+const Sentry = require("@sentry/node");
+
 const express = require('express');
 const cors = require('cors');
 const rateLimit = require('express-rate-limit');
@@ -166,6 +169,9 @@ app.get('/api/health', async (req, res) => {
         res.status(503).send(healthcheck);
     }
 });
+
+// The Sentry error handler must be before any other error middleware
+Sentry.setupExpressErrorHandler(app);
 
 // --- NEW: Global Error Handler ---
 app.use((err, req, res, next) => {
