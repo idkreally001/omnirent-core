@@ -208,25 +208,25 @@ This sprint moved OmniRent from a "feature-complete" state to a "production-reli
 *   **Owner Rental Alerts:** Integrated email notifications into the rental creation route, automatically alerting item owners when their equipment is booked, including renter name and earnings details.
 *   **Escrow Completion Receipts:** Implemented dual-party digital receipt dispatch upon successful return confirmation, providing both the renter and owner with a transaction summary for audit purposes.
 *   **Environment Variable Elimination:** Removed the need for a `FRONTEND_URL` environment variable by deriving the backend URL from the incoming request (`req.protocol + req.get('host')`) and reusing the existing `ALLOWED_ORIGINS` variable for frontend redirects.
-*   **Test Suite Adaptation:** Updated all 58 integration tests to accommodate the new verification flow by auto-verifying test users in the database and generating tokens manually via `authService.generateToken()`.
-*   **Dependency Audit:** Resolved all npm audit vulnerabilities across both backend and frontend, achieving zero known vulnerabilities in the dependency tree.
+*   **Test Suite Adaptation:** Updated all 58 integration tests to accommodate the new verification flow by auto-verifying test users*   **Dependency Audit:** Resolved all npm audit vulnerabilities across both backend and frontend, achieving zero known vulnerabilities in the dependency tree.
+*   **CI/CD Pipeline:** Configured GitHub Actions to spin up a PostgreSQL 17 container and run the full 58-test suite on every push or pull request to `main`, providing an automated safety net for the production branch.
 
 ### **⚠️ Technical Blockers & Resolutions**
 *   **Existing User Lockout Risk:** Identified that the `is_email_verified` column defaults to `FALSE`, which would lock out all pre-existing users. Mitigated by confirming the production database was truncated prior to deployment.
-*   **Frontend State Desync:** The original `Register.jsx` attempted to store a token that the backend no longer returns, causing silent failures and redirect loops. Fixed by replacing the auto-login pattern with an explicit success state.
-*   **Axios Interceptor Collision:** Verified that the frontend's response interceptor only catches `401` (not `403`) and explicitly skips auth routes, ensuring the "unverified" error message displays correctly on the login page.
-*   **Route Syntax Corruption:** Identified and repaired a critical syntax error in `rental.routes.js` where missing `require` statements and an unclosed route handler caused the entire rental module to fail silently.
+*   **CI/CD Production Safeguard:** The automated test runner initially failed because `DATABASE_URL` was identical to `DATABASE_URL_TEST` (a safeguard I built in Sprint 10). Resolved by setting a dummy `DATABASE_URL` in the GitHub Actions environment.
+*   **Frontend State Desync:** Updated the registration UI to handle the lack of a token response, showing a "Check Your Email" message instead of attempting a failed auto-login.
+*   **Route Syntax Corruption:** Repaired the accidentally broken `rental.routes.js` module.
 
 ### **🔄 Sprint Reflection**
-OmniRent now enforces verified-identity-first access, ensuring that every user on the platform has confirmed ownership of their email address. The transactional email system provides real-time, out-of-app awareness for the two most critical marketplace events: new revenue and completed transactions. The architecture remains zero-config for developers, requiring only a single optional API key (`RESEND_API_KEY`) to activate live email dispatch.
+OmniRent is now a professionally guarded platform. We have eliminated manual verification friction while simultaneously hardening the identity layer. With the addition of CI/CD, the codebase is now self-validating — any future changes that break the escrow logic will be caught by GitHub before they ever touch your users.
 
 ---
 
-## **Sprint 12: Automation & Growth (Proposed)**
-**Primary Focus:** Expanding platform capabilities and automating the developer lifecycle.
+## **Sprint 12: Growth & Visual Excellence (Proposed)**
+**Primary Focus:** Expanding platform capabilities and booking flexibility.
 
 ### **🎯 Future Goals**
-*   **CI/CD Pipeline:** Configure GitHub Actions to run the full test suite on every push, blocking deployment if any test fails.
-*   **Availability Calendar:** Implement visual date-range booking on item detail pages to prevent users from attempting reservations on occupied dates.
-*   **Multi-Image Gallery:** Expand item listings to support multiple photos with a carousel viewer.
+*   **Availability Calendar:** Implement visual date-range booking on item detail pages to prevent overlapping reservation attempts.
+*   **Multi-Image Gallery:** Expand item listings to support multiple photos with a high-performance carousel viewer.
 *   **Notification Digest:** Implement a periodic email summary for users with unread notifications after extended inactivity.
+lement a periodic email summary for users with unread notifications after extended inactivity.
