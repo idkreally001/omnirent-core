@@ -6,7 +6,7 @@ const { Pool } = require('pg');
 require('dotenv').config();
 
 module.exports = async () => {
-    const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+    const pool = new Pool({ connectionString: process.env.DATABASE_URL_TEST });
     
     try {
         await pool.query(`
