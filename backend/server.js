@@ -54,10 +54,10 @@ app.use((req, res, next) => {
 // });
 
 // 4. Rate Limiting (The "Wall")
-// Limits each IP to 150 requests per 15 minutes window
+// Limits each IP to 500 requests per 15 minutes window
 const apiLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, 
-    max: 150, 
+    max: 500, 
     message: { error: "Too many requests from this IP, please try again after 15 minutes." },
     standardHeaders: true, 
     legacyHeaders: false, 
