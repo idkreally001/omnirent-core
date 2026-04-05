@@ -20,6 +20,10 @@ import ItemDetail from './pages/ItemDetail';
 import PublicProfile from './pages/PublicProfile';
 import ChatPage from './pages/ChatPage';
 import AdminDashboard from './pages/AdminDashboard';
+import Terms from './pages/Terms';
+import Privacy from './pages/Privacy';
+import Usage from './pages/Usage';
+import Footer from './components/Footer';
 
 // Import your guards
 import PublicRoute from './components/PublicRoute';
@@ -35,6 +39,9 @@ function App() {
             {/* 1. Open Routes (Anyone can see) */}
             <Route path="/" element={<Home />} />
             <Route path="/user/:id" element={<PublicProfile />} />
+            <Route path="/terms" element={<Terms />} />
+            <Route path="/privacy" element={<Privacy />} />
+            <Route path="/usage" element={<Usage />} />
 
             {/* 2. Public-Only Routes (Redirect to Profile if logged in) */}
             <Route path="/login" element={
@@ -77,6 +84,7 @@ function App() {
             } />
           </Routes>
         </main>
+        <Footer />
       </div>
     </Router>
   );
