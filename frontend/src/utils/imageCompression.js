@@ -51,43 +51,36 @@ export const compressImage = (file, maxWidth = 1280, quality = 0.8) => {
 };
 
 /**
- * Uploads an image to Cloudinary using a secure, server-signed upload.
- * Fetches a time-stamped HMAC signature from the backend to avoid exposing secrets.
+ * Uploads an image to Cloudinary using an unsigned upload preset.
+ * Fallbacks to a mock URL if env vars aren't configured yet.
  */
 export const uploadToCloudinary = async (file) => {
-  try {
-    // 1. Fetch a secure, time-stamped signature from your backend
-    const signatureRes = await fetch(`${import.meta.env.VITE_API_URL}/api/upload-signature`, {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
-      }
+  const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
+  const uploadPreset = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
+
+  // Fallback for development if user hasn't set up Cloudinary yet
+  if (!cloudName || !uploadPreset) {
+    console.warn("Cloudinary keys missing. Returning a mock URL for development.");
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve("https://res.cloudinary.com/demo/image/upload/v1312461204/sample.jpg");
+      }, 1000); // simulate upload
     });
-    
-    if (!signatureRes.ok) throw new Error("Could not get upload signature");
-    const { signature, timestamp, apiKey, cloudName } = await signatureRes.json();
-
-    // 2. Append the secure signature instead of the public preset
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('signature', signature);
-    formData.append('api_key', apiKey);
-    formData.append('timestamp', timestamp);
-
-    // 3. Upload to Cloudinary securely
-    const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
-      method: 'POST',
-      body: formData,
-    });
-
-    if (!res.ok) throw new Error('Failed to upload image to Cloudinary');
-
-    const data = await res.json();
-    return data.secure_url; 
-    
-  } catch (error) {
-    console.error("Upload Error:", error);
-    // Fallback for development UI mapping if cloud fails
-    return "https://res.cloudinary.com/demo/image/upload/v1312461204/sample.jpg";
   }
+
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('upload_preset', uploadPreset);
+
+  const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+    method: 'POST',
+    body: formData,
+  });
+
+  if (!res.ok) {
+    throw new Error('Failed to upload image to Cloudinary');
+  }
+
+  const data = await res.json();
+  return data.secure_url; 
 };

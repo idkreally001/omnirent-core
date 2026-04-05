@@ -9,7 +9,7 @@ router.post('/', auth, async (req, res) => {
     try {
         const newItem = await pool.query(
             "INSERT INTO items (owner_id, title, description, price_per_day, category, image_url) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *",
-            [req.user.id, title, description, Math.round(price * 100), category, image_url] // Multiplied by 100 → stored as Kuruş/Cents
+            [req.user.id, title, description, price, category, image_url]
         );
         res.json(newItem.rows[0]);
     } catch (err) {
