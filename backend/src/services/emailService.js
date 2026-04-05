@@ -13,8 +13,8 @@ const emailService = {
   /**
    * Send a verification email to a new user
    */
-  sendVerificationEmail: async (email, name, token) => {
-    const verificationUrl = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/verify-email?token=${token}`;
+  sendVerificationEmail: async (email, name, token, backendUrl) => {
+    const verificationUrl = `${backendUrl}/api/auth/verify-email?token=${token}`;
     
     const html = `
       <div style="font-family: sans-serif; max-width: 500px; margin: 0 auto; border: 1px solid #e5e7eb; padding: 2rem; border-radius: 12px;">

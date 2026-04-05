@@ -67,8 +67,9 @@ router.post('/register', async (req, res) => {
             [fullName, email, passwordHash, verificationToken]
         );
 
-        // 5. Send Verification Email (Don't wait for it to finish, send in background)
-        emailService.sendVerificationEmail(email, fullName, verificationToken).catch(err => {
+        // 5. Send Verification Email
+        const backendUrl = `${req.protocol}://${req.get('host')}`;
+        emailService.sendVerificationEmail(email, fullName, verificationToken, backendUrl).catch(err => {
             console.error("Verification email failed to send:", err);
         });
 
@@ -108,7 +109,7 @@ router.get('/verify-email', async (req, res) => {
                 <div style="text-align: center; background: white; padding: 2rem; border-radius: 20px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);">
                     <h1 style="color: #16a34a;">Account Verified!</h1>
                     <p style="color: #4b5563;">Your email has been confirmed. You can now log in to OmniRent.</p>
-                    <a href="${process.env.FRONTEND_URL || 'http://localhost:5173'}/login" style="display: inline-block; background: #2563eb; color: white; padding: 12px 24px; border-radius: 6px; text-decoration: none; margin-top: 1rem;">Go to Login</a>
+                    <a href="${(process.env.ALLOWED_ORIGINS || 'http://localhost:5173').split(',')[0]}/login" style="display: inline-block; background: #2563eb; color: white; padding: 12px 24px; border-radius: 6px; text-decoration: none; margin-top: 1rem;">Go to Login</a>
                 </div>
             </body>
         `);
