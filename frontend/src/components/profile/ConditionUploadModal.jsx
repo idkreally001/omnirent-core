@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { X, UploadCloud, CheckCircle2, ShieldCheck } from 'lucide-react';
 import { compressImage, uploadToCloudinary } from '../../utils/imageCompression';
 import api from '../../api/axios';
@@ -98,6 +99,13 @@ export default function ConditionUploadModal({ rentalId, stage, onClose, onSucce
             </div>
           </div>
         )}
+
+        <div className="flex items-start gap-2 mb-4">
+          <ShieldCheck size={14} className="text-gray-400 shrink-0 mt-0.5" />
+          <p className="text-[9px] text-gray-500 font-medium leading-tight">
+            By uploading evidence, you agree to our <Link to="/privacy" className="text-blue-600 hover:underline">Privacy Policy</Link>. These photos will be permanently bound to the rental escrow record and are only accessible by OmniRent Administrators.
+          </p>
+        </div>
 
         <button 
           onClick={handleConfirm}

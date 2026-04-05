@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import api from '../api/axios';
 import { 
-  Share2, User, ArrowLeft, Package, CheckCircle2, Star, MessageSquare
+  Share2, User, ArrowLeft, Package, CheckCircle2, Star, MessageSquare, ShieldCheck
 } from 'lucide-react';
 
 export default function ItemDetail() {
@@ -195,6 +195,12 @@ export default function ItemDetail() {
                 <div>
                   <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest mb-1">Daily Rate</p>
                   <p className="text-4xl font-black text-blue-600 tracking-tight">{item.price_per_day}₺</p>
+                  <div className="flex items-start gap-2 mt-4 max-w-[250px]">
+                    <ShieldCheck size={14} className="text-gray-400 shrink-0 mt-0.5" />
+                    <p className="text-[9px] text-gray-400 font-bold leading-tight">
+                      By renting, you agree to the <Link to="/usage" className="text-blue-600 hover:underline">Usage Agreement</Link> and Escrow Verification terms.
+                    </p>
+                  </div>
                 </div>
                 
                 <button 
