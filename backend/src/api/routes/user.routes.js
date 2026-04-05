@@ -70,6 +70,12 @@ router.put('/verify', auth, async (req, res) => {
     }
 
     try {
+        // --- NEW: TCKN Uniqueness Check ---
+        const existing = await pool.query("SELECT id FROM users WHERE tc_no = $1 AND id != $2", [tc_no, req.user.id]);
+        if (existing.rows.length > 0) {
+            return res.status(400).json({ error: "This Identity Number is already verified with another account." });
+        }
+
         // We pass fullName first, then tcNo, as per your service definition
         const verificationResult = await verifyIdentity(req.user.full_name, tc_no);
         

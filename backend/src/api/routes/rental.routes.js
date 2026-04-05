@@ -39,9 +39,10 @@ router.post('/', auth, async (req, res) => {
 
         // 5. Create Rental & Update Item
         const rentalRes = await client.query(
-            "INSERT INTO rentals (item_id, renter_id, return_date, total_price) VALUES ($1, $2, $3, $4) RETURNING id",
+            "INSERT INTO rentals (item_id, renter_id, return_date, total_price, status) VALUES ($1, $2, $3, $4, 'pending_handover') RETURNING id",
             [itemId, renterId, returnDate, totalPrice]
         );
+        // We set item status to 'rented' immediately to remove it from catalog
         await client.query("UPDATE items SET status = 'rented' WHERE id = $1", [itemId]);
 
         // 6. Notify the Owner (renter_name is now properly fetched from DB)
@@ -79,6 +80,35 @@ router.get('/my-rentals', auth, async (req, res) => {
     } catch (err) {
         console.error(err.message);
         res.status(500).send("Server Error");
+    }
+});
+
+// 0. RENTER: Confirms they physically received the item (Handover)
+router.put('/:id/confirm-handover', auth, async (req, res) => {
+    const client = await pool.connect();
+    try {
+        await client.query('BEGIN');
+        
+        const rental = await client.query(
+            "SELECT * FROM rentals WHERE id = $1 AND renter_id = $2 AND status = 'pending_handover'",
+            [req.params.id, req.user.id]
+        );
+
+        if (rental.rows.length === 0) throw new Error("Rental not found or not in 'pending_handover' state.");
+
+        // Update rental to 'active'
+        await client.query(
+            "UPDATE rentals SET status = 'active' WHERE id = $1",
+            [req.params.id]
+        );
+
+        await client.query('COMMIT');
+        res.json({ message: "Handover confirmed! Your rental is now active." });
+    } catch (err) {
+        await client.query('ROLLBACK');
+        res.status(400).json({ error: err.message });
+    } finally {
+        client.release();
     }
 });
 

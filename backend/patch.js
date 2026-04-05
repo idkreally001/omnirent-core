@@ -5,21 +5,30 @@ async function patch() {
     try {
         console.log("🚀 Starting Production Schema Migration...");
 
-        // 1. Users: Add is_admin
+        // 1. Users: Add is_admin and TCKN uniqueness
         await pool.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS is_admin BOOLEAN DEFAULT FALSE;');
-        console.log("✅ Users: is_admin column secured.");
+        try {
+            await pool.query('ALTER TABLE users ADD CONSTRAINT unique_tc_no UNIQUE (tc_no);');
+            console.log("✅ Users: TCKN uniqueness constraint added.");
+        } catch (e) {
+            console.log("ℹ️ Users: TCKN uniqueness already exists or duplicate data detected.");
+        }
 
-        // 2. Disputes: Add resolution and admin_notes
+        // 2. Rentals: Update default status for new rentals
+        await pool.query("ALTER TABLE rentals ALTER COLUMN status SET DEFAULT 'pending_handover';");
+        console.log("✅ Rentals: status now defaults to 'pending_handover'.");
+
+        // 3. Disputes: Add resolution and admin_notes
         await pool.query('ALTER TABLE disputes ADD COLUMN IF NOT EXISTS resolution VARCHAR(50);');
         await pool.query('ALTER TABLE disputes ADD COLUMN IF NOT EXISTS admin_notes TEXT;');
         console.log("✅ Disputes: resolution & admin_notes columns secured.");
 
-        // 3. Messages: Ensure read logic exists (Performance fix)
+        // 4. Messages: Ensure read logic exists (Performance fix)
         await pool.query('ALTER TABLE messages ADD COLUMN IF NOT EXISTS is_read BOOLEAN DEFAULT FALSE;');
         await pool.query('ALTER TABLE messages ADD COLUMN IF NOT EXISTS read_at TIMESTAMP;');
         console.log("✅ Messages: read_at & is_read logic secured.");
 
-        // 4. Ensure Evidence table exists (If it wasn't there before)
+        // 5. Ensure Evidence table exists
         const schema = `
             CREATE TABLE IF NOT EXISTS rental_evidence (
                 id SERIAL PRIMARY KEY,

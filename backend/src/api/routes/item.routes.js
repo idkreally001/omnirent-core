@@ -124,7 +124,7 @@ router.get('/mine/all', auth, async (req, res) => {
                 u.full_name as renter_name 
              FROM items i 
              -- We join with rentals that are NOT completed to see current activity
-             LEFT JOIN rentals r ON i.id = r.item_id AND r.status IN ('active', 'returned_by_renter')
+             LEFT JOIN rentals r ON i.id = r.item_id AND r.status IN ('active', 'returned_by_renter', 'pending_handover')
              LEFT JOIN users u ON r.renter_id = u.id 
              WHERE i.owner_id = $1 
                AND i.is_deleted = FALSE 
