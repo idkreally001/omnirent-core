@@ -93,12 +93,19 @@ export default function ItemDetail() {
         {/* Right: Info Area */}
         <div className="p-10 flex flex-col justify-between">
           {rentedSuccess ? (
-            <div className="flex flex-col items-center justify-center h-full text-center space-y-4 animate-in zoom-in duration-300">
-              <div className="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center">
-                <CheckCircle2 size={48} />
+            <div className="flex flex-col items-center justify-center h-full text-center space-y-6 animate-in zoom-in duration-300">
+              <div className="w-24 h-24 bg-green-100 text-green-600 rounded-[2.5rem] flex items-center justify-center shadow-lg shadow-green-100">
+                <CheckCircle2 size={56} />
               </div>
-              <h2 className="text-3xl font-black text-gray-900">Rental Confirmed!</h2>
-              <p className="text-gray-500 font-medium">Redirecting you to your dashboard...</p>
+              <div>
+                <h2 className="text-3xl font-black text-gray-900 mb-2">Reserved! 🤝</h2>
+                <p className="text-gray-500 font-bold max-w-[300px] mx-auto text-sm leading-relaxed">
+                  Funds are now in <span className="text-blue-600">Escrow</span>. Meet the owner to pick up the item and click <span className="text-gray-900">"Confirm Receipt"</span> in your dashboard once you have it.
+                </p>
+              </div>
+              <div className="w-full bg-gray-50 p-4 rounded-2xl border border-gray-100 animate-pulse">
+                <p className="text-[10px] font-black uppercase text-gray-400 tracking-widest">Redirecting to Dashboard...</p>
+              </div>
             </div>
           ) : (
             <>
