@@ -218,3 +218,25 @@ The architecture is now robust not just against happy paths, but against adversa
 
 ## 🔄 Reflection
 OmniRent has successfully transitioned from an experimental sandbox into a hardened, production-capable financial escrow platform, where every stage of an item's lifecycle mathematically protects both the owner and the renter.
+
+---
+
+# Sprint 9 — Escrow Fortress & Legal Compliance
+
+**Focus:** Eradicate state collision bugs, secure the Escrow payouts against concurrent disputes, and integrate proactive legal consent.
+
+## ✅ What We Implemented
+
+### The Escrow Fortress (State-Lock Matrix)
+* **Ghost Inventory Lock:** Re-engineered the "Archive" function. Owners can no longer delete items that are currently in an active transaction or dispute, ensuring active evidence is physically bolted down for Administrators.
+* **Double-Payout Immunity:** Intercepted the `PUT /confirm-receipt` Escrow release endpoint. If there is an `open` dispute in the system from either party, the transaction explicitly throws a hard error and freezes. The Escrow flow physically pauses until the Admin ticket is resolved.
+* **Symmetrical Owner Disputes:** Fixed a loophole where Owners could dispute a returned item without providing evidence. Owners are now forced through the `ConditionUploadModal` to provide "Post-Flight" camera documentation *before* unlocking the `DisputeModal` text submission.
+* **Single-Ticket Enforcement:** Blocked users from spamming the dispute endpoint, locking the relationship to an absolute 1:1 `rental_id` to `dispute` configuration.
+
+### Proactive Legal Connectivity
+* **Active Consent Hooks:** Injected explicit, legally binding UI warnings into the four major platform arteries: User Registration, Item Publishing, Rental Checkout, and Evidence Uploading.
+* **Legal Policy Architecture:** Built and deployed formal, aesthetic static routes for *Terms of Service*, *Privacy Policy*, and *Usage Agreements*, clarifying OmniRent's exact stance on identity verification and physical asset liability.
+* **Global Ecosystem:** Implemented a unified system footer to seamlessly ground the UI while providing persistent legal navigation.
+
+## 🔄 Reflection
+OmniRent's backend is now mathematically immune to overlapping matrix state errors. The platform has officially reached elite physical Escrow functionality standards.
