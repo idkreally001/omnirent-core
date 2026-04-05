@@ -197,3 +197,24 @@ The system is now vertically scaled to handle complex P2P marketplaces with high
 The architecture is now robust not just against happy paths, but against adversarial interaction.
 
 ---
+
+# Sprint 8 — High-Trust Operations & Deployment Sync
+
+**Focus:** Close the final gaps in P2P trust mechanisms and synchronize schema migrations to the live production environments.
+
+## ✅ What We Implemented
+
+### Identity Singularity
+* **Hardware-Level Uniqueness:** Enforced a `UNIQUE` constraint on the `tc_no` column in PostgreSQL, neutralizing identity-cloning across multiple accounts. The backend verification API now actively intercepts duplicate TCKNs.
+
+### The True "Handover Handshake"
+* **Pre-Flight Accountability:** We completely dismantled the "Word of Mouth" vulnerability. Rentals now default to a `pending_handover` state on creation.
+* **Dual-Verification Funnel:** The Renter must physically receive the item and click **"Confirm Receipt"**. This triggers the `ConditionUploadModal`, forcing the renter to supply *Pre-Flight Evidence* (`stage: handover`), anchoring the item's starting condition definitively into the system.
+* **Stage Alignment Fix:** Corrected a critical mapping distortion where post-flight returns were cross-contaminating pre-flight staging in the Admin Dashboard query logs.
+
+### UI/UX Immersion
+* **Integrated Dispute Modal:** Replaced the legacy window-prompt `window.prompt` with a full-context, high-fidelity `DisputeModal`, wrapping serious actions in professional UX.
+* **DevOps Balancing:** Loosened the `express-rate-limit` from 150 to 500 requests to accommodate aggressive testing sprints without locking out administrators.
+
+## 🔄 Reflection
+OmniRent has successfully transitioned from an experimental sandbox into a hardened, production-capable financial escrow platform, where every stage of an item's lifecycle mathematically protects both the owner and the renter.

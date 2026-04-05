@@ -137,24 +137,42 @@ export default function AdminDashboard() {
                         <AlertCircle /> No evidence was submitted for this transaction.
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
+                    <div className="flex flex-col gap-6 mb-8">
                         {/* Handover Evidence */}
-                        <div className="space-y-3">
+                        <div className="space-y-3 bg-white p-4 rounded-2xl border border-gray-100">
                            <h4 className="text-xs font-black uppercase tracking-widest text-gray-500 bg-gray-100 px-3 py-1 inline-block rounded-md">Pre-Flight (Handover)</h4>
-                           <div className="grid grid-cols-2 gap-2">
+                           <p className="text-[10px] font-bold text-gray-400 uppercase mb-2">Renter Pick-up Condition</p>
+                           <div className="flex flex-wrap gap-2">
                               {evidence.filter(e => e.stage === 'handover').map(e => (
-                                 <img key={e.id} src={e.image_url} alt="Handover" className="aspect-square object-cover rounded-xl bg-gray-100" />
+                                 <img key={e.id} src={e.image_url} alt="Handover" className="w-24 h-24 object-cover rounded-xl bg-gray-100 border border-gray-200" />
                               ))}
                            </div>
                         </div>
 
                         {/* Return Evidence */}
-                        <div className="space-y-3">
+                        <div className="space-y-4 bg-white p-4 rounded-2xl border border-blue-100">
                            <h4 className="text-xs font-black uppercase tracking-widest text-blue-600 bg-blue-50 px-3 py-1 inline-block rounded-md">Post-Flight (Return)</h4>
-                           <div className="grid grid-cols-2 gap-2">
-                              {evidence.filter(e => e.stage === 'return').map(e => (
-                                 <img key={e.id} src={e.image_url} alt="Return" className="aspect-square object-cover rounded-xl bg-gray-100" />
-                              ))}
+                           
+                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                               {/* Renter Return Phase */}
+                               <div className="bg-gray-50 p-3 rounded-xl border border-gray-100">
+                                  <p className="text-[10px] font-bold text-gray-500 uppercase mb-2">Renter Drop-off</p>
+                                  <div className="flex flex-wrap gap-2">
+                                     {evidence.filter(e => e.stage === 'return' && e.uploaded_by === selectedDispute.renter_id).map(e => (
+                                        <img key={e.id} src={e.image_url} alt="Renter Return" className="w-20 h-20 object-cover rounded-xl bg-white border border-gray-200" />
+                                     ))}
+                                  </div>
+                               </div>
+
+                               {/* Owner Confirm Phase */}
+                               <div className="bg-blue-50/50 p-3 rounded-xl border border-blue-100/50">
+                                  <p className="text-[10px] font-bold text-blue-600 uppercase mb-2">Owner Received</p>
+                                  <div className="flex flex-wrap gap-2">
+                                     {evidence.filter(e => e.stage === 'return' && e.uploaded_by === selectedDispute.owner_id).map(e => (
+                                        <img key={e.id} src={e.image_url} alt="Owner Receive" className="w-20 h-20 object-cover rounded-xl bg-white border border-gray-200" />
+                                     ))}
+                                  </div>
+                               </div>
                            </div>
                         </div>
                     </div>
