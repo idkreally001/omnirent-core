@@ -5,5 +5,4 @@ module.exports = {
     // Setup file runs before all test suites
     globalSetup: './tests/globalSetup.js',
     globalTeardown: './tests/globalTeardown.js',
-    setupFilesAfterFramework: ['./tests/setup.js'],
 };
