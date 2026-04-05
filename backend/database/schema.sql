@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS users (
     id SERIAL PRIMARY KEY,
     full_name VARCHAR(100) NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
-    tc_no VARCHAR(11),
+    tc_no VARCHAR(11) UNIQUE,
     password_hash TEXT NOT NULL,
     balance DECIMAL(10, 2) DEFAULT 0.00,
     is_admin BOOLEAN DEFAULT FALSE,
@@ -32,7 +32,8 @@ CREATE TABLE IF NOT EXISTS rentals (
     rental_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Added to match your psql output
     return_date TIMESTAMP NOT NULL,
     total_price DECIMAL(10, 2) NOT NULL,
-    status VARCHAR(20) DEFAULT 'active', -- 'active', 'returned_by_renter', 'completed'
+    status VARCHAR(20) DEFAULT 'pending_handover', 
+    -- 'pending_handover', 'active', 'returned_by_renter', 'completed'
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
