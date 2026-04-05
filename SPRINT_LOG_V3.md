@@ -172,6 +172,9 @@ OmniRent has successfully transitioned from an experimental sandbox into a harde
 * **Policy Architecture:** Deployed dedicated routes for Terms of Service, Privacy Policy, and Usage Agreements to clarify platform liability.
 * **Unified Footer:** Implemented a global footer system to provide persistent navigation for legal and usage policies.
 
+### **🔄 Sprint Reflection**
+OmniRent's backend is now mathematically immune to overlapping state errors, reaching elite standards for physical escrow functionality.
+
 ---
 
 ## **Sprint 10: Production Hardening & Quality Assurance**
@@ -180,9 +183,12 @@ OmniRent has successfully transitioned from an experimental sandbox into a harde
 ### **✅ Core Deliverables & Implementation**
 *   **Integration Testing Suite:** Developed a comprehensive test suite using **Jest and Supertest** (58 tests) covering Auth, Items, Rentals, Messaging, and Admin governance.
 *   **Database Isolation:** Engineered a `globalSetup.js` and `globalTeardown.js` logic that runs tests against a dedicated `DATABASE_URL_TEST`, with absolute guards preventing accidental production data wipes.
-*   **Brute-Force Protection:** Implemented strict rate-limiting on the `/api/auth/login` endpoint (5 attempts per 15 minutes) to protect against credential stuffing.
-*   **Secure Upload Flow:** Migrated from client-side Cloudinary logic to a secure **Backend Signature** flow, ensuring upload API secrets are never exposed to the browser.
-*   **Intelligent Health Monitoring:** Built a dual-purpose `/api/health` endpoint that performs a live database connectivity check (`SELECT 1`) to ensure the entire stack is healthy before Render deployments switch traffic.
+*   **Server Refactor:** Decoupled the Express `app` from the HTTP server listener, enabling Supertest to inject the app instance without network port conflicts during testing.
+*   **Brute-Force Protection:** Implemented strict rate-limiting on the `/api/auth/login` endpoint to protect against credential stuffing attacks.
+*   **Dynamic CORS:** Implemented configurable CORS origins via `ALLOWED_ORIGINS` environment variable, replacing hardcoded localhost values.
+*   **Secure Upload Flow:** Migrated from client-side Cloudinary logic to a secure **Backend Signature** flow (`/api/upload-signature`), ensuring upload API secrets are never exposed to the browser.
+*   **Intelligent Health Monitoring:** Built a dual-purpose `/api/health` endpoint that performs a live database connectivity check (`SELECT 1`) and serves both machine-readable JSON and human-friendly HTML status pages.
+*   **Global Error Handler:** Implemented centralized error-handling middleware to catch unhandled exceptions and prevent full server crashes.
 *   **UX Bug Fixes:** Patched the "Account Deletion" 401/400 status code bug that was causing unintentional global logouts on failed password attempts.
 
 ### **🔄 Sprint Reflection**
@@ -190,11 +196,37 @@ This sprint moved OmniRent from a "feature-complete" state to a "production-reli
 
 ---
 
-## **Sprint 11: Scale & Transactional Excellence (Proposed)**
-**Primary Focus:** Expanding user engagement and automating the developer lifecycle.
+## **Sprint 11: Email Verification & Transactional Communication**
+**Primary Focus:** Implementing mandatory email verification for account security and integrating transactional email notifications across the rental lifecycle.
+
+### **✅ Core Deliverables & Implementation**
+*   **Email Service Architecture:** Built a modular `emailService.js` using **Resend** with an automatic console-logging fallback for development environments without an API key.
+*   **Account Verification:** Mandated email verification for all new registrations. The backend generates a cryptographic token (`crypto.randomBytes`), stores it in the database, and dispatches a verification email containing a secure activation link.
+*   **Verification Endpoint:** Implemented `GET /api/auth/verify-email` that activates user accounts and renders a branded success page with a direct link back to the login screen.
+*   **Login Guard:** Updated the authentication flow to reject unverified accounts with a `403 Forbidden` status, preventing access to the platform before email confirmation.
+*   **Frontend Registration Flow:** Replaced the auto-login behavior with a dedicated "Check Your Email" success screen (`MailCheck` icon, email display, and login redirect), ensuring alignment with the new backend contract.
+*   **Owner Rental Alerts:** Integrated email notifications into the rental creation route, automatically alerting item owners when their equipment is booked, including renter name and earnings details.
+*   **Escrow Completion Receipts:** Implemented dual-party digital receipt dispatch upon successful return confirmation, providing both the renter and owner with a transaction summary for audit purposes.
+*   **Environment Variable Elimination:** Removed the need for a `FRONTEND_URL` environment variable by deriving the backend URL from the incoming request (`req.protocol + req.get('host')`) and reusing the existing `ALLOWED_ORIGINS` variable for frontend redirects.
+*   **Test Suite Adaptation:** Updated all 58 integration tests to accommodate the new verification flow by auto-verifying test users in the database and generating tokens manually via `authService.generateToken()`.
+*   **Dependency Audit:** Resolved all npm audit vulnerabilities across both backend and frontend, achieving zero known vulnerabilities in the dependency tree.
+
+### **⚠️ Technical Blockers & Resolutions**
+*   **Existing User Lockout Risk:** Identified that the `is_email_verified` column defaults to `FALSE`, which would lock out all pre-existing users. Mitigated by confirming the production database was truncated prior to deployment.
+*   **Frontend State Desync:** The original `Register.jsx` attempted to store a token that the backend no longer returns, causing silent failures and redirect loops. Fixed by replacing the auto-login pattern with an explicit success state.
+*   **Axios Interceptor Collision:** Verified that the frontend's response interceptor only catches `401` (not `403`) and explicitly skips auth routes, ensuring the "unverified" error message displays correctly on the login page.
+*   **Route Syntax Corruption:** Identified and repaired a critical syntax error in `rental.routes.js` where missing `require` statements and an unclosed route handler caused the entire rental module to fail silently.
+
+### **🔄 Sprint Reflection**
+OmniRent now enforces verified-identity-first access, ensuring that every user on the platform has confirmed ownership of their email address. The transactional email system provides real-time, out-of-app awareness for the two most critical marketplace events: new revenue and completed transactions. The architecture remains zero-config for developers, requiring only a single optional API key (`RESEND_API_KEY`) to activate live email dispatch.
+
+---
+
+## **Sprint 12: Automation & Growth (Proposed)**
+**Primary Focus:** Expanding platform capabilities and automating the developer lifecycle.
 
 ### **🎯 Future Goals**
-*   **Transactional Emails:** Integrate **Resend** for out-of-app notifications.
-*   **Automated CI:** Setup GitHub Actions to run tests on every pull request.
-*   **Availability Calendar:** Implement date-range booking visuals for items.
-*   **Multi-Image Support:** Support for item photo galleries.
+*   **CI/CD Pipeline:** Configure GitHub Actions to run the full test suite on every push, blocking deployment if any test fails.
+*   **Availability Calendar:** Implement visual date-range booking on item detail pages to prevent users from attempting reservations on occupied dates.
+*   **Multi-Image Gallery:** Expand item listings to support multiple photos with a carousel viewer.
+*   **Notification Digest:** Implement a periodic email summary for users with unread notifications after extended inactivity.

@@ -1,0 +1,48 @@
+name: Run Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: omnirent_ci
+          POSTGRES_PASSWORD: ci_password
+          POSTGRES_DB: omnirent_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    env:
+      DATABASE_URL: postgresql://omnirent_ci:ci_password@localhost:5432/omnirent_test
+      DATABASE_URL_TEST: postgresql://omnirent_ci:ci_password@localhost:5432/omnirent_test
+      JWT_SECRET: ci-test-secret
+      ADMIN_SECRET: ci-admin-secret
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install Backend Dependencies
+        working-directory: ./backend
+        run: npm ci
+
+      - name: Run Tests
+        working-directory: ./backend
+        run: npm test
