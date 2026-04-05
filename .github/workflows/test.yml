@@ -26,7 +26,7 @@ jobs:
           --health-retries=5
 
     env:
-      DATABASE_URL: postgresql://omnirent_ci:ci_password@localhost:5432/omnirent_test
+      DATABASE_URL: postgresql://dummy:dummy@localhost:5432/not_real
       DATABASE_URL_TEST: postgresql://omnirent_ci:ci_password@localhost:5432/omnirent_test
       JWT_SECRET: ci-test-secret
       ADMIN_SECRET: ci-admin-secret
