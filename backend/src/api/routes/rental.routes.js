@@ -167,6 +167,15 @@ router.put('/:id/confirm-receipt', auth, async (req, res) => {
 
         if (owner_id !== req.user.id) return res.status(403).json({ error: "Unauthorized" });
 
+        // ESCROW FREEZE: Check if an active dispute exists
+        const disputeCheck = await client.query(
+            "SELECT id FROM disputes WHERE rental_id = $1 AND status = 'open'",
+            [req.params.id]
+        );
+        if (disputeCheck.rows.length > 0) {
+            throw new Error("Escrow is currently frozen due to an active dispute. Platform logic is paused until an Administrator resolves the ticket.");
+        }
+
         // Get Escrow Funds
         const rentDetails = await client.query("SELECT total_price FROM rentals WHERE id = $1", [req.params.id]);
         const escrowAmount = rentDetails.rows[0].total_price;

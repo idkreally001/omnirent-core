@@ -50,10 +50,10 @@ router.put('/disputes/:id/resolve', auth, adminAuth, async (req, res) => {
         
         // Escrow Resolution Logic
         const rentalCheck = await pool.query(
-            "SELECT r.total_price, r.renter_id, i.owner_id FROM rentals r JOIN items i ON r.item_id = i.id WHERE r.id = $1", 
+            "SELECT r.total_price, r.renter_id, r.item_id, i.owner_id FROM rentals r JOIN items i ON r.item_id = i.id WHERE r.id = $1", 
             [disputeRes.rows[0].rental_id]
         );
-        const { total_price, renter_id, owner_id } = rentalCheck.rows[0];
+        const { total_price, renter_id, item_id, owner_id } = rentalCheck.rows[0];
 
         if (resolution === 'refund_renter') {
             await pool.query("UPDATE users SET balance = balance + $1 WHERE id = $2", [total_price, renter_id]);
@@ -61,11 +61,9 @@ router.put('/disputes/:id/resolve', auth, adminAuth, async (req, res) => {
             await pool.query("UPDATE users SET balance = balance + $1 WHERE id = $2", [total_price, owner_id]);
         }
         
-        // Let's close the rental as well to clear it out of active buckets
-        await pool.query(
-            "UPDATE rentals SET status = 'completed' WHERE id = $1",
-            [disputeRes.rows[0].rental_id]
-        );
+        // Let's close the rental as well to clear it out of active buckets, and restore the item to available
+        await pool.query("UPDATE rentals SET status = 'completed' WHERE id = $1", [disputeRes.rows[0].rental_id]);
+        await pool.query("UPDATE items SET status = 'available' WHERE id = $1", [item_id]);
 
         await pool.query('COMMIT');
         res.json({ message: "Dispute resolved successfully. Escrow funds have been distributed." });

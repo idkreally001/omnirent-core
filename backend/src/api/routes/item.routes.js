@@ -101,8 +101,13 @@ router.delete('/:id', auth, async (req, res) => {
             return res.status(403).json({ error: "Unauthorized" });
         }
 
-        if (item.status === 'rented') {
-            return res.status(400).json({ error: "Cannot delete item while it is currently rented." });
+        // Strict check: Are there any unresolved rentals (or disputes) for this item?
+        const activeRentals = await pool.query(
+            "SELECT id FROM rentals WHERE item_id = $1 AND status != 'completed'",
+            [req.params.id]
+        );
+        if (activeRentals.rows.length > 0) {
+            return res.status(400).json({ error: "Cannot archive an item that is currently in a transaction or active dispute." });
         }
 
         await pool.query("UPDATE items SET is_deleted = TRUE WHERE id = $1", [req.params.id]);
