@@ -89,7 +89,7 @@ export default function Legal() {
         <h1 className="text-3xl md:text-5xl font-black mb-3">
           Legal Center
         </h1>
-        <p className="text-xs tracking-widest text-gray-500">
+        <p className="text-xs tracking-widest text-text-secondary">
           Terms • Privacy • Usage • License
         </p>
       </header>
@@ -107,7 +107,7 @@ export default function Legal() {
               className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm whitespace-nowrap border ${
                 active === id
                   ? "bg-blue-600 text-white"
-                  : "bg-white border-gray-200"
+                  : "bg-card-bg border-border-subtle text-text-primary"
               }`}
             >
               <Icon size={14} />
@@ -132,8 +132,8 @@ export default function Legal() {
                 onClick={() => changeSection(id)}
                 className={`w-full flex items-center justify-between p-4 rounded-xl border ${
                   isActive
-                    ? 'bg-gray-50 border-blue-500 shadow'
-                    : 'bg-white border-gray-200 hover:border-gray-300'
+                    ? 'bg-bg-primary border-blue-500 shadow'
+                    : 'bg-card-bg border-border-subtle hover:border-blue-400'
                 }`}
               >
                 <div className="flex items-center gap-3">
@@ -149,15 +149,15 @@ export default function Legal() {
         </nav>
 
         {/* CONTENT */}
-        <main className="lg:col-span-9 bg-white border border-gray-200 rounded-2xl p-6 md:p-10 shadow-sm">
+        <main className="lg:col-span-9 bg-card-bg border border-border-subtle rounded-2xl p-6 md:p-10 shadow-sm">
 
           {/* DISCLAIMER */}
-          <div className="mb-8 p-4 bg-red-50 border border-red-200 rounded-xl">
-            <div className="flex items-center gap-2 mb-2 text-red-600 text-sm font-bold">
+          <div className="mb-8 p-4 bg-red-500/10 border border-red-500/30 rounded-xl">
+            <div className="flex items-center gap-2 mb-2 text-red-500 text-sm font-bold">
               <AlertTriangle size={16} />
               General Disclaimer
             </div>
-            <p className="text-sm text-gray-700 leading-relaxed">
+            <p className="text-sm text-text-secondary leading-relaxed">
               OmniRent facilitates peer-to-peer transactions and does not guarantee the safety, legality, or condition of listed items. All real-world risks are assumed by users.
             </p>
           </div>
@@ -168,7 +168,7 @@ export default function Legal() {
 
             return (
               <div key={id} className={isActive ? 'block' : 'hidden'}>
-                <div className="flex justify-between items-center mb-8 border-b pb-4">
+                <div className="flex justify-between items-center mb-8 border-b border-border-subtle pb-4">
                   <h2 className="text-2xl md:text-3xl font-black">
                     {config.title}
                   </h2>
@@ -183,7 +183,7 @@ export default function Legal() {
                       <h3 className="font-semibold text-sm mb-1">
                         {c.head}
                       </h3>
-                      <p className="text-sm md:text-base text-gray-700 leading-relaxed">
+                      <p className="text-sm md:text-base text-text-secondary leading-relaxed">
                         {c.body}
                       </p>
                     </section>
@@ -192,7 +192,7 @@ export default function Legal() {
 
                 <button
                   onClick={() => window.print()}
-                  className="mt-8 flex items-center gap-2 text-xs font-bold text-gray-500 hover:text-blue-600"
+                  className="mt-8 flex items-center gap-2 text-xs font-bold text-text-secondary hover:text-accent-primary"
                 >
                   <Printer size={14} />
                   Print Document

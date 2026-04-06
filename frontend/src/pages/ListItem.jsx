@@ -45,21 +45,21 @@ export default function ListItem() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto mt-10 bg-white p-10 rounded-3xl shadow-sm border border-gray-100">
+    <div className="max-w-2xl mx-auto mt-10 bg-card-bg p-10 rounded-3xl shadow-sm border border-border-subtle">
       <div className="flex items-center gap-4 mb-8">
         <div className="bg-blue-50 p-3 rounded-2xl text-blue-600">
           <PackagePlus size={32} />
         </div>
-        <h1 className="text-3xl font-black text-gray-900">List an Item</h1>
+        <h1 className="text-3xl font-black text-text-primary">List an Item</h1>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
-          <label className="block text-xs font-black uppercase text-gray-400 mb-2 ml-1">What are you renting?</label>
+          <label className="block text-xs font-black uppercase text-text-secondary mb-2 ml-1">What are you renting?</label>
           <input 
             type="text" 
             placeholder="e.g., Bosch Professional Drill"
-            className="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-blue-600 outline-none transition font-semibold"
+            className="w-full p-4 bg-bg-primary text-text-primary border border-border-subtle rounded-2xl focus:ring-2 focus:ring-blue-600 outline-none transition font-semibold placeholder:text-text-secondary"
             onChange={(e) => setFormData({...formData, title: e.target.value})}
             required
           />
@@ -67,9 +67,9 @@ export default function ListItem() {
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-xs font-black uppercase text-gray-400 mb-2 ml-1">Category</label>
+            <label className="block text-xs font-black uppercase text-text-secondary mb-2 ml-1">Category</label>
             <select 
-              className="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-blue-600 outline-none transition font-semibold"
+              className="w-full p-4 bg-bg-primary text-text-primary border border-border-subtle rounded-2xl focus:ring-2 focus:ring-blue-600 outline-none transition font-semibold"
               onChange={(e) => setFormData({...formData, category: e.target.value})}
             >
               <option>Tools</option>
@@ -79,11 +79,11 @@ export default function ListItem() {
             </select>
           </div>
           <div>
-            <label className="block text-xs font-black uppercase text-gray-400 mb-2 ml-1">Price / Day (₺)</label>
+            <label className="block text-xs font-black uppercase text-text-secondary mb-2 ml-1">Price / Day (₺)</label>
             <input 
               type="number" 
               placeholder="0.00"
-              className="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-blue-600 outline-none transition font-semibold"
+              className="w-full p-4 bg-bg-primary text-text-primary border border-border-subtle rounded-2xl focus:ring-2 focus:ring-blue-600 outline-none transition font-semibold placeholder:text-text-secondary"
               onChange={(e) => setFormData({...formData, price: e.target.value})}
               required
             />
@@ -116,7 +116,7 @@ export default function ListItem() {
               </div>
             ) : (
               <div className={`w-full py-12 rounded-2xl transition border-2 border-dashed flex flex-col items-center justify-center gap-3
-                ${isUploading ? 'bg-gray-100 border-gray-300 text-gray-400 animate-pulse' : 'bg-gray-50 border-gray-200 text-gray-500 hover:bg-gray-100'}`}>
+                ${isUploading ? 'bg-bg-secondary border-border-subtle text-text-secondary animate-pulse' : 'bg-bg-primary border-border-subtle text-text-secondary hover:bg-bg-secondary'}`}>
                 <UploadCloud size={32} className={isUploading ? 'text-gray-300' : 'text-blue-500'} /> 
                 <span className="font-bold text-sm">
                   {isUploading ? 'Compressing & Uploading...' : 'Click or Drag to Upload Photo'}
@@ -128,19 +128,19 @@ export default function ListItem() {
         </div>
 
         <div>
-          <label className="block text-xs font-black uppercase text-gray-400 mb-2 ml-1">Description</label>
+          <label className="block text-xs font-black uppercase text-text-secondary mb-2 ml-1">Description</label>
           <textarea 
             rows="4"
             placeholder="Tell us about the condition and features..."
-            className="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-blue-600 outline-none transition font-semibold"
+            className="w-full p-4 bg-bg-primary text-text-primary border border-border-subtle rounded-2xl focus:ring-2 focus:ring-blue-600 outline-none transition font-semibold placeholder:text-text-secondary"
             onChange={(e) => setFormData({...formData, description: e.target.value})}
             required
           />
         </div>
 
-        <div className="p-4 bg-gray-50 border border-gray-100 rounded-2xl flex items-start gap-3 mt-6">
-          <ShieldCheck size={20} className="text-gray-400 shrink-0 mt-0.5" />
-          <p className="text-[10px] text-gray-500 font-medium leading-relaxed">
+        <div className="p-4 bg-bg-primary border border-border-subtle rounded-2xl flex items-start gap-3 mt-6">
+          <ShieldCheck size={20} className="text-text-secondary shrink-0 mt-0.5" />
+          <p className="text-[10px] text-text-secondary font-medium leading-relaxed">
             By publishing this listing, you confirm that you legally own this asset and agree to OmniRent's <Link to="/usage" className="text-blue-600 font-bold hover:underline">Usage Agreement</Link>. You also agree to adhere to the photographic evidence guidelines mandated by the Trust & Safety Engine during handovers.
           </p>
         </div>
