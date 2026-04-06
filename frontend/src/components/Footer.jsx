@@ -1,22 +1,39 @@
 import { Link } from 'react-router-dom';
-import { Layers } from 'lucide-react';
+import { Layers, Github } from 'lucide-react';
 
 export default function Footer() {
   return (
-    <footer className="mt-20 border-t border-gray-100 bg-white">
-      <div className="max-w-7xl mx-auto px-4 py-8 flex flex-col md:flex-row justify-between items-center gap-4">
-        
-        <div className="flex items-center gap-2 text-gray-900 font-black tracking-tight">
-          <Layers size={20} className="text-blue-600" />
-          OMNIRENT <span className="text-gray-400 font-bold ml-1 text-sm">© 2026</span>
+    <footer className="mt-20 border-t border-border-subtle bg-bg-secondary transition-colors duration-300">
+      <div className="max-w-7xl mx-auto px-4 py-12">
+        <div className="flex flex-col md:flex-row justify-between items-center gap-8">
+          
+          <div className="flex flex-col items-center md:items-start gap-2">
+            <div className="flex items-center gap-2 text-text-primary font-black tracking-tight">
+              <Layers size={20} className="text-blue-600" />
+              OMNIRENT <span className="text-text-secondary font-bold ml-1 text-sm">© 2026</span>
+            </div>
+            <p className="text-[10px] text-text-secondary font-bold uppercase tracking-widest">
+              Built for the community, by the community.
+            </p>
+          </div>
+
+          <nav className="flex items-center gap-8 text-[11px] font-black uppercase tracking-widest text-text-secondary">
+            <Link to="/about" className="hover:text-blue-600 transition-colors">About</Link>
+            <Link to="/terms" className="hover:text-text-primary transition-colors">Terms</Link>
+            <Link to="/privacy" className="hover:text-text-primary transition-colors">Privacy</Link>
+            <Link to="/usage" className="hover:text-text-primary transition-colors">Usage</Link>
+            <a 
+              href="https://github.com/idkreally001/omnirent-core" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 px-4 py-2 bg-text-primary text-bg-primary rounded-full hover:bg-blue-600 transition-all scale-95 hover:scale-100"
+            >
+              <Github size={14} />
+              GitHub
+            </a>
+          </nav>
+
         </div>
-
-        <nav className="flex items-center gap-6 text-[11px] font-black uppercase tracking-widest text-gray-400">
-          <Link to="/terms" className="hover:text-gray-900 transition-colors">Terms of Service</Link>
-          <Link to="/privacy" className="hover:text-gray-900 transition-colors">Privacy Policy</Link>
-          <Link to="/usage" className="hover:text-gray-900 transition-colors">Usage Agreement</Link>
-        </nav>
-
       </div>
     </footer>
   );

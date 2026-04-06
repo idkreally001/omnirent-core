@@ -222,11 +222,24 @@ OmniRent is now a professionally guarded platform. We have eliminated manual ver
 
 ---
 
-## **Sprint 12: Growth & Visual Excellence (Proposed)**
-**Primary Focus:** Expanding platform capabilities and booking flexibility.
+## **Sprint 12: Dark Mode & Community Engagement**
+**Primary Focus:** Implementing a premium visual experience and establishing a professional open-source presence.
+
+### **✅ Core Deliverables & Implementation**
+*   **Dynamic Theme Engine:** Engineered a `ThemeContext` that detects system preferences (`prefers-color-scheme`) and persists user choices via `localStorage`.
+*   **Tailwind v4 Design Tokens:** Refactored the entire CSS foundation in `index.css` to use semantic variables (`--bg-primary`, `--text-primary`), enabling instant application-wide theme switching.
+*   **Aesthetic Switcher:** Designed a high-polish Sun/Moon toggle with micro-animations and integrated it into the global navigation bar.
+*   **Community Presence:** Created a dedicated **"About & Thank You"** page documenting the project's mission and open-source spirit.
+*   **GitHub Integration:** Added a direct, styled link to the official repository in the footer to encourage community transparency and contribution.
+*   **Themed Content Audit:** Systematically updated `Home.jsx`, `Browse.jsx`, and the `Navbar/Footer` components to ensure a premium "Slate & Charcoal" experience in Dark Mode.
+
+---
+
+## **Sprint 13: Advanced Logistics & Visual Content (Proposed)**
+**Primary Focus:** Enhancing the booking experience and item representation.
 
 ### **🎯 Future Goals**
-*   **Availability Calendar:** Implement visual date-range booking on item detail pages to prevent overlapping reservation attempts.
-*   **Multi-Image Gallery:** Expand item listings to support multiple photos with a high-performance carousel viewer.
-*   **Notification Digest:** Implement a periodic email summary for users with unread notifications after extended inactivity.
-lement a periodic email summary for users with unread notifications after extended inactivity.
+*   **Availability Calendar:** Implement visual date-range selection on item detail pages to provide real-time booking availability and prevent overlap errors.
+*   **Multi-Image Gallery:** Support multiple high-resolution photos per listing with a performance-optimized carousel and lightbox viewer.
+*   **Real-Time Notification Bar:** Add an in-app "Toast" system for instant feedback when rental statuses change or new messages arrive.
+*   **User Verification Badges:** Implement a visual "Verified" checkmark for users who have completed their email confirmation and have a 4.5+ star rating.

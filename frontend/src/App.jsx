@@ -23,71 +23,77 @@ import AdminDashboard from './pages/AdminDashboard';
 import Terms from './pages/Terms';
 import Privacy from './pages/Privacy';
 import Usage from './pages/Usage';
+import About from './pages/About';
 import Footer from './components/Footer';
 
 // Import your guards
 import PublicRoute from './components/PublicRoute';
 import PrivateRoute from './components/PrivateRoute';
+import { ThemeProvider } from './context/ThemeContext';
 
 function App() {
   return (
-    <Router>
-      <div className="min-h-screen bg-gray-50 text-gray-900 font-sans">
-        <Navbar />
-        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <Routes>
-            {/* 1. Open Routes (Anyone can see) */}
-            <Route path="/" element={<Home />} />
-            <Route path="/user/:id" element={<PublicProfile />} />
-            <Route path="/terms" element={<Terms />} />
-            <Route path="/privacy" element={<Privacy />} />
-            <Route path="/usage" element={<Usage />} />
+    <ThemeProvider>
+      <Router>
+        <div className="min-h-screen bg-bg-primary text-text-primary font-sans transition-colors duration-300">
+          <Navbar />
+          <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <Routes>
+              {/* 1. Open Routes (Anyone can see) */}
+              <Route path="/" element={<Home />} />
+              <Route path="/user/:id" element={<PublicProfile />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/terms" element={<Terms />} />
+              <Route path="/privacy" element={<Privacy />} />
+              <Route path="/usage" element={<Usage />} />
 
-            {/* 2. Public-Only Routes (Redirect to Profile if logged in) */}
-            <Route path="/login" element={
-              <PublicRoute>
-                <Login />
-              </PublicRoute>
-            } />
-            <Route path="/register" element={
-              <PublicRoute>
-                <Register />
-              </PublicRoute>
-            } />
+              {/* 2. Public-Only Routes (Redirect to Profile if logged in) */}
+              <Route path="/login" element={
+                <PublicRoute>
+                  <Login />
+                </PublicRoute>
+              } />
+              <Route path="/register" element={
+                <PublicRoute>
+                  <Register />
+                </PublicRoute>
+              } />
 
-            <Route path="/browse" element={<Browse />} />
+              <Route path="/browse" element={<Browse />} />
 
-            <Route path="/item/:id" element={<ItemDetail />} />
+              <Route path="/item/:id" element={<ItemDetail />} />
 
 
-            <Route path="/list-item" element={
-              <PrivateRoute>
-                <ListItem />
-              </PrivateRoute>
-            } />
+              <Route path="/list-item" element={
+                <PrivateRoute>
+                  <ListItem />
+                </PrivateRoute>
+              } />
 
-            {/* 3. Private Routes (Redirect to Login if logged out) */}
-            <Route path="/profile" element={
-              <PrivateRoute>
-                <Profile />
-              </PrivateRoute>
-            } />
-            <Route path="/messages" element={
-              <PrivateRoute>
-                <ChatPage />
-              </PrivateRoute>
-            } />
-            <Route path="/admin" element={
-              <PrivateRoute>
-                <AdminDashboard />
-              </PrivateRoute>
-            } />
-          </Routes>
-        </main>
-        <Footer />
-      </div>
-    </Router>
+              {/* 3. Private Routes (Redirect to Login if logged out) */}
+              <Route path="/profile" element={
+                <PrivateRoute>
+                  <Profile />
+                </PrivateRoute>
+              } />
+              <Route path="/messages" element={
+                <PrivateRoute>
+                  <ChatPage />
+                </PrivateRoute>
+              } />
+              <Route path="/admin" element={
+                <PrivateRoute>
+                  <AdminDashboard />
+                </PrivateRoute>
+              } />
+            </Routes>
+          </main>
+          <Footer />
+        </div>
+      </Router>
+    </ThemeProvider>
   );
 }
 
 export default App;
+
