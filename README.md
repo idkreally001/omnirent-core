@@ -1,5 +1,3 @@
----
-
 # OmniRent: The Universal Sharing Marketplace
 
 OmniRent is a high-trust, peer-to-peer (P2P) rental platform designed to transition from a model of **"Ownership" to "Access."** It provides a secure ecosystem for users to monetize assets and access premium equipment on demand.
@@ -8,26 +6,36 @@ OmniRent is a high-trust, peer-to-peer (P2P) rental platform designed to transit
 
 ## 🏗 Modular System Architecture
 
-The OmniRent platform is developed using a highly scalable, 6-module Agile architecture. Each module operates with distinct independence and objective-driven logic:
+The OmniRent platform is developed using a highly scalable, 8-module architecture:
 
-1. **The Identity & Trust Module:** A secure onboarding system featuring JWT authentication, mathematically accurate TCKN validation algorithms, and a pluggable Service-Adapter pattern.
-2. **The Asset Management & Discovery Module:** A dynamic digital catalog featuring real-time live feeds, multi-parameter filtering, debounced global search querying, and soft-delete historical preservation.
-3. **The Transaction & Escrow Module:** An ACID-compliant financial engine utilizing PostgreSQL `BEGIN/COMMIT` blocks securely freezing transaction funds in system proxy. Eliminates risk by holding funds until the owner and renter mutually verify condition and transfer.
-4. **The Notification & Governance Module:** An asynchronous Event Bus powering real-time system alerts, deep-linked actionable tasks, and real-time Admin Dispute broadcasts.
-5. **The Real-Time Communication Module:** A low-latency Socket.io messaging layer featuring context-aware inboxes linked to specific assets, and "Focus/Blur" logic for instant Read Receipts (blue ticks).
-6. **The Production Readiness Module:** A responsive, multi-column CSS Grid interface prepared for enterprise scaling. Includes a robust **Dispute Engine** where administrators compare condition-logging evidence to release escrow holds.
-7. **The Media & Asset Evidence Module:** A browser-native image compression system using HTML5 Canvas to optimize high-resolution proof-of-condition photos before uploading them to Cloudinary.
+1. **Identity & Trust:** Secure onboarding featuring JWT, TCKN validation, and **Mandatory Email Verification (Resend)**.
+2. **Asset Management:** A dynamic digital catalog with real-time feeds, debounced search, and multi-parameter filtering.
+3. **Transaction & Escrow:** An ACID-compliant financial engine utilizing PostgreSQL blocks to securely freeze funds until mutual verification.
+4. **Real-Time Communication:** A low-latency Socket.io layer featuring context-aware inboxes and instant Read Receipts.
+5. **Aesthetic & Experience:** A premium UI powered by **Tailwind v4 Design Tokens** and a persistent, system-aware **Dark Mode**.
+6. **Verification & Reliability:** A CI/CD pipeline using **GitHub Actions** to run **58 integration tests** on every push.
+7. **Media & Asset Evidence:** Browser-native image compression using HTML5 Canvas before **Secure Signed-Uploads** to Cloudinary.
+8. **Governance & Dispute Module:** A high-friction dispute engine where admins monitor photographic evidence to arbitrate escrow holds.
 
 ---
 
 ## 🛠 Tech Stack
 
-* **Frontend:** React (Vite) + Vanilla CSS + Lucide Icons
-* **Backend:** Node.js (Express) + JWT Authentication
-* **Real-Time Layer:** Socket.io (Bi-directional communication)
-* **Media Storage:** Cloudinary (Unsigned Upload Preset)
-* **Database:** PostgreSQL 17 (Relational Schema with strict constraints)
-* **Architecture Patterns:** Service-Adapter Pattern, Event-Driven Hooks, Component Decomposition
+* **Frontend:** React (Vite) + **Tailwind v4** + Lucide Icons
+* **Backend:** Node.js (Express) + JWT + PostgreSQL 17
+* **Real-Time:** Socket.io (Bi-directional)
+* **DevOps:** GitHub Actions (CI/CD)
+* **Email:** Resend (Transactional Lifecycle Emails)
+* **Storage:** Cloudinary (Secure Signature Flow)
+* **Testing:** Jest + Supertest (58 Individual Cases)
+
+---
+
+## 🛡 System Security & Reliability
+
+* **Zero-Touch CI/CD:** Code is only promoted to production if all 58 tests pass on the main branch.
+* **Escrow Financial Freezes:** Total risk mitigation by holding rental funds securely until recovery is confirmed.
+* **Identity-Gated Lifecycle:** Login is strictly blocked for unverified accounts, ensuring market participants are verified.
 
 ---
 
@@ -37,8 +45,6 @@ The OmniRent platform is developed using a highly scalable, 6-module Agile archi
 
 * Node.js (v22+)
 * PostgreSQL (v17+)
-
----
 
 ### Installation
 
@@ -51,62 +57,17 @@ npm install
 
 cd ../frontend
 npm install
-
 ```
-
----
 
 ### Database Setup
 
-1. Create a PostgreSQL database named:
+1. Create a PostgreSQL database named `omnirent`.
+2. On backend startup, the system automatically executes `backend/src/db/schema.sql` to initialize the schema.
 
-```
-omnirent
-
-```
-
-2. On backend startup, the system automatically executes the synchronization script:
-
-```
-backend/src/db/schema.sql
-
-```
-
-This initializes the relational database schema, tables, and necessary triggers.
-
----
-
----
-
-### ⚡️ Run the Entire Platform (Simultanous)
-
-You can spin up both the **Frontend** and **Backend** with a single command from the root folder:
+### ⚡️ Run the Entire Platform
 
 ```bash
 npm run dev
 ```
 
-*(On Windows, you can also simply double-click `run_omnirent.bat`)*
-
-#### Manual Execution
-
-##### Backend (from `/backend`)
-```bash
-npm start
-```
-
-##### Frontend (from `/frontend`)
-```bash
-npm run dev
-```
-
----
-
-## 🛡 System Security & Trust Model
-
-OmniRent takes data integrity and peer safety seriously:
-
-* **Service-Adapter Verification:** Enables seamless transitions between mock development environments and production-grade API integrations.
-* **Escrow Financial Freezes:** Total risk mitigation by holding rental funds securely in the background, only routing to the vendor upon confirmed asset recovery or Administrative intervention. 
-* **High-Friction Target Constraints:** Strict system architecture prevents deletion of active rental records or ongoing dispute files, ensuring comprehensive audit logs.
-* **Denial of Wallet & DoS Defenses:** Implements `express-rate-limit` middleware (to block bot swarms and scrapers) alongside browser-native Canvas compression (to prevent massive files from draining cloud bucket space).
+*(On Windows, you can also double-click `run_omnirent.bat` from the root folder)*
