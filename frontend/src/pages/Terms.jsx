@@ -4,42 +4,42 @@ export default function Terms() {
   return (
     <div className="max-w-4xl mx-auto py-12 px-4 space-y-8 animate-in fade-in duration-500 font-sans">
       <div className="text-center space-y-4 mb-12">
-        <div className="w-16 h-16 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center mx-auto">
+        <div className="w-16 h-16 bg-blue-100/50 text-blue-600 rounded-2xl flex items-center justify-center mx-auto">
           <Shield size={32} />
         </div>
-        <h1 className="text-4xl font-black text-gray-900 tracking-tight">Terms of Service</h1>
-        <p className="text-gray-500 font-medium max-w-lg mx-auto">Effective Date: April 2026</p>
+        <h1 className="text-4xl font-black text-text-primary tracking-tight">Terms of Service</h1>
+        <p className="text-text-secondary font-medium max-w-lg mx-auto uppercase tracking-widest text-[10px]">Effective Date: April 2026</p>
       </div>
 
-      <div className="bg-white rounded-[2.5rem] p-8 md:p-12 border border-gray-100 shadow-sm space-y-8 text-gray-700 leading-relaxed">
+      <div className="bg-bg-secondary rounded-[2.5rem] p-8 md:p-12 border border-border-subtle shadow-2xl shadow-blue-500/5 space-y-8 text-text-primary leading-relaxed transition-colors">
         
         <section className="space-y-4">
-          <h2 className="text-xl font-black text-gray-900">1. Acceptance of Terms</h2>
-          <p>By accessing or using the OmniRent platform, you agree to be bound by these Terms of Service. If you do not agree, you may not use the platform.</p>
+          <h2 className="text-xl font-black text-text-primary">1. Acceptance of Terms</h2>
+          <p className="text-text-secondary">By accessing or using the OmniRent platform, you agree to be bound by these Terms of Service. If you do not agree, you may not use the platform.</p>
         </section>
 
         <section className="space-y-4">
-          <h2 className="text-xl font-black text-gray-900">2. The OmniRent Escrow System</h2>
-          <p>OmniRent acts as an intermediary. Funds are held in Escrow from the moment a renter initiates a booking until the transaction successfully concludes.</p>
-          <ul className="list-disc pl-5 space-y-2">
+          <h2 className="text-xl font-black text-text-primary">2. The OmniRent Escrow System</h2>
+          <p className="text-text-secondary">OmniRent acts as an intermediary. Funds are held in Escrow from the moment a renter initiates a booking until the transaction successfully concludes.</p>
+          <ul className="list-disc pl-5 space-y-2 text-text-secondary">
             <li>Funds are not released to the Owner until both the Handover and Return photo-verification loops are completed.</li>
             <li>In the event of a dispute, Escrow funds are frozen indefinitely until an OmniRent Administrator provides a final resolution.</li>
           </ul>
         </section>
 
         <section className="space-y-4">
-          <h2 className="text-xl font-black text-gray-900">3. Finality of the Handshake</h2>
-          <p>Upon concluding a rental, clicking "Confirm Receipt" (as the Owner) acts as a legally binding assertion that the item has been returned in satisfactory condition. <strong className="text-red-600">You waive your right to a dispute once the item is confirmed.</strong> Please inspect all equipment thoroughly *before* completing the transaction.</p>
+          <h2 className="text-xl font-black text-text-primary">3. Finality of the Handshake</h2>
+          <p className="text-text-secondary">Upon concluding a rental, clicking "Confirm Receipt" (as the Owner) acts as a legally binding assertion that the item has been returned in satisfactory condition. <strong className="text-red-500">You waive your right to a dispute once the item is confirmed.</strong> Please inspect all equipment thoroughly *before* completing the transaction.</p>
         </section>
 
         <section className="space-y-4">
-          <h2 className="text-xl font-black text-gray-900">4. Hardware-Level Identity Integrity</h2>
-          <p>To use OmniRent, you must provide a valid government-issued Identity Number (TCKN). Our systems enforce cryptographic uniqueness constraints. Any attempt to use duplicate, forged, or stolen identity data will result in immediate permanent suspension and potential referral to law enforcement.</p>
+          <h2 className="text-xl font-black text-text-primary">4. Hardware-Level Identity Integrity</h2>
+          <p className="text-text-secondary">To use OmniRent, you must provide a valid government-issued Identity Number (TCKN). Our systems enforce cryptographic uniqueness constraints. Any attempt to use duplicate, forged, or stolen identity data will result in immediate permanent suspension and potential referral to law enforcement.</p>
         </section>
 
         <section className="space-y-4">
-          <h2 className="text-xl font-black text-gray-900">5. Renter & Lister Liability</h2>
-          <p>OmniRent is not liable for structural defaults, hardware failures, or loss of revenue sustained due to a rental arrangement. The platform guarantees the financial transaction workflow, not the kinetic properties of the physical assets being rented.</p>
+          <h2 className="text-xl font-black text-text-primary">5. Renter & Lister Liability</h2>
+          <p className="text-text-secondary">OmniRent is not liable for structural defaults, hardware failures, or loss of revenue sustained due to a rental arrangement. The platform guarantees the financial transaction workflow, not the kinetic properties of the physical assets being rented.</p>
         </section>
         
       </div>

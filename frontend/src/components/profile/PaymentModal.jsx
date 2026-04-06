@@ -30,7 +30,6 @@ export default function PaymentModal({ onClose, onSuccess, isLoading, setIsLoadi
     if (cardNumber.length < 19) return setError("Please enter a valid 16-digit card number.");
     if (expiry.length < 5) return setError("Please enter a valid expiry date (MM/YY).");
     
-    // Expiration date logic check
     const [expMonth, expYear] = expiry.split('/');
     const currentYear = new Date().getFullYear() % 100;
     const currentMonth = new Date().getMonth() + 1;
@@ -46,105 +45,104 @@ export default function PaymentModal({ onClose, onSuccess, isLoading, setIsLoadi
     setError('');
     setIsLoading(true);
 
-    // Simulate 1.5s bank processing time
     setTimeout(() => {
         onSuccess(amount);
     }, 1500);
   };
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[200] p-4">
-      <div className="bg-white rounded-[2.5rem] p-8 max-w-md w-full shadow-2xl relative">
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[200] p-4 transition-all duration-300">
+      <div className="bg-bg-secondary rounded-[2.5rem] border border-border-subtle p-8 max-w-md w-full shadow-2xl relative transition-all duration-300">
         <button 
           onClick={() => { if(!isLoading) onClose(); }} 
-          className="absolute top-6 right-6 text-gray-400 hover:text-gray-900 transition"
+          className="absolute top-6 right-6 text-text-secondary hover:text-text-primary transition-colors"
         >
-          <X size={20}/>
+          <X size={24}/>
         </button>
         
-        <div className="flex items-center gap-3 mb-6">
-          <div className="w-12 h-12 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center">
-            <CreditCard strokeWidth={2.5} size={24} />
+        <div className="flex items-center gap-4 mb-8">
+          <div className="w-14 h-14 bg-blue-600/10 text-blue-600 border border-blue-600/20 rounded-2xl flex items-center justify-center flex-shrink-0">
+            <CreditCard strokeWidth={2.5} size={28} />
           </div>
           <div>
-            <h3 className="text-xl font-black text-gray-900">Add Wallet Funds</h3>
-            <p className="text-sm font-medium text-gray-500">Secure AES-256 encrypted checkout.</p>
+            <h3 className="text-xl font-black text-text-primary uppercase tracking-tight">Add Wallet Funds</h3>
+            <p className="text-[10px] font-black text-text-secondary uppercase tracking-widest mt-0.5">Secure AES-256 encrypted gateway</p>
           </div>
         </div>
 
         {error && (
-            <p className="text-red-600 text-xs font-bold mb-4 bg-red-50 p-3 rounded-xl flex items-center gap-2">
+            <p className="text-red-500 text-[10px] font-black uppercase tracking-widest mb-6 bg-red-600/10 border border-red-600/20 p-4 rounded-xl flex items-center gap-2 animate-shake">
                 <Lock size={14} /> {error}
             </p>
         )}
 
-        <form onSubmit={handlePay} className="space-y-4">
+        <form onSubmit={handlePay} className="space-y-5">
           <div>
-              <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Deposit Amount (₺)</label>
+              <label className="block text-[10px] font-black text-text-secondary uppercase tracking-widest mb-2 ml-1">Deposit Amount (₺)</label>
               <input 
                 type="number" 
                 min="50"
                 value={amount} 
                 onChange={(e) => setAmount(Number(e.target.value))} 
-                className="w-full text-2xl font-black text-gray-900 p-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500" 
+                className="w-full text-3xl font-black text-text-primary p-5 bg-bg-primary border border-border-subtle rounded-2xl outline-none focus:ring-2 focus:ring-blue-600 tracking-tighter" 
               />
           </div>
 
-          <div className="pt-2 border-t border-gray-100">
-             <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Card Number</label>
+          <div className="pt-4 border-t border-border-subtle/50">
+             <label className="block text-[10px] font-black text-text-secondary uppercase tracking-widest mb-2 ml-1">Card Number</label>
              <input 
                 type="text" 
                 placeholder="0000 0000 0000 0000" 
                 value={cardNumber}
                 onChange={handleCardFormat}
                 maxLength="19"
-                className="w-full font-medium text-gray-900 p-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 mb-4 tracking-widest" 
+                className="w-full font-bold text-text-primary p-4 bg-bg-primary border border-border-subtle rounded-2xl outline-none focus:ring-2 focus:ring-blue-600 mb-4 tracking-widest placeholder:text-text-secondary/20" 
               />
 
               <div className="grid grid-cols-2 gap-4 mb-4">
                   <div>
-                      <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Expiry</label>
+                      <label className="block text-[10px] font-black text-text-secondary uppercase tracking-widest mb-2 ml-1">Expiry</label>
                       <input 
                         type="text" 
                         placeholder="MM/YY" 
                         value={expiry}
                         onChange={handleExpiryFormat}
                         maxLength="5"
-                        className="w-full font-medium text-gray-900 p-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500" 
+                        className="w-full font-bold text-text-primary p-4 bg-bg-primary border border-border-subtle rounded-2xl outline-none focus:ring-2 focus:ring-blue-600 text-center" 
                       />
                   </div>
                   <div>
-                      <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">CVC</label>
+                      <label className="block text-[10px] font-black text-text-secondary uppercase tracking-widest mb-2 ml-1">CVC</label>
                       <input 
                         type="text" 
                         placeholder="123" 
                         value={cvc}
                         onChange={(e) => setCvc(e.target.value.replace(/\D/g, '').substring(0,4))}
-                        className="w-full font-medium text-gray-900 p-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500" 
+                        className="w-full font-bold text-text-primary p-4 bg-bg-primary border border-border-subtle rounded-2xl outline-none focus:ring-2 focus:ring-blue-600 text-center" 
                       />
                   </div>
               </div>
 
-              <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Name on Card</label>
+              <label className="block text-[10px] font-black text-text-secondary uppercase tracking-widest mb-2 ml-1">Name on Card</label>
               <input 
                 type="text" 
-                placeholder="John Doe" 
+                placeholder="CARDHOLDER NAME" 
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full font-medium text-gray-900 p-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 uppercase" 
+                className="w-full font-bold text-text-primary p-4 bg-bg-primary border border-border-subtle rounded-2xl outline-none focus:ring-2 focus:ring-blue-600 uppercase tracking-widest placeholder:text-text-secondary/20" 
               />
           </div>
 
           <button 
             type="submit"
             disabled={isLoading} 
-            className={`w-full py-4 rounded-2xl font-black transition text-sm text-white flex items-center justify-center gap-2 mt-4 
-                ${isLoading ? 'bg-blue-400 cursor-not-allowed animate-pulse' : 'bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-200'}`}
+            className={`w-full py-5 rounded-[1.5rem] font-black uppercase tracking-widest transition-all text-[11px] text-white flex items-center justify-center gap-2 mt-4 active:scale-95 shadow-xl
+                ${isLoading ? 'bg-blue-400 cursor-not-allowed animate-pulse' : 'bg-blue-600 hover:bg-blue-700 shadow-blue-500/20'}`}
           >
             {isLoading ? (
                 <>Processing Payment...</>
             ) : (
-                <><ShieldCheck size={18} /> Pay {amount}₺</>
+                <><ShieldCheck size={18} /> Pay {amount}₺ Securely</>
             )}
           </button>
         </form>

@@ -1,52 +1,48 @@
 import { ShoppingBag, Clock, CheckCircle2, AlertCircle, AlertTriangle } from 'lucide-react';
 
 export default function BorrowedItems({ myRentals, onReturn, onConfirmHandover, onDispute }) {
-  const isOverdue = (returnDate, status) => {
-    return status === 'active' && new Date(returnDate) < new Date();
-  };
-
   const activeRentals = myRentals.filter(r => r.status === 'active' || r.status === 'returned_by_renter' || r.status === 'pending_handover');
   const historyRentals = myRentals.filter(r => r.status === 'completed');
 
   return (
-    <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-8">
-      <div className="flex justify-between items-center mb-6">
-        <h3 className="text-xl font-black text-gray-900">Borrowed Items</h3>
-        <span className="text-xs font-black text-green-600 bg-green-50 px-3 py-1 rounded-full">{activeRentals.length} active</span>
+    <div className="bg-bg-secondary rounded-[2.5rem] border border-border-subtle shadow-2xl shadow-blue-500/5 p-8 transition-colors">
+      <div className="flex justify-between items-center mb-10">
+        <h3 className="text-xl font-black text-text-primary uppercase tracking-tight">Borrowed Gear</h3>
+        <span className="text-[10px] font-black text-green-600 bg-green-600/10 border border-green-600/20 px-3 py-1.5 rounded-xl uppercase tracking-widest">{activeRentals.length} active</span>
       </div>
 
       {myRentals.length === 0 ? (
-        <div className="text-center py-8 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-100">
-          <ShoppingBag className="mx-auto text-gray-300 mb-2" size={32} />
-          <p className="text-gray-400 font-bold text-sm">You haven't rented anything yet.</p>
+        <div className="text-center py-12 bg-bg-primary rounded-[2rem] border-2 border-dashed border-border-subtle">
+          <ShoppingBag className="mx-auto text-text-secondary opacity-30 mb-4" size={48} />
+          <p className="text-text-secondary font-black uppercase tracking-widest text-[10px]">You haven't borrowed anything yet.</p>
         </div>
       ) : (
         <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 no-scrollbar">
-        <div className="space-y-8">
-          {activeRentals.length > 0 && (
-            <div className="space-y-4">
-               <h4 className="text-[10px] font-black uppercase text-blue-600 tracking-widest mb-2">Currently Borrowing</h4>
-               {activeRentals.map(rental => (
-                 <RentalCard 
-                   key={rental.id} 
-                   rental={rental} 
-                   onReturn={() => onReturn(rental.id)} 
-                   onConfirmHandover={() => onConfirmHandover(rental.id)}
-                   onDispute={() => onDispute(rental.id)} 
-                   isActive={rental.status === 'active'} 
-                 />
-               ))}
-            </div>
-          )}
-          {historyRentals.length > 0 && (
-            <div className="space-y-4">
-              <h4 className="text-[10px] font-black uppercase text-gray-400 tracking-widest mb-2 border-t border-gray-100 pt-6">Rental History</h4>
-              {historyRentals.map(rental => (
-                 <RentalCard key={rental.id} rental={rental} isActive={false} />
-              ))}
-            </div>
-          )}
-        </div>
+          <div className="space-y-8">
+            {activeRentals.length > 0 && (
+              <div className="space-y-4">
+                 <h4 className="text-[10px] font-black uppercase text-blue-600 tracking-widest mb-4">Currently Borrowing</h4>
+                 {activeRentals.map(rental => (
+                   <RentalCard 
+                     key={rental.id} 
+                     rental={rental} 
+                     onReturn={() => onReturn(rental.id)} 
+                     onConfirmHandover={() => onConfirmHandover(rental.id)}
+                     onDispute={() => onDispute(rental.id)} 
+                     isActive={rental.status === 'active'} 
+                   />
+                 ))}
+              </div>
+            )}
+            {historyRentals.length > 0 && (
+              <div className="space-y-4">
+                <h4 className="text-[10px] font-black uppercase text-text-secondary tracking-widest mb-4 border-t border-border-subtle pt-8">Rental History</h4>
+                {historyRentals.map(rental => (
+                   <RentalCard key={rental.id} rental={rental} isActive={false} />
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       )}
     </div>
@@ -59,27 +55,27 @@ function RentalCard({ rental, onReturn, onConfirmHandover, onDispute, isActive }
   const isOverdue = isActive && new Date(rental.return_date) < new Date();
   
   return (
-    <div className={`flex items-center justify-between p-4 rounded-2xl border transition-all 
-      ${isPendingReturn ? 'bg-orange-50 border-orange-200' : 
-        isPendingHandover ? 'bg-blue-50 border-blue-200' : 
-        isActive ? 'bg-gray-50 border-gray-100 hover:border-blue-100' : 
-        'bg-gray-50/50 border-gray-100 opacity-60'}`}>
+    <div className={`flex items-center justify-between p-5 rounded-3xl border transition-all duration-300 
+      ${isPendingReturn ? 'bg-orange-600/5 border-orange-600/20' : 
+        isPendingHandover ? 'bg-blue-600/5 border-blue-600/20' : 
+        isActive ? 'bg-bg-primary border-border-subtle hover:border-blue-600/50' : 
+        'bg-bg-primary/30 border-dashed border-border-subtle opacity-60'}`}>
       
-      <div className="flex items-center gap-4">
-        <div className={`w-12 h-12 rounded-xl flex items-center justify-center shadow-sm overflow-hidden ${isActive || isPendingHandover ? 'bg-white text-blue-600' : 'bg-gray-100 text-gray-400'}`}>
-          {rental.image_url ? <img src={rental.image_url} alt="" className="object-cover w-full h-full" /> : <ShoppingBag size={20} />}
+      <div className="flex items-center gap-4 overflow-hidden">
+        <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg overflow-hidden border border-border-subtle ${isActive || isPendingHandover ? 'bg-bg-secondary text-blue-600' : 'bg-bg-primary text-text-secondary'}`}>
+          {rental.image_url ? <img src={rental.image_url} alt="" className="object-cover w-full h-full" /> : <ShoppingBag size={24} />}
         </div>
         <div>
-          <p className="font-bold text-gray-900 text-sm line-clamp-1">{rental.title}</p>
-          <div className={`flex items-center gap-2 text-[10px] font-bold uppercase ${isOverdue ? 'text-red-500' : 'text-gray-500'}`}>
-            {isPendingReturn ? <AlertCircle size={12} className="text-orange-500" /> : 
-             isPendingHandover ? <Clock size={12} className="text-blue-500" /> :
-             isOverdue ? <AlertCircle size={12} className="animate-pulse" /> : 
-             isActive ? <Clock size={12} /> : 
-             <CheckCircle2 size={12} />}
+          <p className="font-black text-text-primary text-sm line-clamp-1 uppercase tracking-tight">{rental.title}</p>
+          <div className={`flex items-center gap-2 text-[9px] font-black uppercase tracking-widest ${isOverdue ? 'text-red-500 animate-pulse' : 'text-text-secondary'}`}>
+            {isPendingReturn ? <AlertCircle size={10} className="text-orange-500" /> : 
+             isPendingHandover ? <Clock size={10} className="text-blue-500" /> :
+             isOverdue ? <AlertCircle size={10} /> : 
+             isActive ? <Clock size={10} /> : 
+             <CheckCircle2 size={10} />}
 
             {isPendingReturn ? <span className="text-orange-600">Waiting for Owner Return Confirmation</span> : 
-             isPendingHandover ? <span className="text-blue-600">Pending Handover (Meet Owner)</span> :
+             isPendingHandover ? <span className="text-blue-600">Handover Required</span> :
              isOverdue ? <span>OVERDUE! Return ASAP</span> : 
              isActive ? `Due: ${new Date(rental.return_date).toLocaleDateString()}` : 
              `Completed`}
@@ -87,32 +83,32 @@ function RentalCard({ rental, onReturn, onConfirmHandover, onDispute, isActive }
         </div>
       </div>
 
-      <div className="text-right flex flex-col items-end gap-2">
+      <div className="text-right flex flex-col items-end gap-3 ml-4 flex-shrink-0">
         <div>
-          <p className="text-xs font-black text-gray-900">{rental.total_price}₺</p>
-          <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded 
-            ${isOverdue ? 'text-white bg-red-500 animate-pulse' : 
-              isPendingReturn ? 'text-orange-600 bg-orange-100' : 
-              isPendingHandover ? 'text-blue-600 bg-blue-100' :
-              isActive ? 'text-green-600 bg-green-100' : 
-              'text-gray-500 bg-gray-200'}`}>
-            {isOverdue ? 'OVERDUE' : isPendingReturn ? 'Pending Return' : isPendingHandover ? 'To Be Picked Up' : isActive ? 'Active' : 'Completed'}
+          <p className="text-sm font-black text-text-primary mb-1">{rental.total_price}₺</p>
+          <span className={`text-[8px] font-black uppercase tracking-widest px-2 py-1 rounded-lg border
+            ${isOverdue ? 'text-white bg-red-600 border-red-500 animate-bounce' : 
+              isPendingReturn ? 'text-orange-600 bg-orange-600/10 border-orange-600/20' : 
+              isPendingHandover ? 'text-blue-600 bg-blue-600/10 border-blue-600/20' :
+              isActive ? 'text-green-600 bg-green-600/10 border-green-600/20' : 
+              'text-text-secondary bg-bg-secondary border-border-subtle'}`}>
+            {isOverdue ? 'OVERDUE' : isPendingReturn ? 'Pending Return' : isPendingHandover ? 'To Collect' : isActive ? 'Active' : 'History'}
           </span>
         </div>
 
         <div className="flex gap-2">
           {isPendingHandover && (
-            <button onClick={onConfirmHandover} className="text-[10px] font-black uppercase text-white bg-blue-600 hover:bg-blue-700 px-3 py-1.5 rounded-lg transition-all shadow-md">
+            <button onClick={onConfirmHandover} className="text-[10px] font-black uppercase tracking-widest text-white bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-xl transition-all shadow-lg shadow-blue-500/20 active:scale-95">
               Confirm Receipt
             </button>
           )}
           
           {isActive && !isPendingReturn && (
             <>
-              <button onClick={onDispute} className="text-[10px] font-black uppercase text-red-600 hover:bg-red-50 px-2 py-1.5 rounded-lg transition-all border border-red-100 shadow-sm flex items-center justify-center">
-                <AlertTriangle size={14} />
+              <button onClick={onDispute} title="Open Dispute" className="p-2 text-red-600 hover:bg-red-600 hover:text-white rounded-xl transition-all border border-red-600/20 bg-red-600/10 flex items-center justify-center active:scale-90">
+                <AlertTriangle size={16} />
               </button>
-              <button onClick={onReturn} className="text-[10px] font-black uppercase text-blue-600 hover:text-white bg-blue-50 hover:bg-blue-600 px-3 py-1.5 rounded-lg transition-all shadow-sm border border-blue-100">
+              <button onClick={onReturn} className="text-[10px] font-black uppercase tracking-widest text-blue-600 hover:text-white bg-blue-600/10 hover:bg-blue-600 px-4 py-2 rounded-xl transition-all border border-blue-600/20 active:scale-95">
                 Return Item
               </button>
             </>

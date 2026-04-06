@@ -11,35 +11,35 @@ export default function DisputeModal({ onClose, onSubmit, isLoading }) {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[500] p-4">
-      <div className="bg-white rounded-[2.5rem] p-10 max-w-md w-full shadow-2xl relative">
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[500] p-4 transition-all duration-300">
+      <div className="bg-bg-secondary rounded-[2.5rem] border border-border-subtle p-10 max-w-md w-full shadow-2xl relative transition-all duration-300">
         <button 
           onClick={onClose} 
-          className="absolute top-6 right-6 text-gray-400 hover:text-gray-900 transition-colors"
+          className="absolute top-6 right-6 text-text-secondary hover:text-text-primary transition-colors"
         >
           <X size={24} />
         </button>
 
         <div className="text-center">
-          <div className="w-16 h-16 bg-red-100 text-red-600 rounded-[1.25rem] flex items-center justify-center mb-6 mx-auto">
+          <div className="w-16 h-16 bg-red-600/10 text-red-600 border border-red-600/20 rounded-[1.5rem] flex items-center justify-center mb-6 mx-auto">
             <AlertTriangle size={32} />
           </div>
           
-          <h3 className="text-2xl font-black text-gray-900 mb-2">Raise a Dispute</h3>
-          <p className="text-gray-500 text-sm mb-8 font-medium">
-            Please describe the issue in detail. An administrator will review your claim and the uploaded evidence photos.
+          <h3 className="text-2xl font-black text-text-primary mb-2 uppercase tracking-tight">Raise a Dispute</h3>
+          <p className="text-text-secondary font-black tracking-widest text-[10px] uppercase mb-8">
+            Describe the issue clearly. Our administrators will review the evidence.
           </p>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-6 text-left">
             <div className="relative">
-              <div className="absolute top-4 left-4 text-gray-400">
+              <div className="absolute top-5 left-5 text-text-secondary opacity-30">
                 <MessageSquare size={18} />
               </div>
               <textarea
                 required
                 autoFocus
-                className="w-full p-4 pl-12 bg-gray-50 border border-gray-100 rounded-2xl min-h-[120px] outline-none focus:ring-2 focus:ring-red-500 font-medium text-gray-900 placeholder:text-gray-400"
-                placeholder="Ex: Item was damaged upon arrival / Item was not as described..."
+                className="w-full p-5 pl-14 bg-bg-primary border border-border-subtle rounded-2xl min-h-[140px] outline-none focus:ring-2 focus:ring-red-600 font-bold text-text-primary placeholder:text-text-secondary/20 transition-all resize-none"
+                placeholder="EX: ITEM WAS DAMAGED UPON ARRIVAL..."
                 value={reason}
                 onChange={(e) => setReason(e.target.value)}
               />
@@ -49,14 +49,14 @@ export default function DisputeModal({ onClose, onSubmit, isLoading }) {
               <button
                 type="button"
                 onClick={onClose}
-                className="flex-1 px-6 py-4 bg-gray-100 text-gray-500 rounded-2xl font-black text-sm hover:bg-gray-200 transition-all"
+                className="flex-1 px-6 py-4 bg-bg-primary text-text-secondary border border-border-subtle rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-text-primary hover:text-bg-primary transition-all"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={isLoading || !reason.trim()}
-                className="flex-1 px-6 py-4 bg-red-600 text-white rounded-2xl font-black text-sm hover:bg-red-700 transition-all shadow-lg shadow-red-100 disabled:opacity-50"
+                className="flex-1 px-6 py-4 bg-red-600 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-red-700 active:scale-95 transition-all shadow-xl shadow-red-500/20 disabled:opacity-30 disabled:cursor-not-allowed"
               >
                 {isLoading ? 'Submitting...' : 'Send Dispute'}
               </button>

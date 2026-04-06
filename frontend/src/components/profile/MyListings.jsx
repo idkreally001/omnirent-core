@@ -2,35 +2,35 @@ import { Package, Trash2, AlertCircle, User, Clock, AlertTriangle } from 'lucide
 
 export default function MyListings({ myItems, onItemDeleteClick, onConfirmReceipt, onDispute }) {
   return (
-    <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-8">
-      <div className="flex justify-between items-center mb-6">
-        <h3 className="text-xl font-black text-gray-900">My Listings</h3>
-        <span className="text-xs font-black text-blue-600 bg-blue-50 px-3 py-1 rounded-full">{myItems.length} items</span>
+    <div className="bg-bg-secondary rounded-[2.5rem] border border-border-subtle shadow-2xl shadow-blue-500/5 p-8 transition-colors">
+      <div className="flex justify-between items-center mb-10">
+        <h3 className="text-xl font-black text-text-primary uppercase tracking-tight">My Equipment</h3>
+        <span className="text-[10px] font-black text-blue-600 bg-blue-600/10 border border-blue-600/20 px-3 py-1.5 rounded-xl uppercase tracking-widest">{myItems.length} items</span>
       </div>
 
       {myItems.length === 0 ? (
-        <div className="text-center py-8 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-100">
-          <Package className="mx-auto text-gray-300 mb-2" size={32} />
-          <p className="text-gray-400 font-bold text-sm">No items listed.</p>
+        <div className="text-center py-12 bg-bg-primary rounded-[2rem] border-2 border-dashed border-border-subtle">
+          <Package className="mx-auto text-text-secondary opacity-30 mb-4" size={48} />
+          <p className="text-text-secondary font-black uppercase tracking-widest text-[10px]">No active listings found.</p>
         </div>
       ) : (
         <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 no-scrollbar">
-        <div className="grid grid-cols-1 gap-4">
+        <div className="grid grid-cols-1 gap-5">
           {myItems.map(item => (
-            <div key={item.id} className={`flex flex-col p-4 rounded-2xl border transition-all group ${item.rental_status === 'returned_by_renter' ? 'bg-orange-50 border-orange-200' : 'bg-white border-gray-100'}`}>
+            <div key={item.id} className={`flex flex-col p-5 rounded-[2rem] border transition-all duration-300 group ${item.rental_status === 'returned_by_renter' ? 'bg-orange-600/5 border-orange-600/40 shadow-xl shadow-orange-500/5' : 'bg-bg-primary border-border-subtle hover:border-blue-600/50'}`}>
               
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4 overflow-hidden">
-                  <div className={`w-10 h-10 flex-shrink-0 rounded-xl flex items-center justify-center transition-colors ${item.status === 'rented' ? 'bg-orange-100 text-orange-600' : 'bg-gray-50 text-blue-600'}`}>
-                    <Package size={18} />
+                  <div className={`w-12 h-12 flex-shrink-0 rounded-2xl flex items-center justify-center transition-colors border border-border-subtle ${item.status === 'rented' ? 'bg-orange-600/10 text-orange-600' : 'bg-bg-secondary text-blue-600'}`}>
+                    <Package size={22} />
                   </div>
                   <div className="overflow-hidden">
-                    <p className="font-bold text-gray-900 text-sm truncate">{item.title}</p>
-                    <div className="flex items-center gap-2">
-                      <p className="text-[10px] text-blue-600 font-black">{item.price_per_day}₺/day</p>
+                    <p className="font-black text-text-primary text-sm truncate uppercase tracking-tight">{item.title}</p>
+                    <div className="flex items-center gap-2 mt-1">
+                      <p className="text-[10px] text-blue-600 font-bold">{item.price_per_day}₺/day</p>
                       {item.status === 'rented' && (
-                        <span className="text-[8px] font-black uppercase bg-orange-100 text-orange-600 px-1.5 py-0.5 rounded flex items-center gap-1">
-                          Rented
+                        <span className="text-[8px] font-black uppercase tracking-widest bg-orange-600/10 text-orange-600 px-2 py-0.5 rounded-lg border border-orange-600/20 flex items-center gap-1">
+                          Active Rental
                         </span>
                       )}
                     </div>
@@ -39,7 +39,7 @@ export default function MyListings({ myItems, onItemDeleteClick, onConfirmReceip
                 {item.status === 'available' && (
                   <button 
                     onClick={() => onItemDeleteClick(item)} 
-                    className="p-2 text-gray-400 hover:text-red-600 transition"
+                    className="p-3 text-text-secondary hover:bg-red-500 hover:text-white rounded-xl transition-all active:scale-90"
                   >
                     <Trash2 size={18} />
                   </button>
@@ -47,46 +47,47 @@ export default function MyListings({ myItems, onItemDeleteClick, onConfirmReceip
               </div>
 
               {item.status === 'rented' && (
-                 <div className="mt-4 pt-4 border-t border-gray-100">
+                 <div className="mt-5 pt-5 border-t border-border-subtle/50">
                     {item.rental_status === 'returned_by_renter' ? (
-                      <div className="flex items-center justify-between animate-pulse">
-                          <div className="flex items-center gap-2 text-orange-700 font-black text-[10px] uppercase">
+                      <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2 text-orange-600 font-black text-[9px] uppercase tracking-widest animate-pulse">
                               <AlertCircle size={14} /> Action Required
                           </div>
                           <div className="flex gap-2">
                             <button 
                               onClick={() => onDispute(item.active_rental_id)}
-                              className="bg-red-50 text-red-600 px-3 py-2 rounded-xl border border-red-200 hover:bg-red-100 transition flex items-center justify-center"
+                              className="bg-red-600/10 text-red-600 p-2.5 rounded-xl border border-red-600/20 hover:bg-red-600 hover:text-white transition-all flex items-center justify-center active:scale-95"
+                              title="Report Issue"
                             >
-                              <AlertTriangle size={14} />
+                              <AlertTriangle size={16} />
                             </button>
                             <button 
                               onClick={() => onConfirmReceipt(item.active_rental_id)}
-                              className="bg-orange-600 text-white px-4 py-2 rounded-xl text-[10px] font-black uppercase shadow-lg shadow-orange-100 hover:bg-orange-700 transition"
+                              className="bg-orange-600 text-white px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-orange-500/20 hover:bg-orange-700 transition-all active:scale-95"
                             >
-                              Confirm Receipt
+                              Confirm Return
                             </button>
                           </div>
                       </div>
                      ) : item.rental_status === 'pending_handover' ? (
-                        <div className="flex justify-between items-center bg-blue-50/50 p-3 rounded-xl border border-blue-100 w-full">
-                           <div className="flex items-center gap-2 text-blue-700 font-black text-[10px] uppercase">
-                               <Clock size={14} className="animate-spin-slow" /> Awaiting Handover Confirmation
+                        <div className="flex justify-between items-center bg-blue-600/5 p-4 rounded-2xl border border-blue-600/20 w-full">
+                           <div className="flex items-center gap-2 text-blue-700 dark:text-blue-400 font-black text-[9px] uppercase tracking-widest">
+                               <Clock size={16} className="animate-spin-slow" /> Awaiting Handover
                            </div>
-                           <p className="text-[10px] font-bold text-blue-600">Give item to {item.renter_name || 'User'}</p>
+                           <p className="text-[10px] font-black text-blue-600 uppercase tracking-tight">Give to {item.renter_name || 'User'}</p>
                         </div>
                      ) : (
-                       <div className="flex justify-between items-center text-[10px]">
-                          <div className="flex items-center gap-2 text-gray-500 font-bold">
+                       <div className="flex justify-between items-center text-[9px] font-black uppercase tracking-widest">
+                          <div className="flex items-center gap-2 text-text-secondary">
                               <User size={12} />
                               <span>Renter: {item.renter_name || 'User'}</span>
                           </div>
-                          <div className="flex items-center gap-2 text-blue-600 font-bold">
+                          <div className="flex items-center gap-2 text-blue-600">
                               <Clock size={12} />
                               <span>Due: {new Date(item.return_date).toLocaleDateString()}</span>
                           </div>
                       </div>
-                    )}
+                     )}
                  </div>
               )}
             </div>

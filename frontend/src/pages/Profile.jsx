@@ -248,9 +248,9 @@ export default function Profile() {
   };
 
   if (!user) return (
-    <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4">
-      <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-      <p className="font-bold text-gray-400 animate-pulse">Loading Account...</p>
+    <div className="flex flex-col items-center justify-center min-h-[80vh] space-y-6 transition-colors bg-bg-primary">
+      <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+      <p className="text-[10px] font-black text-text-secondary uppercase tracking-[0.3em] animate-pulse">Synchronizing Account...</p>
     </div>
   );
 
@@ -298,13 +298,13 @@ export default function Profile() {
           </div>
 
           {/* Promotional Card */}
-          <div className="bg-blue-600 rounded-[2.5rem] p-8 text-white flex flex-col sm:flex-row justify-between items-center shadow-xl shadow-blue-100/50 gap-4">
+          <div className="bg-blue-600 rounded-[2.5rem] p-10 text-white flex flex-col sm:flex-row justify-between items-center shadow-2xl shadow-blue-500/20 gap-6 transition-transform hover:scale-[1.01] duration-500">
             <div>
-              <h3 className="text-2xl font-black">Ready to list something new?</h3>
-              <p className="text-blue-100 text-sm opacity-80 mt-1 font-medium">Turn your idle tools into extra earnings today.</p>
+              <h3 className="text-2xl font-black uppercase tracking-tight">Ready to earn more?</h3>
+              <p className="text-blue-100 text-xs font-black uppercase tracking-widest opacity-80 mt-2">Turn your idle gear into high-growth assets.</p>
             </div>
-            <button onClick={() => navigate('/list-item')} className="w-full sm:w-auto bg-white text-blue-600 px-8 py-4 rounded-2xl font-black hover:scale-105 transition-transform shadow-lg">
-              Add New Item
+            <button onClick={() => navigate('/list-item')} className="w-full sm:w-auto bg-white text-blue-600 px-10 py-4 rounded-[1.5rem] font-black uppercase tracking-widest text-[11px] hover:bg-blue-50 transition-all shadow-xl active:scale-95">
+              Add New Listing
             </button>
           </div>
         </div>
@@ -358,18 +358,18 @@ export default function Profile() {
       )}
 
       {showDeleteModal && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[200] p-4">
-          <div className="bg-white rounded-[2.5rem] p-10 max-w-sm w-full shadow-2xl relative text-center">
-            <button onClick={() => { setShowDeleteModal(false); setIsConfirmingDelete(false); setError(''); }} className="absolute top-6 right-6 text-gray-400 hover:text-gray-900"><X size={20}/></button>
-            <div className="w-16 h-16 bg-red-100 text-red-600 rounded-3xl flex items-center justify-center mb-6 mx-auto"><ShieldAlert size={32} /></div>
-            <h3 className="text-2xl font-black text-gray-900 mb-2">Final Warning</h3>
-            <p className="text-gray-500 text-sm mb-8 font-medium">This action is permanent and cannot be undone.</p>
-            {error && <p className="text-red-600 text-xs font-bold mb-4 bg-red-50 p-3 rounded-xl">{error}</p>}
-            <input type="password" placeholder="Confirm password" className="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl mb-4 outline-none focus:ring-2 focus:ring-red-500 font-medium" onChange={(e) => { setDeletePassword(e.target.value); setIsConfirmingDelete(false); }} />
-            <div className="flex gap-3">
-              <button onClick={() => { setShowDeleteModal(false); setIsConfirmingDelete(false); setError(''); }} className="flex-1 bg-gray-100 text-gray-500 py-4 rounded-2xl font-bold text-sm">Cancel</button>
-              <button onClick={handleDeleteAccount} disabled={isLoading || !deletePassword} className={`flex-1 py-4 rounded-2xl font-bold transition text-sm text-white disabled:opacity-50 ${isConfirmingDelete ? 'bg-orange-600 animate-pulse' : 'bg-red-600'}`}>
-                {isLoading ? 'Wait...' : isConfirmingDelete ? 'Delete?' : 'Delete'}
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[500] p-4 transition-all animate-in fade-in duration-300">
+          <div className="bg-bg-secondary rounded-[2.5rem] border border-border-subtle p-10 max-w-sm w-full shadow-2xl relative text-center">
+            <button onClick={() => { setShowDeleteModal(false); setIsConfirmingDelete(false); setError(''); }} className="absolute top-6 right-6 text-text-secondary hover:text-text-primary transition-colors"><X size={24}/></button>
+            <div className="w-16 h-16 bg-red-600/10 text-red-600 border border-red-600/20 rounded-3xl flex items-center justify-center mb-6 mx-auto"><ShieldAlert size={32} /></div>
+            <h3 className="text-2xl font-black text-text-primary mb-2 uppercase tracking-tight">Final Warning</h3>
+            <p className="text-text-secondary font-black tracking-widest text-[10px] uppercase mb-10">This action is permanent and cannot be reversed.</p>
+            {error && <p className="text-red-500 text-[10px] font-black uppercase tracking-widest mb-6 bg-red-600/10 border border-red-600/20 p-4 rounded-xl">{error}</p>}
+            <input type="password" placeholder="CONFIRM PASSWORD" className="w-full p-5 bg-bg-primary border border-border-subtle rounded-2xl mb-6 outline-none focus:ring-2 focus:ring-red-600 font-bold text-text-primary placeholder:text-text-secondary/20 tracking-widest" onChange={(e) => { setDeletePassword(e.target.value); setIsConfirmingDelete(false); }} />
+            <div className="flex gap-4">
+              <button onClick={() => { setShowDeleteModal(false); setIsConfirmingDelete(false); setError(''); }} className="flex-1 bg-bg-primary text-text-secondary border border-border-subtle py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-text-primary hover:text-bg-primary transition-all">Cancel</button>
+              <button onClick={handleDeleteAccount} disabled={isLoading || !deletePassword} className={`flex-1 py-4 rounded-2xl font-black transition-all text-[10px] uppercase tracking-widest text-white disabled:opacity-30 ${isConfirmingDelete ? 'bg-orange-600 animate-pulse' : 'bg-red-600 shadow-xl shadow-red-500/20 hover:bg-red-700'}`}>
+                {isLoading ? 'Wait...' : isConfirmingDelete ? 'REALLY?' : 'Delete'}
               </button>
             </div>
           </div>
@@ -377,23 +377,23 @@ export default function Profile() {
       )}
 
       {itemToDelete && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[200] p-4">
-          <div className="bg-white rounded-[2.5rem] p-10 max-w-sm w-full shadow-2xl text-center">
-            <div className="w-16 h-16 bg-orange-100 text-orange-600 rounded-3xl flex items-center justify-center mb-6 mx-auto"><Package size={32} /></div>
-            <h3 className="text-2xl font-black text-gray-900 mb-2">Archive Listing?</h3>
-            <p className="text-gray-500 text-sm mb-8 font-medium">Are you sure you want to archive <span className="text-gray-900 font-bold italic">"{itemToDelete.title}"</span>?</p>
-            <div className="flex gap-3">
-              <button onClick={() => setItemToDelete(null)} className="flex-1 bg-gray-100 text-gray-500 py-4 rounded-2xl font-bold text-sm">Cancel</button>
-              <button onClick={() => handleDeleteItem(itemToDelete.id)} className="flex-1 bg-red-600 text-white py-4 rounded-2xl font-bold text-sm shadow-lg shadow-red-100">Archive</button>
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[500] p-4 transition-all duration-300">
+          <div className="bg-bg-secondary rounded-[2.5rem] border border-border-subtle p-10 max-w-sm w-full shadow-2xl text-center relative transition-all duration-300">
+            <div className="w-16 h-16 bg-amber-600/10 text-amber-600 border border-amber-600/20 rounded-3xl flex items-center justify-center mb-6 mx-auto"><Package size={32} /></div>
+            <h3 className="text-2xl font-black text-text-primary mb-2 uppercase tracking-tight">Archive Listing?</h3>
+            <p className="text-text-secondary font-black tracking-widest text-[10px] uppercase mb-10">Are you sure you want to archive <span className="text-text-primary italic">"{itemToDelete.title}"</span>?</p>
+            <div className="flex gap-4">
+              <button onClick={() => setItemToDelete(null)} className="flex-1 bg-bg-primary text-text-secondary border border-border-subtle py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-text-primary hover:text-bg-primary transition-all">Cancel</button>
+              <button onClick={() => handleDeleteItem(itemToDelete.id)} className="flex-1 bg-red-600 text-white py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl shadow-red-500/20 hover:bg-red-700 transition-all active:scale-95">Archive</button>
             </div>
           </div>
         </div>
       )}
 
       {/* Toast Notification */}
-      <div className={`fixed bottom-8 left-1/2 -translate-x-1/2 z-[300] transition-all duration-500 transform ${toast.show ? 'translate-y-0 opacity-100' : 'translate-y-12 opacity-0 pointer-events-none'}`}>
-        <div className={`px-8 py-4 rounded-2xl shadow-2xl font-bold flex items-center gap-3 border ${toast.type === 'success' ? 'bg-gray-900 text-white border-gray-800' : 'bg-red-600 text-white border-red-500'}`}>
-          {toast.type === 'success' ? <Package size={20} className="text-blue-400" /> : <ShieldAlert size={20} />}
+      <div className={`fixed bottom-8 left-1/2 -translate-x-1/2 z-[1000] transition-all duration-500 transform ${toast.show ? 'translate-y-0 opacity-100' : 'translate-y-12 opacity-0 pointer-events-none'}`}>
+        <div className={`px-10 py-5 rounded-[2rem] shadow-2xl font-black uppercase tracking-[0.2em] text-[10px] flex items-center gap-4 border backdrop-blur-xl ${toast.type === 'success' ? 'bg-bg-secondary/90 text-text-primary border-blue-600/30' : 'bg-red-600 text-white border-red-500 shadow-red-500/20'}`}>
+          {toast.type === 'success' ? <Package size={20} className="text-blue-600" /> : <ShieldAlert size={20} />}
           {toast.message}
         </div>
       </div>

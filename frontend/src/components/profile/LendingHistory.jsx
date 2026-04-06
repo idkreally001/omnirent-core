@@ -4,49 +4,49 @@ export default function LendingHistory({ myLendings }) {
   const completedLendings = myLendings.filter(l => l.status === 'completed');
 
   return (
-    <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-8">
-      <div className="flex justify-between items-center mb-6">
-        <h3 className="text-xl font-black text-gray-900">Lending History</h3>
+    <div className="bg-bg-secondary rounded-[2.5rem] border border-border-subtle shadow-2xl shadow-blue-500/5 p-8 transition-colors">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-10 gap-4">
+        <h3 className="text-xl font-black text-text-primary uppercase tracking-tight">Earnings Log</h3>
         <div className="flex items-center gap-3">
-          <span className="text-[10px] font-black text-green-600 bg-green-50 px-2 py-1 rounded border border-green-100">
-  Total Earned: {completedLendings.reduce((acc, curr) => acc + Number(curr.total_price), 0).toFixed(2)}₺
-</span>
-          <span className="text-xs font-black text-gray-400 bg-gray-50 px-3 py-1 rounded-full">
+          <span className="text-[10px] font-black text-green-600 bg-green-600/10 border border-green-600/20 px-3 py-1.5 rounded-xl uppercase tracking-widest">
+            Total: {completedLendings.reduce((acc, curr) => acc + Number(curr.total_price), 0).toFixed(2)}₺
+          </span>
+          <span className="text-[9px] font-black text-text-secondary bg-bg-primary border border-border-subtle px-3 py-1.5 rounded-xl uppercase tracking-widest">
             {completedLendings.length} completed
           </span>
         </div>
       </div>
 
       {completedLendings.length === 0 ? (
-        <div className="text-center py-8 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-100">
-          <CheckCircle2 className="mx-auto text-gray-300 mb-2" size={32} />
-          <p className="text-gray-400 font-bold text-sm">No completed lendings yet.</p>
+        <div className="text-center py-12 bg-bg-primary rounded-[2rem] border-2 border-dashed border-border-subtle">
+          <CheckCircle2 className="mx-auto text-text-secondary opacity-30 mb-4" size={48} />
+          <p className="text-text-secondary font-black uppercase tracking-widest text-[10px]">No lending history yet.</p>
         </div>
       ) : (
         <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 no-scrollbar">
-        <div className="space-y-4">
-          {completedLendings.map(lending => (
-            <div key={lending.id} className="flex items-center justify-between p-4 bg-gray-50/50 rounded-2xl border border-gray-100 opacity-75">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center text-gray-400 overflow-hidden">
-                  {lending.image_url ? <img src={lending.image_url} alt="" className="object-cover w-full h-full" /> : <Package size={20} />}
-                </div>
-                <div>
-                  <p className="font-bold text-gray-500 text-sm line-clamp-1">{lending.title}</p>
-                  <div className="flex items-center gap-2 text-[10px] text-gray-400 font-bold uppercase">
-                    <User size={12} className="text-blue-400" />
-                    Lent to {lending.renter_name}
+          <div className="space-y-4">
+            {completedLendings.map(lending => (
+              <div key={lending.id} className="flex items-center justify-between p-5 bg-bg-primary rounded-[2rem] border border-border-subtle transition-all duration-300 hover:border-green-600/30">
+                <div className="flex items-center gap-4 overflow-hidden">
+                  <div className="w-14 h-14 bg-bg-secondary border border-border-subtle rounded-2xl flex items-center justify-center text-text-secondary overflow-hidden flex-shrink-0 shadow-sm">
+                    {lending.image_url ? <img src={lending.image_url} alt="" className="object-cover w-full h-full" /> : <Package size={24} />}
+                  </div>
+                  <div className="overflow-hidden">
+                    <p className="font-black text-text-primary text-sm truncate uppercase tracking-tight">{lending.title}</p>
+                    <div className="flex items-center gap-2 text-[9px] text-text-secondary font-black uppercase tracking-widest mt-1">
+                      <User size={12} className="text-blue-500" />
+                      Lent to {lending.renter_name}
+                    </div>
                   </div>
                 </div>
+                <div className="text-right ml-4 flex-shrink-0">
+                  <p className="text-sm font-black text-green-600 tracking-tighter">+{lending.total_price}₺</p>
+                  <span className="text-[8px] font-black uppercase tracking-widest text-green-600 bg-green-600/10 border border-green-600/20 px-2.5 py-1 rounded-lg mt-1 inline-block">Earned</span>
+                </div>
               </div>
-              <div className="text-right">
-                <p className="text-xs font-black text-gray-400">+{lending.total_price}₺</p>
-                <span className="text-[9px] font-black uppercase text-green-600 bg-green-50 px-2 py-0.5 rounded">Earned</span>
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
-      </div>
       )}
     </div>
   );
