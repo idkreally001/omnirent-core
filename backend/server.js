@@ -81,8 +81,8 @@ app.get('/api/upload-signature', verifyToken, (req, res) => {
     res.json({
       signature,
       timestamp,
-      cloudName: process.env.CLOUDINARY_CLOUD_NAME,
-      apiKey: process.env.CLOUDINARY_API_KEY
+      cloudName: process.env.CLOUDINARY_CLOUD_NAME || process.env.VITE_CLOUDINARY_CLOUD_NAME,
+      apiKey: process.env.CLOUDINARY_API_KEY || process.env.VITE_CLOUDINARY_API_KEY
     });
   } catch (error) {
     console.error("Signature Error:", error);

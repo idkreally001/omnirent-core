@@ -62,15 +62,19 @@ export const uploadToCloudinary = async (file) => {
     const signatureRes = await api.get('/upload-signature');
     const { signature, timestamp, apiKey, cloudName } = signatureRes.data;
 
+    // FALLBACK: Use frontend env vars if backend is missing config
+    const finalCloudName = cloudName || import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
+    const finalApiKey = apiKey || import.meta.env.VITE_CLOUDINARY_API_KEY;
+
     // 2. Append the secure signature instead of the public preset
     const formData = new FormData();
     formData.append('file', file);
     formData.append('signature', signature);
-    formData.append('api_key', apiKey);
+    formData.append('api_key', finalApiKey);
     formData.append('timestamp', timestamp);
 
     // 3. Upload to Cloudinary securely
-    const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+    const res = await fetch(`https://api.cloudinary.com/v1_1/${finalCloudName}/image/upload`, {
       method: 'POST',
       body: formData,
     });
@@ -78,7 +82,7 @@ export const uploadToCloudinary = async (file) => {
     if (!res.ok) throw new Error('Failed to upload image to Cloudinary');
 
     const data = await res.json();
-    return data.secure_url; 
+    return data.secure_url;
 
   } catch (error) {
     console.error("Upload Error:", error);
