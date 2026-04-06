@@ -47,7 +47,7 @@ export default function About() {
 
         <section className="text-center py-8">
           <p className="text-text-secondary font-bold mb-6 italic">
-            "Developed with care by Islam Pashazade"
+            Developed with care by Islam Pashazade
           </p>
           <p className="text-text-secondary font-bold mb-6 italic">
             Special thanks to Kamal Hagverdi and Bestami Yıldırım for their support.
