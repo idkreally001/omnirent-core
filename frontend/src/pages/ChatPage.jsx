@@ -159,7 +159,7 @@ export default function ChatPage() {
         </button>
 
         {/* Sidebar: Conversations */}
-        <div className="hidden md:flex w-80 border-r border-border-subtle flex-col bg-bg-primary/50">
+        <div className={`${activeChat ? 'hidden' : 'flex'} md:flex w-full md:w-80 border-r border-border-subtle flex-col bg-bg-primary/50`}>
           <div className="p-8">
             <h2 className="text-2xl font-black text-text-primary tracking-tight">Inbox</h2>
             <p className="text-[10px] text-text-secondary font-bold uppercase tracking-widest mt-1">Recent Handshakes</p>
@@ -187,13 +187,13 @@ export default function ChatPage() {
         </div>
 
         {/* Main Chat Area */}
-        <div className="flex-1 flex flex-col bg-bg-secondary">
+        <div className={`flex-1 ${activeChat ? 'flex' : 'hidden'} md:flex flex-col bg-bg-secondary animate-in slide-in-from-right-4 duration-300`}>
           {activeChat ? (
             <>
               {/* Header */}
               <div className="p-6 border-b border-border-subtle flex items-center justify-between pr-20">
                 <div className="flex items-center gap-4">
-                  <button onClick={() => navigate(-1)} className="md:hidden p-2 text-text-secondary"><ArrowLeft size={20}/></button>
+                  <button onClick={() => setActiveChat(null)} className="md:hidden p-2 text-text-secondary hover:bg-bg-primary rounded-xl transition-colors"><ArrowLeft size={20}/></button>
                   <div className="w-10 h-10 bg-text-primary text-bg-secondary rounded-xl flex items-center justify-center font-black">
                     {conversations.find(c => c.other_user_id === activeChat)?.full_name?.charAt(0) || 'U'}
                   </div>
