@@ -3,6 +3,12 @@ name: Run Tests
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - '**.md'
+      - 'SPRINT_LOG.md'
+      - 'SPRINT_LOG_V2.md'
+      - 'SPRINT_LOG_V3.md'
+      - 'Requirements.md'
   pull_request:
     branches: [main]
 
