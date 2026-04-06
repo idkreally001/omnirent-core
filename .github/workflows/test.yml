@@ -46,3 +46,22 @@ jobs:
       - name: Run Tests
         working-directory: ./backend
         run: npm test
+
+      # 🚀 PROMOTION TO PRODUCTION (Only runs if tests pass on MAIN)
+      - name: Promote to Production (Cleaned)
+        if: success() && github.ref == 'refs/heads/main'
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          
+          # Force mirror main to a fresh production state
+          git checkout -B production
+          
+          # 🔥 DOCUMENTATION STRIPPING
+          # Remove all .md files, logs, and development artifacts
+          find . -name "*.md" -type f -delete
+          rm -rf .github/ # Optional: hide workflows from production branch
+          
+          git add -A
+          git commit -m "Automated Production Release: Clean Build (Tests Passed)"
+          git push origin production --force
