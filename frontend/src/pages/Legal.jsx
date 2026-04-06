@@ -9,7 +9,7 @@ import {
 } from 'lucide-react';
 
 /* =========================
-   LEGAL CONTENT STRUCTURE
+   LEGAL STRUCTURE
 ========================= */
 
 const sections = [
@@ -21,20 +21,28 @@ const sections = [
     bg: "bg-blue-600/10",
     content: [
       {
-        head: "Acceptance of Service",
+        head: "01. Acceptance of Service",
         body: "By using OmniRent, you agree to follow the rules and processes defined on this platform."
       },
       {
-        head: "Escrow & Payments",
+        head: "02. Escrow & Payments",
         body: "All payments are held securely and released only after required verification steps are completed by both parties."
       },
       {
-        head: "Platform Role",
-        body: "OmniRent provides the infrastructure for transactions. It does not inspect, guarantee, or certify listed items."
+        head: "03. Platform Role",
+        body: "OmniRent provides the infrastructure for transactions and does not guarantee or certify listed items."
       },
       {
-        head: "User Responsibility",
+        head: "04. User Responsibility",
         body: "Users are responsible for verifying item condition, ownership, and suitability before completing any transaction."
+      },
+      {
+        head: "05. Governing Law & Jurisdiction",
+        body: "This agreement is governed by the laws of the Republic of Türkiye. Disputes shall be resolved exclusively in the Courts and Execution Offices of Ankara."
+      },
+      {
+        head: "06. Force Majeure & Service Limits",
+        body: "OmniRent is not liable for service interruptions caused by factors outside its control, including infrastructure failures, network outages, or natural disasters. No guarantee of uninterrupted service is provided."
       }
     ]
   },
@@ -47,20 +55,28 @@ const sections = [
     bg: "bg-green-600/10",
     content: [
       {
-        head: "Data Collection",
-        body: "Identification data (such as TCKN) may be collected to prevent fraud and enforce platform integrity."
+        head: "01. Data Controller & KVKK Compliance",
+        body: "In accordance with KVKK No. 6698, the platform operator acts as the Data Controller. Personal data is processed strictly for identity verification, fraud prevention, and transaction security."
       },
       {
-        head: "Data Storage",
+        head: "02. Data Collection",
+        body: "Identification data (such as TCKN) may be collected to enforce platform integrity and prevent duplicate or fraudulent accounts."
+      },
+      {
+        head: "03. Data Storage",
         body: "Sensitive data is stored securely using encryption and hashing techniques."
       },
       {
-        head: "Usage of Data",
-        body: "Collected data is used only for verification, security, and dispute resolution."
+        head: "04. Rental Evidence",
+        body: "Photos and transaction records are stored securely and used only for dispute resolution and audit purposes."
       },
       {
-        head: "Data Sharing",
-        body: "User data is not sold or shared with third parties for advertising purposes."
+        head: "05. Data Usage & Sharing",
+        body: "User data is not sold or shared with third parties for advertising. Data may only be processed where legally required."
+      },
+      {
+        head: "06. Your Data Rights",
+        body: "Under Article 11 of KVKK, users may request access, correction, or deletion of their data, unless retention is required for disputes or legal obligations."
       }
     ]
   },
@@ -73,16 +89,24 @@ const sections = [
     bg: "bg-orange-600/10",
     content: [
       {
-        head: "Listing Rules",
-        body: "Users must have legal rights to list any item. Illegal, stolen, or hazardous items are prohibited."
+        head: "01. Listing Rules",
+        body: "Users must have legal rights to list items. Illegal, stolen, or hazardous items are strictly prohibited."
       },
       {
-        head: "Platform Conduct",
-        body: "Users must not attempt to exploit, disrupt, or misuse the platform."
+        head: "02. Platform Conduct",
+        body: "Users must not attempt to exploit, disrupt, or misuse the platform or its services."
       },
       {
-        head: "Dispute Handling",
-        body: "Disputes are resolved using available platform evidence. Decisions made by the platform are final within its scope."
+        head: "03. Dispute Handling",
+        body: "Disputes are resolved based on available platform data. Decisions made within the platform are final for internal transactions."
+      },
+      {
+        head: "04. Severability Clause",
+        body: "If any provision of these terms is found unenforceable, the remaining provisions shall remain valid and enforceable."
+      },
+      {
+        head: "05. Prohibited Manipulation",
+        body: "Automated scraping, bypassing system protections, or interfering with platform workflows is strictly prohibited and may result in immediate access revocation."
       }
     ]
   },
@@ -96,20 +120,20 @@ const sections = [
     content: [
       {
         head: "MIT License",
-        body: "This software is provided under the MIT License. It is distributed without warranty of any kind."
+        body: "This software is provided under the MIT License and is distributed without warranty of any kind."
       }
     ]
   }
 ];
 
 /* =========================
-   GLOBAL DISCLAIMER (ONCE)
+   GLOBAL DISCLAIMER (SINGLE SOURCE)
 ========================= */
 
 const globalDisclaimer = `
-OmniRent is an independent software platform. It acts solely as a facilitator for peer-to-peer transactions.
-The platform does not guarantee the condition, legality, or safety of listed items.
-All risks related to physical goods and transactions are assumed by the users.
+OmniRent is a software platform that facilitates peer-to-peer transactions. 
+It does not guarantee the condition, legality, or safety of listed items. 
+All risks related to physical goods and real-world interactions are assumed by the users.
 `;
 
 /* =========================
@@ -118,10 +142,8 @@ All risks related to physical goods and transactions are assumed by the users.
 
 export default function Legal() {
   const [active, setActive] = useState("terms");
-
   const ids = sections.map(s => s.id);
 
-  /* HASH SYNC */
   useEffect(() => {
     const handleHash = () => {
       const hash = window.location.hash.replace('#', '');
@@ -148,7 +170,6 @@ export default function Legal() {
   return (
     <div className="max-w-6xl mx-auto px-4 mt-12 mb-20">
 
-      {/* HEADER */}
       <header className="text-center mb-16">
         <h1 className="text-4xl md:text-5xl font-black uppercase mb-4">
           Legal Center
@@ -160,7 +181,7 @@ export default function Legal() {
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
 
-        {/* SIDEBAR */}
+        {/* Sidebar */}
         <nav className="lg:col-span-3 space-y-2 sticky top-24">
           {sections.map((s) => {
             const Icon = s.icon;
@@ -170,10 +191,11 @@ export default function Legal() {
                 key={s.id}
                 onClick={() => changeSection(s.id)}
                 onKeyDown={handleKey}
-                className={`w-full flex items-center justify-between p-4 rounded-xl border transition ${active === s.id
+                className={`w-full flex items-center justify-between p-4 rounded-xl border transition ${
+                  active === s.id
                     ? "bg-bg-secondary border-blue-600/40 shadow"
                     : "bg-bg-primary border-border-subtle hover:border-text-secondary/20"
-                  }`}
+                }`}
               >
                 <div className="flex items-center gap-3">
                   <div className={`${s.bg} ${s.color} p-2 rounded-lg`}>
@@ -193,10 +215,10 @@ export default function Legal() {
           })}
         </nav>
 
-        {/* CONTENT */}
+        {/* Content */}
         <main className="lg:col-span-9 bg-bg-secondary border border-border-subtle rounded-3xl p-8 md:p-14 shadow-xl">
 
-          {/* GLOBAL DISCLAIMER */}
+          {/* Global Disclaimer */}
           <div className="mb-12 p-6 bg-red-600/5 border border-red-600/10 rounded-2xl">
             <div className="flex items-center gap-2 mb-3 text-red-600 font-bold text-sm uppercase tracking-widest">
               <AlertTriangle size={16} />
@@ -211,10 +233,7 @@ export default function Legal() {
             const isActive = active === s.id;
 
             return (
-              <div
-                key={s.id}
-                className={`${isActive ? "block" : "hidden"} print:block`}
-              >
+              <div key={s.id} className={`${isActive ? "block" : "hidden"} print:block`}>
                 <div className="mb-10 border-b pb-6">
                   <h2 className="text-3xl font-black uppercase tracking-tight">
                     {s.title}
