@@ -9,7 +9,7 @@ import {
 } from 'lucide-react';
 
 /* =========================
-   LEGAL STRUCTURE
+   LEGAL CONTENT
 ========================= */
 
 const sections = [
@@ -17,8 +17,6 @@ const sections = [
     id: "terms",
     title: "Terms of Service",
     icon: Shield,
-    color: "text-blue-600",
-    bg: "bg-blue-600/10",
     content: [
       {
         head: "01. Acceptance of Service",
@@ -51,8 +49,6 @@ const sections = [
     id: "privacy",
     title: "Privacy Policy",
     icon: Lock,
-    color: "text-green-600",
-    bg: "bg-green-600/10",
     content: [
       {
         head: "01. Data Controller & KVKK Compliance",
@@ -85,8 +81,6 @@ const sections = [
     id: "usage",
     title: "Usage Agreement",
     icon: FileText,
-    color: "text-orange-600",
-    bg: "bg-orange-600/10",
     content: [
       {
         head: "01. Listing Rules",
@@ -115,8 +109,6 @@ const sections = [
     id: "license",
     title: "License",
     icon: Copyright,
-    color: "text-purple-600",
-    bg: "bg-purple-600/10",
     content: [
       {
         head: "MIT License",
@@ -127,10 +119,10 @@ const sections = [
 ];
 
 /* =========================
-   GLOBAL DISCLAIMER (SINGLE SOURCE)
+   GLOBAL DISCLAIMER
 ========================= */
 
-const globalDisclaimer = `
+const disclaimer = `
 OmniRent is a software platform that facilitates peer-to-peer transactions. 
 It does not guarantee the condition, legality, or safety of listed items. 
 All risks related to physical goods and real-world interactions are assumed by the users.
@@ -142,8 +134,10 @@ All risks related to physical goods and real-world interactions are assumed by t
 
 export default function Legal() {
   const [active, setActive] = useState("terms");
+
   const ids = sections.map(s => s.id);
 
+  /* HASH SUPPORT */
   useEffect(() => {
     const handleHash = () => {
       const hash = window.location.hash.replace('#', '');
@@ -152,6 +146,7 @@ export default function Legal() {
 
     handleHash();
     window.addEventListener('hashchange', handleHash);
+
     return () => window.removeEventListener('hashchange', handleHash);
   }, []);
 
@@ -161,28 +156,48 @@ export default function Legal() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleKey = (e) => {
-    const i = ids.indexOf(active);
-    if (e.key === "ArrowDown") changeSection(ids[(i + 1) % ids.length]);
-    if (e.key === "ArrowUp") changeSection(ids[(i - 1 + ids.length) % ids.length]);
-  };
+  /* =========================
+     UI
+  ========================= */
 
   return (
-    <div className="max-w-6xl mx-auto px-4 mt-12 mb-20">
+    <div className="max-w-6xl mx-auto px-4 mt-8 mb-16">
 
-      <header className="text-center mb-16">
-        <h1 className="text-4xl md:text-5xl font-black uppercase mb-4">
+      {/* HEADER */}
+      <header className="text-center mb-10">
+        <h1 className="text-3xl md:text-5xl font-black uppercase mb-3">
           Legal Center
         </h1>
-        <p className="text-xs uppercase tracking-widest opacity-60">
+        <p className="text-xs uppercase tracking-widest text-gray-500">
           Terms • Privacy • Usage • License
         </p>
       </header>
 
+      {/* MOBILE TABS */}
+      <div className="flex gap-2 overflow-x-auto pb-3 mb-6 lg:hidden">
+        {sections.map((s) => {
+          const Icon = s.icon;
+          return (
+            <button
+              key={s.id}
+              onClick={() => changeSection(s.id)}
+              className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm whitespace-nowrap border ${
+                active === s.id
+                  ? "bg-blue-600 text-white"
+                  : "bg-white border-gray-200"
+              }`}
+            >
+              <Icon size={14} />
+              {s.title}
+            </button>
+          );
+        })}
+      </div>
+
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
 
-        {/* Sidebar */}
-        <nav className="lg:col-span-3 space-y-2 sticky top-24">
+        {/* DESKTOP SIDEBAR */}
+        <nav className="hidden lg:block lg:col-span-3 space-y-2 sticky top-24">
           {sections.map((s) => {
             const Icon = s.icon;
 
@@ -190,17 +205,14 @@ export default function Legal() {
               <button
                 key={s.id}
                 onClick={() => changeSection(s.id)}
-                onKeyDown={handleKey}
-                className={`w-full flex items-center justify-between p-4 rounded-xl border transition ${
+                className={`w-full flex items-center justify-between p-4 rounded-xl border ${
                   active === s.id
-                    ? "bg-bg-secondary border-blue-600/40 shadow"
-                    : "bg-bg-primary border-border-subtle hover:border-text-secondary/20"
+                    ? "bg-gray-50 border-blue-500 shadow"
+                    : "bg-white border-gray-200 hover:border-gray-300"
                 }`}
               >
                 <div className="flex items-center gap-3">
-                  <div className={`${s.bg} ${s.color} p-2 rounded-lg`}>
-                    <Icon size={18} />
-                  </div>
+                  <Icon size={18} />
                   <span className="text-xs font-bold uppercase tracking-widest">
                     {s.title}
                   </span>
@@ -215,49 +227,47 @@ export default function Legal() {
           })}
         </nav>
 
-        {/* Content */}
-        <main className="lg:col-span-9 bg-bg-secondary border border-border-subtle rounded-3xl p-8 md:p-14 shadow-xl">
+        {/* CONTENT */}
+        <main className="lg:col-span-9 bg-white border border-gray-200 rounded-2xl p-6 md:p-10 shadow-sm">
 
-          {/* Global Disclaimer */}
-          <div className="mb-12 p-6 bg-red-600/5 border border-red-600/10 rounded-2xl">
-            <div className="flex items-center gap-2 mb-3 text-red-600 font-bold text-sm uppercase tracking-widest">
+          {/* DISCLAIMER */}
+          <div className="mb-8 p-4 bg-red-50 border border-red-200 rounded-xl">
+            <div className="flex items-center gap-2 mb-2 text-red-600 text-sm font-bold uppercase">
               <AlertTriangle size={16} />
               General Disclaimer
             </div>
-            <p className="text-sm leading-relaxed text-text-secondary">
-              {globalDisclaimer}
+            <p className="text-sm text-gray-700 leading-relaxed">
+              {disclaimer}
             </p>
           </div>
 
+          {/* SECTIONS */}
           {sections.map((s) => {
             const isActive = active === s.id;
 
             return (
-              <div key={s.id} className={`${isActive ? "block" : "hidden"} print:block`}>
-                <div className="mb-10 border-b pb-6">
-                  <h2 className="text-3xl font-black uppercase tracking-tight">
-                    {s.title}
-                  </h2>
-                </div>
+              <div key={s.id} className={isActive ? "block" : "hidden"}>
+                <h2 className="text-2xl md:text-3xl font-black mb-6 uppercase">
+                  {s.title}
+                </h2>
 
-                <div className="space-y-10">
+                <div className="space-y-6">
                   {s.content.map((c, i) => (
-                    <section key={i} className="space-y-3">
-                      <h3 className="text-sm font-bold uppercase tracking-widest">
+                    <div key={i}>
+                      <h3 className="font-bold text-sm uppercase mb-1">
                         {c.head}
                       </h3>
-                      <p className="text-base leading-relaxed text-text-secondary">
+                      <p className="text-sm md:text-base leading-relaxed text-gray-700">
                         {c.body}
                       </p>
-                    </section>
+                    </div>
                   ))}
                 </div>
 
                 <button
                   onClick={() => window.print()}
-                  className="mt-12 text-xs font-bold uppercase tracking-widest hover:text-blue-600 flex items-center gap-2"
+                  className="mt-8 text-xs font-bold uppercase text-gray-500 hover:text-blue-600"
                 >
-                  <FileText size={14} />
                   Print
                 </button>
               </div>
