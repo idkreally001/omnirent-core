@@ -5,266 +5,241 @@ import {
   FileText,
   Copyright,
   ChevronRight,
-  AlertCircle,
-  Scale
+  AlertTriangle
 } from 'lucide-react';
 
 /* =========================
-   1. CONFIG (UI-agnostic)
+   LEGAL CONTENT STRUCTURE
 ========================= */
-const legalConfig = {
-  terms: {
+
+const sections = [
+  {
+    id: "terms",
     title: "Terms of Service",
     icon: Shield,
     color: "text-blue-600",
     bg: "bg-blue-600/10",
-    lastUpdated: "April 2026",
-    sections: [
+    content: [
       {
-        head: "01. Acceptance of Service",
-        body: "By using OmniRent, you agree to follow our payment and verification rules. This platform allows people to rent items from each other."
+        head: "Acceptance of Service",
+        body: "By using OmniRent, you agree to follow the rules and processes defined on this platform."
       },
       {
-        head: "02. Payment Protection (Escrow)",
-        body: "Payments are held securely until the rental is completed. Funds are released only after required pre- and post-check confirmations."
+        head: "Escrow & Payments",
+        body: "All payments are held securely and released only after required verification steps are completed by both parties."
       },
       {
-        head: "03. Condition & Liability",
-        body: "OmniRent provides the platform only. Users are responsible for checking item condition and safety before completing a transaction."
+        head: "Platform Role",
+        body: "OmniRent provides the infrastructure for transactions. It does not inspect, guarantee, or certify listed items."
+      },
+      {
+        head: "User Responsibility",
+        body: "Users are responsible for verifying item condition, ownership, and suitability before completing any transaction."
       }
     ]
   },
 
-  privacy: {
+  {
+    id: "privacy",
     title: "Privacy Policy",
     icon: Lock,
     color: "text-green-600",
     bg: "bg-green-600/10",
-    lastUpdated: "April 2026",
-    sections: [
+    content: [
       {
-        head: "01. Identity Verification",
-        body: "We collect identification data (e.g., TCKN) to reduce fraud. This data is securely hashed and cannot be reused."
+        head: "Data Collection",
+        body: "Identification data (such as TCKN) may be collected to prevent fraud and enforce platform integrity."
       },
       {
-        head: "02. Rental Evidence",
-        body: "Photos taken during transactions are securely stored and only used in case of disputes."
+        head: "Data Storage",
+        body: "Sensitive data is stored securely using encryption and hashing techniques."
+      },
+      {
+        head: "Usage of Data",
+        body: "Collected data is used only for verification, security, and dispute resolution."
+      },
+      {
+        head: "Data Sharing",
+        body: "User data is not sold or shared with third parties for advertising purposes."
       }
     ]
   },
 
-  usage: {
+  {
+    id: "usage",
     title: "Usage Agreement",
     icon: FileText,
     color: "text-orange-600",
     bg: "bg-orange-600/10",
-    lastUpdated: "April 2026",
-    sections: [
+    content: [
       {
-        head: "01. Ownership Rules",
-        body: "Users must own or have permission to rent listed items. Illegal or dangerous items are not allowed."
+        head: "Listing Rules",
+        body: "Users must have legal rights to list any item. Illegal, stolen, or hazardous items are prohibited."
       },
       {
-        head: "02. Dispute Resolution",
-        body: "Disputes are reviewed using platform data. Final decisions are binding within the platform."
+        head: "Platform Conduct",
+        body: "Users must not attempt to exploit, disrupt, or misuse the platform."
+      },
+      {
+        head: "Dispute Handling",
+        body: "Disputes are resolved using available platform evidence. Decisions made by the platform are final within its scope."
       }
     ]
   },
 
-  license: {
+  {
+    id: "license",
     title: "License",
     icon: Copyright,
     color: "text-purple-600",
     bg: "bg-purple-600/10",
-    lastUpdated: "April 2026",
-    sections: [
+    content: [
       {
         head: "MIT License",
-        body: "Copyright (c) 2026 Islam Pashazade. Provided as-is without warranty."
+        body: "This software is provided under the MIT License. It is distributed without warranty of any kind."
       }
     ]
   }
-};
-
-const sectionKeys = Object.keys(legalConfig);
+];
 
 /* =========================
-   2. COMPONENT
+   GLOBAL DISCLAIMER (ONCE)
 ========================= */
-export default function Legal() {
-  const [activeSection, setActiveSection] = useState('terms');
 
-  /* =========================
-     3. HASH SYNC (LOAD + BACK)
-  ========================= */
+const globalDisclaimer = `
+OmniRent is an independent software platform. It acts solely as a facilitator for peer-to-peer transactions.
+The platform does not guarantee the condition, legality, or safety of listed items.
+All risks related to physical goods and transactions are assumed by the users.
+`;
+
+/* =========================
+   COMPONENT
+========================= */
+
+export default function Legal() {
+  const [active, setActive] = useState("terms");
+
+  const ids = sections.map(s => s.id);
+
+  /* HASH SYNC */
   useEffect(() => {
-    const setFromHash = () => {
+    const handleHash = () => {
       const hash = window.location.hash.replace('#', '');
-      if (legalConfig[hash]) {
-        setActiveSection(hash);
-      } else {
-        setActiveSection('terms');
-      }
+      if (ids.includes(hash)) setActive(hash);
     };
 
-    setFromHash();
-    window.addEventListener('hashchange', setFromHash);
-
-    return () => window.removeEventListener('hashchange', setFromHash);
+    handleHash();
+    window.addEventListener('hashchange', handleHash);
+    return () => window.removeEventListener('hashchange', handleHash);
   }, []);
 
-  /* =========================
-     4. HANDLERS
-  ========================= */
-  const handleSectionChange = (id) => {
-    setActiveSection(id);
+  const changeSection = (id) => {
+    setActive(id);
     window.location.hash = id;
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleKeyNav = (e) => {
-    const index = sectionKeys.indexOf(activeSection);
-
-    if (e.key === 'ArrowDown') {
-      const next = sectionKeys[(index + 1) % sectionKeys.length];
-      handleSectionChange(next);
-    }
-
-    if (e.key === 'ArrowUp') {
-      const prev = sectionKeys[(index - 1 + sectionKeys.length) % sectionKeys.length];
-      handleSectionChange(prev);
-    }
+  const handleKey = (e) => {
+    const i = ids.indexOf(active);
+    if (e.key === "ArrowDown") changeSection(ids[(i + 1) % ids.length]);
+    if (e.key === "ArrowUp") changeSection(ids[(i - 1 + ids.length) % ids.length]);
   };
 
-  /* =========================
-     5. UI
-  ========================= */
   return (
-    <div className="max-w-6xl mx-auto mt-12 mb-20 px-4 print:mt-0">
+    <div className="max-w-6xl mx-auto px-4 mt-12 mb-20">
 
       {/* HEADER */}
-      <header className="text-center mb-16 print:hidden">
-        <h1 className="text-4xl md:text-5xl font-black uppercase tracking-tight mb-4">
+      <header className="text-center mb-16">
+        <h1 className="text-4xl md:text-5xl font-black uppercase mb-4">
           Legal Center
         </h1>
         <p className="text-xs uppercase tracking-widest opacity-60">
-          Governance • Privacy • Licensing
+          Terms • Privacy • Usage • License
         </p>
       </header>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
 
         {/* SIDEBAR */}
-        <nav
-          role="tablist"
-          aria-label="Legal Sections"
-          className="lg:col-span-3 space-y-2 sticky top-24 print:hidden"
-        >
-          {sectionKeys.map((id) => {
-            const config = legalConfig[id];
-            const Icon = config.icon;
+        <nav className="lg:col-span-3 space-y-2 sticky top-24">
+          {sections.map((s) => {
+            const Icon = s.icon;
 
             return (
               <button
-                key={id}
-                role="tab"
-                aria-selected={activeSection === id}
-                aria-controls={`panel-${id}`}
-                id={`tab-${id}`}
-                tabIndex={activeSection === id ? 0 : -1}
-                onClick={() => handleSectionChange(id)}
-                onKeyDown={handleKeyNav}
-                className={`w-full flex items-center justify-between p-4 rounded-xl border transition ${activeSection === id
-                    ? 'bg-bg-secondary border-blue-600/40 shadow-lg'
-                    : 'bg-bg-primary border-border-subtle hover:border-text-secondary/20'
+                key={s.id}
+                onClick={() => changeSection(s.id)}
+                onKeyDown={handleKey}
+                className={`w-full flex items-center justify-between p-4 rounded-xl border transition ${active === s.id
+                    ? "bg-bg-secondary border-blue-600/40 shadow"
+                    : "bg-bg-primary border-border-subtle hover:border-text-secondary/20"
                   }`}
               >
                 <div className="flex items-center gap-3">
-                  <div className={`${config.bg} ${config.color} p-2 rounded-lg`}>
+                  <div className={`${s.bg} ${s.color} p-2 rounded-lg`}>
                     <Icon size={18} />
                   </div>
                   <span className="text-xs font-bold uppercase tracking-widest">
-                    {config.title}
+                    {s.title}
                   </span>
                 </div>
 
                 <ChevronRight
                   size={14}
-                  className={`transition ${activeSection === id ? 'text-blue-600 translate-x-1' : 'opacity-0'
-                    }`}
+                  className={active === s.id ? "text-blue-600 translate-x-1" : "opacity-0"}
                 />
               </button>
             );
           })}
-
-          {/* NOTE */}
-          <div className="mt-8 p-6 bg-blue-600 text-white rounded-2xl shadow-xl">
-            <Scale size={24} className="mb-3 opacity-40" />
-            <p className="text-xs uppercase tracking-widest">
-              Independent open-source project by Islam Pashazade
-            </p>
-          </div>
         </nav>
 
-        {/* MAIN CONTENT */}
-        <main className="lg:col-span-9 bg-bg-secondary border border-border-subtle rounded-3xl p-8 md:p-14 shadow-xl print:border-none print:shadow-none print:p-0">
+        {/* CONTENT */}
+        <main className="lg:col-span-9 bg-bg-secondary border border-border-subtle rounded-3xl p-8 md:p-14 shadow-xl">
 
-          {sectionKeys.map((id) => {
-            const config = legalConfig[id];
-            const isActive = activeSection === id;
+          {/* GLOBAL DISCLAIMER */}
+          <div className="mb-12 p-6 bg-red-600/5 border border-red-600/10 rounded-2xl">
+            <div className="flex items-center gap-2 mb-3 text-red-600 font-bold text-sm uppercase tracking-widest">
+              <AlertTriangle size={16} />
+              General Disclaimer
+            </div>
+            <p className="text-sm leading-relaxed text-text-secondary">
+              {globalDisclaimer}
+            </p>
+          </div>
+
+          {sections.map((s) => {
+            const isActive = active === s.id;
 
             return (
               <div
-                key={id}
-                role="tabpanel"
-                id={`panel-${id}`}
-                aria-labelledby={`tab-${id}`}
-                className={`${isActive ? 'block' : 'hidden'} print:block`}
+                key={s.id}
+                className={`${isActive ? "block" : "hidden"} print:block`}
               >
-                {/* HEADER */}
-                <div className="flex justify-between items-center mb-10 border-b pb-6">
+                <div className="mb-10 border-b pb-6">
                   <h2 className="text-3xl font-black uppercase tracking-tight">
-                    {config.title}
+                    {s.title}
                   </h2>
-
-                  <span className="text-xs font-bold text-blue-600 bg-blue-600/5 px-3 py-1 rounded-full">
-                    Last Updated: {config.lastUpdated}
-                  </span>
                 </div>
 
-                {/* CONTENT */}
                 <div className="space-y-10">
-                  {config.sections.map((section, i) => (
+                  {s.content.map((c, i) => (
                     <section key={i} className="space-y-3">
-                      <h3 className="text-sm font-bold uppercase tracking-widest flex items-center gap-2">
-                        <AlertCircle size={14} className="text-blue-600" />
-                        {section.head}
+                      <h3 className="text-sm font-bold uppercase tracking-widest">
+                        {c.head}
                       </h3>
-
                       <p className="text-base leading-relaxed text-text-secondary">
-                        {section.body}
+                        {c.body}
                       </p>
                     </section>
                   ))}
-
-                  {/* LICENSE DISCLAIMER */}
-                  {id === 'license' && (
-                    <div className="p-6 bg-red-600/5 border border-red-600/10 rounded-2xl">
-                      <p className="text-xs font-bold uppercase tracking-widest text-red-600">
-                        Disclaimer: OmniRent is not affiliated with any external rental companies.
-                        Provided as-is without warranty.
-                      </p>
-                    </div>
-                  )}
                 </div>
 
-                {/* PRINT BUTTON */}
                 <button
                   onClick={() => window.print()}
-                  className="mt-12 text-xs font-bold uppercase tracking-widest hover:text-blue-600 flex items-center gap-2 print:hidden"
+                  className="mt-12 text-xs font-bold uppercase tracking-widest hover:text-blue-600 flex items-center gap-2"
                 >
                   <FileText size={14} />
-                  Print Document
+                  Print
                 </button>
               </div>
             );
