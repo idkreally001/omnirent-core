@@ -1,152 +1,77 @@
 import { useState, useEffect } from 'react';
 import {
-  Shield,
-  Lock,
-  FileText,
-  Copyright,
-  ChevronRight,
-  AlertTriangle
+  Shield, Lock, FileText, Copyright,
+  ChevronRight, AlertTriangle, Printer
 } from 'lucide-react';
 
 /* =========================
-   LEGAL CONTENT
+   CONFIG
 ========================= */
-
-const sections = [
-  {
-    id: "terms",
+const legalConfig = {
+  terms: {
     title: "Terms of Service",
     icon: Shield,
-    content: [
-      {
-        head: "01. Acceptance of Service",
-        body: "By using OmniRent, you agree to follow the rules and processes defined on this platform."
-      },
-      {
-        head: "02. Escrow & Payments",
-        body: "All payments are held securely and released only after required verification steps are completed by both parties."
-      },
-      {
-        head: "03. Platform Role",
-        body: "OmniRent provides the infrastructure for transactions and does not guarantee or certify listed items."
-      },
-      {
-        head: "04. User Responsibility",
-        body: "Users are responsible for verifying item condition, ownership, and suitability before completing any transaction."
-      },
-      {
-        head: "05. Governing Law & Jurisdiction",
-        body: "This agreement is governed by the laws of the Republic of Türkiye. Disputes shall be resolved exclusively in the Courts and Execution Offices of Ankara."
-      },
-      {
-        head: "06. Force Majeure & Service Limits",
-        body: "OmniRent is not liable for service interruptions caused by factors outside its control, including infrastructure failures, network outages, or natural disasters. No guarantee of uninterrupted service is provided."
-      }
+    color: "text-blue-600",
+    bg: "bg-blue-600/10",
+    lastUpdated: "April 2026",
+    sections: [
+      { head: "Acceptance of Service", body: "By using OmniRent, you agree to follow the rules and processes defined on this platform." },
+      { head: "Escrow & Payments", body: "All payments are held securely and released only after required verification steps are completed by both parties." },
+      { head: "Governing Law", body: "This agreement is governed by the laws of the Republic of Türkiye. Disputes shall be resolved exclusively in the Courts and Execution Offices of Ankara." },
+      { head: "Force Majeure", body: "OmniRent is not liable for service interruptions caused by factors outside its control, including infrastructure failures or natural disasters." }
     ]
   },
-
-  {
-    id: "privacy",
+  privacy: {
     title: "Privacy Policy",
     icon: Lock,
-    content: [
-      {
-        head: "01. Data Controller & KVKK Compliance",
-        body: "In accordance with KVKK No. 6698, the platform operator acts as the Data Controller. Personal data is processed strictly for identity verification, fraud prevention, and transaction security."
-      },
-      {
-        head: "02. Data Collection",
-        body: "Identification data (such as TCKN) may be collected to enforce platform integrity and prevent duplicate or fraudulent accounts."
-      },
-      {
-        head: "03. Data Storage",
-        body: "Sensitive data is stored securely using encryption and hashing techniques."
-      },
-      {
-        head: "04. Rental Evidence",
-        body: "Photos and transaction records are stored securely and used only for dispute resolution and audit purposes."
-      },
-      {
-        head: "05. Data Usage & Sharing",
-        body: "User data is not sold or shared with third parties for advertising. Data may only be processed where legally required."
-      },
-      {
-        head: "06. Your Data Rights",
-        body: "Under Article 11 of KVKK, users may request access, correction, or deletion of their data, unless retention is required for disputes or legal obligations."
-      }
+    color: "text-green-600",
+    bg: "bg-green-600/10",
+    lastUpdated: "April 2026",
+    sections: [
+      { head: "Data Controller (KVKK)", body: "In accordance with KVKK No. 6698, the platform operator acts as the Data Controller. Data is processed strictly for security." },
+      { head: "Your Data Rights", body: "Under Article 11 of KVKK, users may request access, correction, or deletion of their data, subject to legal auditing requirements." },
+      { head: "Rental Evidence", body: "Photos taken during transactions are securely stored and used only for dispute resolution." }
     ]
   },
-
-  {
-    id: "usage",
+  usage: {
     title: "Usage Agreement",
     icon: FileText,
-    content: [
-      {
-        head: "01. Listing Rules",
-        body: "Users must have legal rights to list items. Illegal, stolen, or hazardous items are strictly prohibited."
-      },
-      {
-        head: "02. Platform Conduct",
-        body: "Users must not attempt to exploit, disrupt, or misuse the platform or its services."
-      },
-      {
-        head: "03. Dispute Handling",
-        body: "Disputes are resolved based on available platform data. Decisions made within the platform are final for internal transactions."
-      },
-      {
-        head: "04. Severability Clause",
-        body: "If any provision of these terms is found unenforceable, the remaining provisions shall remain valid and enforceable."
-      },
-      {
-        head: "05. Prohibited Manipulation",
-        body: "Automated scraping, bypassing system protections, or interfering with platform workflows is strictly prohibited and may result in immediate access revocation."
-      }
+    color: "text-orange-600",
+    bg: "bg-orange-600/10",
+    lastUpdated: "April 2026",
+    sections: [
+      { head: "Listing Rules", body: "Users must have legal rights to list items. Illegal, stolen, or hazardous items are strictly prohibited." },
+      { head: "Severability", body: "If any provision of these terms is found unenforceable, the remaining provisions shall remain valid and enforceable." },
+      { head: "Manipulation", body: "Automated scraping or bypassing system protections is strictly prohibited and results in access revocation." }
     ]
   },
-
-  {
-    id: "license",
+  license: {
     title: "License",
     icon: Copyright,
-    content: [
-      {
-        head: "MIT License",
-        body: "This software is provided under the MIT License and is distributed without warranty of any kind."
-      }
+    color: "text-purple-600",
+    bg: "bg-purple-600/10",
+    lastUpdated: "April 2026",
+    sections: [
+      { head: "MIT License", body: "This software is provided under the MIT License and is distributed without warranty of any kind." }
     ]
   }
-];
+};
 
-/* =========================
-   GLOBAL DISCLAIMER
-========================= */
-
-const disclaimer = `
-OmniRent is a software platform that facilitates peer-to-peer transactions. 
-It does not guarantee the condition, legality, or safety of listed items. 
-All risks related to physical goods and real-world interactions are assumed by the users.
-`;
+const sectionKeys = Object.keys(legalConfig);
 
 /* =========================
    COMPONENT
 ========================= */
-
 export default function Legal() {
-  const [active, setActive] = useState("terms");
+  const [active, setActive] = useState('terms');
 
-  const ids = sections.map(s => s.id);
-
-  /* HASH SUPPORT */
   useEffect(() => {
     const handleHash = () => {
       const hash = window.location.hash.replace('#', '');
-      if (ids.includes(hash)) setActive(hash);
+      if (legalConfig[hash]) setActive(hash);
     };
-
     handleHash();
     window.addEventListener('hashchange', handleHash);
-
     return () => window.removeEventListener('hashchange', handleHash);
   }, []);
 
@@ -156,39 +81,37 @@ export default function Legal() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  /* =========================
-     UI
-  ========================= */
-
   return (
-    <div className="max-w-6xl mx-auto px-4 mt-8 mb-16">
+    <div className="max-w-6xl mx-auto mt-8 mb-16 px-4">
 
       {/* HEADER */}
       <header className="text-center mb-10">
-        <h1 className="text-3xl md:text-5xl font-black uppercase mb-3">
+        <h1 className="text-3xl md:text-5xl font-black mb-3">
           Legal Center
         </h1>
-        <p className="text-xs uppercase tracking-widest text-gray-500">
+        <p className="text-xs tracking-widest text-gray-500">
           Terms • Privacy • Usage • License
         </p>
       </header>
 
       {/* MOBILE TABS */}
       <div className="flex gap-2 overflow-x-auto pb-3 mb-6 lg:hidden">
-        {sections.map((s) => {
-          const Icon = s.icon;
+        {sectionKeys.map((id) => {
+          const config = legalConfig[id];
+          const Icon = config.icon;
+
           return (
             <button
-              key={s.id}
-              onClick={() => changeSection(s.id)}
+              key={id}
+              onClick={() => changeSection(id)}
               className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm whitespace-nowrap border ${
-                active === s.id
+                active === id
                   ? "bg-blue-600 text-white"
                   : "bg-white border-gray-200"
               }`}
             >
               <Icon size={14} />
-              {s.title}
+              {config.title}
             </button>
           );
         })}
@@ -196,32 +119,30 @@ export default function Legal() {
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
 
-        {/* DESKTOP SIDEBAR */}
+        {/* SIDEBAR (DESKTOP ONLY) */}
         <nav className="hidden lg:block lg:col-span-3 space-y-2 sticky top-24">
-          {sections.map((s) => {
-            const Icon = s.icon;
+          {sectionKeys.map((id) => {
+            const config = legalConfig[id];
+            const Icon = config.icon;
+            const isActive = active === id;
 
             return (
               <button
-                key={s.id}
-                onClick={() => changeSection(s.id)}
+                key={id}
+                onClick={() => changeSection(id)}
                 className={`w-full flex items-center justify-between p-4 rounded-xl border ${
-                  active === s.id
-                    ? "bg-gray-50 border-blue-500 shadow"
-                    : "bg-white border-gray-200 hover:border-gray-300"
+                  isActive
+                    ? 'bg-gray-50 border-blue-500 shadow'
+                    : 'bg-white border-gray-200 hover:border-gray-300'
                 }`}
               >
                 <div className="flex items-center gap-3">
                   <Icon size={18} />
-                  <span className="text-xs font-bold uppercase tracking-widest">
-                    {s.title}
+                  <span className="text-xs font-bold tracking-widest">
+                    {config.title}
                   </span>
                 </div>
-
-                <ChevronRight
-                  size={14}
-                  className={active === s.id ? "text-blue-600 translate-x-1" : "opacity-0"}
-                />
+                <ChevronRight size={14} className={isActive ? "text-blue-600" : "opacity-0"} />
               </button>
             );
           })}
@@ -232,43 +153,49 @@ export default function Legal() {
 
           {/* DISCLAIMER */}
           <div className="mb-8 p-4 bg-red-50 border border-red-200 rounded-xl">
-            <div className="flex items-center gap-2 mb-2 text-red-600 text-sm font-bold uppercase">
+            <div className="flex items-center gap-2 mb-2 text-red-600 text-sm font-bold">
               <AlertTriangle size={16} />
               General Disclaimer
             </div>
             <p className="text-sm text-gray-700 leading-relaxed">
-              {disclaimer}
+              OmniRent facilitates peer-to-peer transactions and does not guarantee the safety, legality, or condition of listed items. All real-world risks are assumed by users.
             </p>
           </div>
 
-          {/* SECTIONS */}
-          {sections.map((s) => {
-            const isActive = active === s.id;
+          {sectionKeys.map((id) => {
+            const config = legalConfig[id];
+            const isActive = active === id;
 
             return (
-              <div key={s.id} className={isActive ? "block" : "hidden"}>
-                <h2 className="text-2xl md:text-3xl font-black mb-6 uppercase">
-                  {s.title}
-                </h2>
+              <div key={id} className={isActive ? 'block' : 'hidden'}>
+                <div className="flex justify-between items-center mb-8 border-b pb-4">
+                  <h2 className="text-2xl md:text-3xl font-black">
+                    {config.title}
+                  </h2>
+                  <span className="text-xs text-blue-600 bg-blue-50 px-3 py-1 rounded-full">
+                    {config.lastUpdated}
+                  </span>
+                </div>
 
                 <div className="space-y-6">
-                  {s.content.map((c, i) => (
-                    <div key={i}>
-                      <h3 className="font-bold text-sm uppercase mb-1">
+                  {config.sections.map((c, i) => (
+                    <section key={i}>
+                      <h3 className="font-semibold text-sm mb-1">
                         {c.head}
                       </h3>
-                      <p className="text-sm md:text-base leading-relaxed text-gray-700">
+                      <p className="text-sm md:text-base text-gray-700 leading-relaxed">
                         {c.body}
                       </p>
-                    </div>
+                    </section>
                   ))}
                 </div>
 
                 <button
                   onClick={() => window.print()}
-                  className="mt-8 text-xs font-bold uppercase text-gray-500 hover:text-blue-600"
+                  className="mt-8 flex items-center gap-2 text-xs font-bold text-gray-500 hover:text-blue-600"
                 >
-                  Print
+                  <Printer size={14} />
+                  Print Document
                 </button>
               </div>
             );
