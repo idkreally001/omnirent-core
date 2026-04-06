@@ -1,9 +1,14 @@
 import axios from 'axios';
 
 // CHANGE THIS PART
+// Ensure baseURL always ends with /api (standard for this backend)
+const getBaseURL = () => {
+    let url = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+    return url.endsWith('/api') ? url : url.replace(/\/$/, '') + '/api';
+};
+
 const api = axios.create({
-    // Vite uses import.meta.env for environment variables
-    baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api',
+    baseURL: getBaseURL(),
 });
 
 api.interceptors.request.use((config) => {

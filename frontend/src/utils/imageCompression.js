@@ -1,3 +1,5 @@
+import api from '../api/axios';
+
 /**
  * Compresses an image using an HTML5 Canvas, reducing its size significantly.
  * @param {File} file - The image file to compress.
@@ -56,16 +58,9 @@ export const compressImage = (file, maxWidth = 1280, quality = 0.8) => {
  */
 export const uploadToCloudinary = async (file) => {
   try {
-    // 1. Fetch a secure, time-stamped signature from your backend
-    const signatureRes = await fetch(`${import.meta.env.VITE_API_URL}/api/upload-signature`, {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
-      }
-    });
-
-    if (!signatureRes.ok) throw new Error("Could not get upload signature");
-    const { signature, timestamp, apiKey, cloudName } = await signatureRes.json();
+    // 1. Fetch a secure, time-stamped signature from your backend (using axios instance)
+    const signatureRes = await api.get('/upload-signature');
+    const { signature, timestamp, apiKey, cloudName } = signatureRes.data;
 
     // 2. Append the secure signature instead of the public preset
     const formData = new FormData();
@@ -87,7 +82,7 @@ export const uploadToCloudinary = async (file) => {
 
   } catch (error) {
     console.error("Upload Error:", error);
-    // Fallback for development UI mapping if cloud fails
+    // Fallback URL if real upload fails for any reason
     return "https://res.cloudinary.com/demo/image/upload/v1312461204/sample.jpg";
   }
 };
