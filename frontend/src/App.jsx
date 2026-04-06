@@ -20,11 +20,8 @@ import ItemDetail from './pages/ItemDetail';
 import PublicProfile from './pages/PublicProfile';
 import ChatPage from './pages/ChatPage';
 import AdminDashboard from './pages/AdminDashboard';
-import Terms from './pages/Terms';
-import Privacy from './pages/Privacy';
-import Usage from './pages/Usage';
+import Legal from './pages/Legal';
 import About from './pages/About';
-import Copyright from './pages/Copyright';
 import Footer from './components/Footer';
 
 // Import your guards
@@ -44,10 +41,7 @@ function App() {
               <Route path="/" element={<Home />} />
               <Route path="/user/:id" element={<PublicProfile />} />
               <Route path="/about" element={<About />} />
-              <Route path="/terms" element={<Terms />} />
-              <Route path="/privacy" element={<Privacy />} />
-              <Route path="/usage" element={<Usage />} />
-              <Route path="/copyright" element={<Copyright />} />
+              <Route path="/legal" element={<Legal />} />
 
               {/* 2. Public-Only Routes (Redirect to Profile if logged in) */}
               <Route path="/login" element={

@@ -58,7 +58,7 @@ export default function Register() {
 
         <div className="p-4 bg-bg-primary border border-border-subtle rounded-2xl">
           <p className="text-[10px] text-text-secondary font-medium leading-relaxed uppercase tracking-wider">
-            By creating an account, you agree to OmniRent's <Link to="/terms" className="text-blue-600 font-bold hover:underline">Terms</Link>, <Link to="/privacy" className="text-blue-600 font-bold hover:underline">Privacy</Link>, and <Link to="/usage" className="text-blue-600 font-bold hover:underline">Usage</Link>.
+            By creating an account, you agree to OmniRent's <Link to="/legal" className="text-blue-600 font-bold hover:underline">Legal & Policies</Link>.
           </p>
         </div>
 
