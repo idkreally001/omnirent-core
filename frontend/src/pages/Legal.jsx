@@ -1,145 +1,210 @@
-import { useState } from 'react';
-import { Shield, Lock, FileText, Copyright, Scale, Globe, ChevronRight } from 'lucide-react';
+import { useState, useMemo } from 'react';
+import {
+  Shield, Lock, FileText, Copyright,
+  Scale, Globe, ChevronRight, Printer, Download
+} from 'lucide-react';
+
+// 1. Data-Driven Content Map (Eliminates Redundancy)
+const LEGAL_CONTENT = {
+  terms: {
+    title: 'Terms of Service',
+    icon: Shield,
+    color: 'text-blue-600',
+    bg: 'bg-blue-600/10',
+    lastUpdated: 'April 2026',
+    sections: [
+      {
+        h3: '1. Acceptance of Terms',
+        p: 'By accessing the OmniRent platform, you agree to be bound by these Terms. OmniRent is an open-source engine; its use is subject to the MIT license.'
+      },
+      {
+        h3: '2. The OmniRent Escrow System',
+        p: 'OmniRent acts as an intermediary. Funds are held in Escrow until both Handover and Return verification loops are completed. In the event of a dispute, funds are frozen until Administrative resolution.'
+      },
+      {
+        h3: '3. Finality of the Handshake',
+        p: 'Confirming receipt as an Owner acts as a binding assertion that the item is in satisfactory condition. You waive dispute rights once confirmed.'
+      }
+    ],
+    footerNotice: {
+      type: 'warning',
+      icon: Globe,
+      text: 'OmniRent is NOT affiliated with, endorsed by, or sponsored by any other corporate entity operating under a similar brand name.'
+    }
+  },
+  privacy: {
+    title: 'Privacy Policy',
+    icon: Lock,
+    color: 'text-green-600',
+    bg: 'bg-green-600/10',
+    lastUpdated: 'April 2026',
+    sections: [
+      {
+        h3: '1. Information Collection',
+        p: 'We collect essential data to maintain a secure marketplace:',
+        list: [
+          'Identity Information: Valid Government Identity (TCKN) for compliance.',
+          'Photographic Evidence: State images uploaded during handovers.',
+          'Financial Metadata: Transaction flow and wallet balances.'
+        ]
+      },
+      {
+        h3: '2. Data Retention',
+        p: 'Due to physical liabilities, dispute records and transactional metadata are archived permanently to ensure community security.'
+      }
+    ]
+  },
+  usage: {
+    title: 'Usage Agreement',
+    icon: FileText,
+    color: 'text-orange-600',
+    bg: 'bg-orange-600/10',
+    lastUpdated: 'April 2026',
+    sections: [
+      {
+        h3: '1. Acceptable Use',
+        p: 'The marketplace is reserved for legal, non-hazardous physical equipment. Listings certify legal ownership of the asset.'
+      },
+      {
+        h3: '2. System Integrity',
+        p: 'Attempts to deploy automated scraping or bypass workflows result in permanent IP bans via internal firewalls.'
+      }
+    ]
+  },
+  copyright: {
+    title: 'Copyright & Legal',
+    icon: Copyright,
+    color: 'text-purple-600',
+    bg: 'bg-purple-600/10',
+    lastUpdated: 'April 2026',
+    sections: [
+      {
+        h3: '1. Software Licensing',
+        p: 'OmniRent is open-source under the MIT License. Attribution is required for all re-distributions.'
+      }
+    ],
+    footerNotice: {
+      type: 'critical',
+      text: 'OmniRent is an independent technology project. Any resemblance to other service names is coincidental and does not imply endorsement or partnership.'
+    }
+  }
+};
 
 export default function Legal() {
-  const [activeSection, setActiveSection] = useState('terms');
+  const [activeId, setActiveId] = useState('terms');
 
-  const sections = [
-    { id: 'terms', title: 'Terms of Service', icon: <Shield size={20} />, color: 'text-blue-600', bg: 'bg-blue-600/10' },
-    { id: 'privacy', title: 'Privacy Policy', icon: <Lock size={20} />, color: 'text-green-600', bg: 'bg-green-600/10' },
-    { id: 'usage', title: 'Usage Agreement', icon: <FileText size={20} />, color: 'text-orange-600', bg: 'bg-orange-600/10' },
-    { id: 'copyright', title: 'Copyright & Legal', icon: <Copyright size={20} />, color: 'text-purple-600', bg: 'bg-purple-600/10' },
-  ];
+  // Memoize active content for performance
+  const activeContent = useMemo(() => LEGAL_CONTENT[activeId], [activeId]);
+  const Icon = activeContent.icon;
 
   return (
-    <div className="max-w-6xl mx-auto mt-12 mb-20 px-4 animate-in fade-in slide-in-from-bottom-4 duration-700">
-      <div className="text-center mb-16">
-        <h1 className="text-5xl font-black text-text-primary tracking-tight mb-4 uppercase">Legal Center</h1>
-        <p className="text-text-secondary font-black tracking-[0.3em] uppercase text-[10px]">Governance, Privacy, and Intellectual Property</p>
-      </div>
+    <div className="max-w-7xl mx-auto mt-12 mb-20 px-6 animate-in fade-in slide-in-from-bottom-4 duration-1000">
+      {/* Refined Header */}
+      <header className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
+        <div>
+          <h1 className="text-6xl font-black text-text-primary tracking-tighter uppercase leading-none">
+            Legal <span className="text-blue-600">Center</span>
+          </h1>
+          <p className="mt-4 text-text-secondary font-bold tracking-[0.2em] uppercase text-xs opacity-70">
+            Platform Governance & Intellectual Property
+          </p>
+        </div>
+        <div className="flex gap-3">
+          <button className="flex items-center gap-2 px-4 py-2 bg-bg-secondary border border-border-subtle rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-border-subtle transition-colors">
+            <Printer size={14} /> Print
+          </button>
+          <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-blue-700 transition-colors shadow-lg shadow-blue-500/20">
+            <Download size={14} /> Export PDF
+          </button>
+        </div>
+      </header>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-start">
         {/* Navigation Sidebar */}
-        <div className="lg:col-span-3 space-y-3 sticky top-24">
-          {sections.map((section) => (
+        <nav className="lg:col-span-3 space-y-2 sticky top-28" aria-label="Legal navigation">
+          {Object.entries(LEGAL_CONTENT).map(([id, data]) => (
             <button
-              key={section.id}
-              onClick={() => setActiveSection(section.id)}
-              className={`w-full flex items-center justify-between p-5 rounded-2xl border transition-all duration-300 group ${activeSection === section.id
-                ? 'bg-bg-secondary border-blue-600/50 shadow-lg shadow-blue-500/5'
-                : 'bg-bg-primary border-border-subtle hover:border-text-secondary/30'
+              key={id}
+              onClick={() => setActiveId(id)}
+              aria-current={activeId === id ? 'page' : undefined}
+              className={`w-full flex items-center justify-between p-4 rounded-2xl border transition-all duration-300 group ${activeId === id
+                ? 'bg-bg-secondary border-blue-600/40 shadow-xl shadow-blue-500/5'
+                : 'bg-transparent border-transparent hover:bg-bg-secondary/50'
                 }`}
             >
               <div className="flex items-center gap-4">
-                <div className={`${section.bg} ${section.color} p-3 rounded-xl transition-transform group-hover:scale-110`}>
-                  {section.icon}
+                <div className={`${data.bg} ${data.color} p-2.5 rounded-xl transition-transform group-hover:scale-110`}>
+                  <data.icon size={18} />
                 </div>
-                <span className={`text-[11px] font-black uppercase tracking-widest ${activeSection === section.id ? 'text-text-primary' : 'text-text-secondary'}`}>
-                  {section.title}
+                <span className={`text-[11px] font-black uppercase tracking-widest ${activeId === id ? 'text-text-primary' : 'text-text-secondary'}`}>
+                  {data.title}
                 </span>
               </div>
-              <ChevronRight size={16} className={`${activeSection === section.id ? 'text-blue-600 translate-x-1' : 'text-text-secondary opacity-0'} transition-all`} />
+              <ChevronRight size={14} className={`${activeId === id ? 'text-blue-600 translate-x-1 opacity-100' : 'opacity-0'} transition-all`} />
             </button>
           ))}
 
-          <div className="mt-8 p-6 bg-blue-600 rounded-3xl text-white shadow-xl shadow-blue-500/20">
-            <Scale size={32} className="mb-4 opacity-50" />
-            <h4 className="font-black uppercase tracking-tight text-sm mb-2">Legal Independence</h4>
-            <p className="text-[10px] font-bold opacity-80 leading-relaxed uppercase tracking-widest">OmniRent is a standalone open-source technology project.</p>
+          <div className="mt-10 p-6 bg-gradient-to-br from-blue-600 to-blue-700 rounded-[2rem] text-white shadow-2xl shadow-blue-500/20 relative overflow-hidden">
+            <Scale size={80} className="absolute -bottom-4 -right-4 opacity-10 rotate-12" />
+            <h4 className="font-black uppercase tracking-tight text-xs mb-2">Legal Autonomy</h4>
+            <p className="text-[10px] font-bold opacity-80 leading-relaxed uppercase tracking-widest">
+              OmniRent is a standalone open-source technology project.
+            </p>
           </div>
-        </div>
+        </nav>
 
-        {/* Content Area */}
-        <div className="lg:col-span-9 bg-bg-secondary border border-border-subtle rounded-[3rem] p-10 md:p-16 shadow-2xl shadow-blue-500/5">
-          {activeSection === 'terms' && (
-            <div className="animate-in fade-in slide-in-from-right-4 duration-500">
-              <h2 className="text-3xl font-black text-text-primary mb-10 uppercase tracking-tight border-b-2 border-border-subtle pb-6 flex items-center gap-4">
-                <Shield size={32} className="text-blue-600" /> Terms of Service
+        {/* Dynamic Content Area */}
+        <article className="lg:col-span-9 bg-bg-secondary border border-border-subtle rounded-[3.5rem] p-10 md:p-20 shadow-inner relative">
+          <div key={activeId} className="animate-in fade-in slide-in-from-right-6 duration-700">
+            <div className="flex justify-between items-start mb-12 border-b border-border-subtle pb-8">
+              <h2 className="text-4xl font-black text-text-primary uppercase tracking-tight flex items-center gap-5">
+                <Icon size={40} className={activeContent.color} />
+                {activeContent.title}
               </h2>
-              <div className="space-y-10 text-text-secondary leading-relaxed font-medium">
-                <section className="space-y-4">
-                  <h3 className="text-lg font-black text-text-primary uppercase tracking-tight">1. Acceptance of Terms</h3>
-                  <p>By accessing or using the OmniRent platform, you agree to be bound by these Terms of Service. If you do not agree, you may not use the platform. OmniRent is an open-source engine; its use is subject to the MIT license.</p>
-                </section>
-                <section className="space-y-4">
-                  <h3 className="text-lg font-black text-text-primary uppercase tracking-tight">2. The OmniRent Escrow System</h3>
-                  <p>OmniRent acts as an intermediary. Funds are held in Escrow from the moment a renter initiates a booking until the transaction successfully concludes.</p>
-                  <ul className="list-disc pl-5 space-y-3">
-                    <li>Funds are not released to the Owner until both the Handover and Return photo-verification loops are completed.</li>
-                    <li>In the event of a dispute, Escrow funds are frozen indefinitely until an OmniRent Administrator provides a final resolution.</li>
-                  </ul>
-                </section>
-                <section className="space-y-4">
-                  <h3 className="text-lg font-black text-text-primary uppercase tracking-tight">3. Finality of the Handshake</h3>
-                  <p>Upon concluding a rental, clicking "Confirm Receipt" (as the Owner) acts as a legally binding assertion that the item has been returned in satisfactory condition. <span className="text-red-500 font-bold">You waive your right to a dispute once the item is confirmed.</span></p>
-                </section>
-                <section className="space-y-4 pt-10 border-t border-border-subtle/50">
-                  <h3 className="text-lg font-black text-text-primary uppercase tracking-tight flex items-center gap-2"><Globe size={20} className="text-red-600" /> Non-Affiliation Notice</h3>
-                  <p className="text-xs italic border-l-2 border-red-600/30 pl-4">OmniRent is NOT affiliated with, endorsed by, or sponsored by any other corporate entity or individual operating under the "Omnirent" brand.</p>
-                </section>
+              <div className="text-right">
+                <span className="block text-[9px] font-black text-text-secondary uppercase tracking-[0.2em] mb-1">Effective Date</span>
+                <span className="text-xs font-bold text-text-primary uppercase">{activeContent.lastUpdated}</span>
               </div>
             </div>
-          )}
 
-          {activeSection === 'privacy' && (
-            <div className="animate-in fade-in slide-in-from-right-4 duration-500">
-              <h2 className="text-3xl font-black text-text-primary mb-10 uppercase tracking-tight border-b-2 border-border-subtle pb-6 flex items-center gap-4">
-                <Lock size={32} className="text-green-600" /> Privacy Policy
-              </h2>
-              <div className="space-y-10 text-text-secondary leading-relaxed font-medium">
-                <section className="space-y-4">
-                  <h3 className="text-lg font-black text-text-primary uppercase tracking-tight">1. Information We Collect</h3>
-                  <p>We collect essential data to maintain a secure and functional escrow marketplace:</p>
-                  <ul className="list-disc pl-5 space-y-3">
-                    <li><strong>Identity Information:</strong> Valid Government Identity details (TCKN) for compliance.</li>
-                    <li><strong>Photographic Evidence:</strong> Device state images uploaded during handovers.</li>
-                    <li><strong>Financial Metadata:</strong> Wallet balances and transaction flow (3rd party tokenized).</li>
-                  </ul>
+            <div className="space-y-12 text-text-secondary leading-relaxed font-medium">
+              {activeContent.sections.map((section, idx) => (
+                <section key={idx} className="group">
+                  <h3 className="text-sm font-black text-text-primary uppercase tracking-widest mb-4 group-hover:text-blue-600 transition-colors">
+                    {section.h3}
+                  </h3>
+                  <p className="text-base leading-loose">{section.p}</p>
+                  {section.list && (
+                    <ul className="mt-6 space-y-4 border-l-2 border-border-subtle pl-6">
+                      {section.list.map((item, i) => (
+                        <li key={i} className="text-sm italic">
+                          <span className="text-text-primary font-bold mr-2">•</span> {item}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
                 </section>
-                <section className="space-y-4">
-                  <h3 className="text-lg font-black text-text-primary uppercase tracking-tight">2. Data Retention</h3>
-                  <p>Due to the financial and physical liabilities of our platform, dispute records, identities, and transactional metadata are archived permanently to ensure the security of the community.</p>
-                </section>
-              </div>
-            </div>
-          )}
+              ))}
 
-          {activeSection === 'usage' && (
-            <div className="animate-in fade-in slide-in-from-right-4 duration-500">
-              <h2 className="text-3xl font-black text-text-primary mb-10 uppercase tracking-tight border-b-2 border-border-subtle pb-6 flex items-center gap-4">
-                <FileText size={32} className="text-orange-600" /> Usage Agreement
-              </h2>
-              <div className="space-y-10 text-text-secondary leading-relaxed font-medium">
-                <section className="space-y-4">
-                  <h3 className="text-lg font-black text-text-primary uppercase tracking-tight">1. Acceptable Use</h3>
-                  <p>The marketplace is reserved strictly for legal, non-hazardous physical equipment. By posting a listing, you certify that you hold legal ownership of the asset.</p>
-                </section>
-                <section className="space-y-4">
-                  <h3 className="text-lg font-black text-text-primary uppercase tracking-tight">2. System Integrity</h3>
-                  <p>Any attempt to deploy automated scraping tools or bypass image compression workflows will result in permanent IP bans via our internal firewalls.</p>
-                </section>
-              </div>
+              {activeContent.footerNotice && (
+                <footer className={`mt-16 p-8 rounded-3xl border ${activeContent.footerNotice.type === 'warning'
+                  ? 'bg-blue-600/5 border-blue-600/10'
+                  : 'bg-red-600/5 border-red-600/10'
+                  }`}>
+                  <div className="flex gap-4">
+                    {activeContent.footerNotice.icon && (
+                      <activeContent.footerNotice.icon size={20} className="text-blue-600 shrink-0" />
+                    )}
+                    <p className={`text-[11px] font-black uppercase tracking-[0.15em] leading-relaxed ${activeContent.footerNotice.type === 'warning' ? 'text-text-secondary' : 'text-red-600'
+                      }`}>
+                      {activeContent.footerNotice.text}
+                    </p>
+                  </div>
+                </footer>
+              )}
             </div>
-          )}
-
-          {activeSection === 'copyright' && (
-            <div className="animate-in fade-in slide-in-from-right-4 duration-500">
-              <h2 className="text-3xl font-black text-text-primary mb-10 uppercase tracking-tight border-b-2 border-border-subtle pb-6 flex items-center gap-4">
-                <Copyright size={32} className="text-purple-600" /> Copyright & Legal
-              </h2>
-              <div className="space-y-10 text-text-secondary leading-relaxed font-medium">
-                <section className="space-y-4">
-                  <h3 className="text-lg font-black text-text-primary uppercase tracking-tight">1. Software Licensing</h3>
-                  <p>OmniRent is open-source under the <span className="text-text-primary font-black">MIT License</span>. Attribution is required for all re-distributions.</p>
-                </section>
-                <section className="space-y-4 text-[13px] bg-red-600/5 p-8 rounded-3xl border border-red-600/10">
-                  <h3 className="text-lg font-black text-red-600 uppercase tracking-tight mb-4">Official Disclaimer</h3>
-                  <p className="leading-loose font-black uppercase tracking-widest opacity-80">OmniRent is an independent technology project. We are not a representative of any other commercial rental service. Any resemblance to other service names is coincidental and does not imply endorsement or partnership.</p>
-                </section>
-              </div>
-            </div>
-          )}
-        </div>
+          </div>
+        </article>
       </div>
     </div>
   );
