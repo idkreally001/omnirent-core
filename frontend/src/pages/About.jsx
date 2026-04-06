@@ -19,8 +19,8 @@ export default function About() {
             <h2 className="text-xl font-black uppercase tracking-widest text-text-primary">Our Mission</h2>
           </div>
           <p className="text-text-secondary leading-relaxed font-medium">
-            OmniRent was created to solve a simple problem: how do we share high-value equipment safely? 
-            By combining a robust escrow system, mandatory identity verification, and a community-driven 
+            OmniRent was created to solve a simple problem: how do we share high-value equipment safely?
+            By combining a robust escrow system, mandatory identity verification, and a community-driven
             review engine, we've built a platform where your gear is as safe as your money.
           </p>
         </section>
@@ -30,7 +30,7 @@ export default function About() {
             <Code className="text-blue-600 mb-4" size={24} />
             <h3 className="text-lg font-black text-text-primary mb-2">Open Source</h3>
             <p className="text-sm text-text-secondary leading-relaxed">
-              This project is open-source under the MIT License. We believe in transparency 
+              This project is open-source under the MIT License. We believe in transparency
               and community contribution to improve platform security.
             </p>
           </div>
@@ -39,7 +39,7 @@ export default function About() {
             <Shield className="text-blue-600 mb-4" size={24} />
             <h3 className="text-lg font-black text-text-primary mb-2">Security First</h3>
             <p className="text-sm text-text-secondary leading-relaxed">
-              With 58+ automated tests guarding the escrow engine, we prioritize the 
+              With 58+ automated tests guarding the escrow engine, we prioritize the
               mathematical safety of every transaction.
             </p>
           </div>
@@ -49,8 +49,11 @@ export default function About() {
           <p className="text-text-secondary font-bold mb-6 italic">
             "Developed with care by Islam Pashazade"
           </p>
+          <p className="text-text-secondary font-bold mb-6 italic">
+            Special thanks to Kamal Hagverdi and Bestami Yıldırım for their support.
+          </p>
           <div className="flex justify-center gap-4">
-            <a 
+            <a
               href="https://github.com/idkreally001/omnirent-core"
               target="_blank"
               rel="noopener noreferrer"
