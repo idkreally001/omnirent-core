@@ -33,9 +33,11 @@ export default function Privacy() {
           <p className="text-text-secondary">Due to the financial and physical liabilities of our platform, dispute records, identities, and transactional metadata are archived permanently. If your account is dissolved, public listings are destroyed, while core transactional memory is retained as required by financial auditing laws.</p>
         </section>
 
-        <section className="space-y-4">
-          <h2 className="text-xl font-black text-text-primary">4. Sharing Your Data</h2>
-          <p className="text-text-secondary">We do NOT sell your data to any third party under any circumstances. Rental history, TCKN hashes, and dispute logs are explicitly limited to OmniRent core infrastructure operations, administrators, and when court-mandated by law enforcement officials regarding stolen property.</p>
+        <section className="space-y-4 pt-8 border-t border-border-subtle/50">
+          <h2 className="text-xl font-black text-text-primary uppercase tracking-tight">5. Non-Affiliation Disclaimer</h2>
+          <p className="text-text-secondary text-xs leading-relaxed italic border-l-2 border-red-600/30 pl-4">
+            OmniRent maintains strict operational independence. This project has no legal or corporate connection to any other entity using the "Omnirent" brand. Our data infrastructure is exclusively dedicated to the OmniRent open-source platform.
+          </p>
         </section>
         
       </div>

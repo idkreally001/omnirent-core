@@ -37,9 +37,11 @@ export default function Terms() {
           <p className="text-text-secondary">To use OmniRent, you must provide a valid government-issued Identity Number (TCKN). Our systems enforce cryptographic uniqueness constraints. Any attempt to use duplicate, forged, or stolen identity data will result in immediate permanent suspension and potential referral to law enforcement.</p>
         </section>
 
-        <section className="space-y-4">
-          <h2 className="text-xl font-black text-text-primary">5. Renter & Lister Liability</h2>
-          <p className="text-text-secondary">OmniRent is not liable for structural defaults, hardware failures, or loss of revenue sustained due to a rental arrangement. The platform guarantees the financial transaction workflow, not the kinetic properties of the physical assets being rented.</p>
+        <section className="space-y-4 pt-8 border-t border-border-subtle/50">
+          <h2 className="text-xl font-black text-text-primary uppercase tracking-tight">6. Non-Affiliation Notice</h2>
+          <p className="text-text-secondary text-xs leading-relaxed italic border-l-2 border-red-600/30 pl-4">
+            OmniRent is an independent open-source project. We are NOT affiliated with, endorsed by, or sponsored by any other corporate entity or individual operating under the "Omnirent" or "Omni Rentals" names in any industry. This platform is a standalone technology project developed for the global community.
+          </p>
         </section>
         
       </div>

@@ -24,6 +24,7 @@ import Terms from './pages/Terms';
 import Privacy from './pages/Privacy';
 import Usage from './pages/Usage';
 import About from './pages/About';
+import Copyright from './pages/Copyright';
 import Footer from './components/Footer';
 
 // Import your guards
@@ -46,6 +47,7 @@ function App() {
               <Route path="/terms" element={<Terms />} />
               <Route path="/privacy" element={<Privacy />} />
               <Route path="/usage" element={<Usage />} />
+              <Route path="/copyright" element={<Copyright />} />
 
               {/* 2. Public-Only Routes (Redirect to Profile if logged in) */}
               <Route path="/login" element={

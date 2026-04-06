@@ -32,9 +32,11 @@ export default function Usage() {
           <p className="text-text-secondary">Any attempt to deploy automated scraping tools, utilize concurrent racing algorithms to "ghost-rent" items, or artificially bloat our storage infrastructure via rapid payload dumps is strictly prohibited. Users detected bypassing client-side image compression workflows will face IP bans via our internal firewalls.</p>
         </section>
         
-        <section className="space-y-4">
-          <h2 className="text-xl font-black text-text-primary">4. Community Integrity</h2>
-          <p className="text-text-secondary">Users engaging in fraudulent item swapping (returning a fake or damaged iteration of a rented product) will immediately forfeit Escrow funds and may have their cryptographic Identity Hash reported to the relevant authorities for theft.</p>
+        <section className="space-y-4 pt-8 border-t border-border-subtle/50">
+          <h2 className="text-xl font-black text-text-primary uppercase tracking-tight">5. Legal Notice & Affiliation</h2>
+          <p className="text-text-secondary text-xs leading-relaxed italic border-l-2 border-red-600/30 pl-4">
+            By using this platform, you acknowledge that OmniRent is an independent technology project. We are not a representative of any other commercial rental service. Any resemblance to other service names is coincidental and does not imply endorsement or partnership.
+          </p>
         </section>
         
       </div>
