@@ -33,6 +33,11 @@ const Navbar = () => {
   };
 
   useEffect(() => {
+    // Request Native Push Notification Permission
+    if ("Notification" in window && Notification.permission !== "granted") {
+      Notification.requestPermission();
+    }
+
     if (!token || !user) return;
 
     socket.emit('join_room', user.id);
@@ -46,6 +51,15 @@ const Navbar = () => {
       const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2358/2358-preview.mp3');
       audio.volume = 0.5;
       audio.play().catch(() => console.log("Sound blocked by browser policy"));
+
+      // Trigger Native Web Push for Lock Screen visibility
+      if ("Notification" in window && Notification.permission === "granted") {
+        new Notification("OmniRent Push Alert", {
+          body: notif.message,
+          icon: '/vite.svg', // A placeholder icon
+          vibrate: [200, 100, 200]
+        });
+      }
     };
 
     socket.on('new_notification', handleNewNotification);

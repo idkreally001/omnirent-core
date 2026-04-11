@@ -13,7 +13,18 @@ export default function ItemDetail() {
   const currentUser = JSON.parse(localStorage.getItem('user'));
   
   const [item, setItem] = useState(null);
+  const [startDate, setStartDate] = useState(new Date().toISOString().split('T')[0]);
+  const [endDate, setEndDate] = useState(new Date(Date.now() + 86400000).toISOString().split('T')[0]);
   const [days, setDays] = useState(1);
+  const [activeImage, setActiveImage] = useState(null);
+  
+  useEffect(() => {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    const diffTime = Math.abs(end - start);
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    setDays(diffDays > 0 ? diffDays : 1);
+  }, [startDate, endDate]);
   const [isRenting, setIsRenting] = useState(false);
   const [rentedSuccess, setRentedSuccess] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -23,6 +34,7 @@ export default function ItemDetail() {
       try {
         const res = await api.get(`/items/${id}`);
         setItem(res.data);
+        if (res.data.image_url) setActiveImage(res.data.image_url);
       } catch (err) {
         console.error("Error fetching item:", err);
       }
@@ -39,12 +51,10 @@ export default function ItemDetail() {
   const handleRent = async () => {
     setIsRenting(true);
     try {
-      const returnDate = new Date();
-      returnDate.setDate(returnDate.getDate() + parseInt(days));
-
       await api.post('/rentals', {
         itemId: item.id,
-        returnDate: returnDate.toISOString(),
+        startDate: new Date(startDate).toISOString(),
+        returnDate: new Date(endDate).toISOString(),
         totalPrice: item.price_per_day * days
       });
 
@@ -79,13 +89,28 @@ export default function ItemDetail() {
       <div className="bg-white rounded-[3.5rem] border border-gray-100 shadow-xl overflow-hidden grid md:grid-cols-2">
         
         {/* Left: Image Area */}
-        <div className="bg-gray-50 flex items-center justify-center border-b md:border-b-0 md:border-r border-gray-100 min-h-[400px]">
-          {item.image_url ? (
-            <img src={item.image_url} alt={item.title} className="w-full h-full object-cover" />
-          ) : (
-            <div className="text-center text-gray-300">
-                <Package size={80} className="mx-auto mb-2 opacity-50" />
-                <p className="font-bold text-sm">No Image Provided</p>
+        <div className="bg-gray-50 flex flex-col border-b md:border-b-0 md:border-r border-gray-100 min-h-[400px]">
+          <div className="flex-1 flex items-center justify-center relative overflow-hidden">
+            {item.image_url ? (
+              <img src={activeImage || item.image_url} alt={item.title} className="absolute inset-0 w-full h-full object-cover transition-opacity duration-300" />
+            ) : (
+              <div className="text-center text-gray-300 z-10">
+                  <Package size={80} className="mx-auto mb-2 opacity-50" />
+                  <p className="font-bold text-sm">No Image Provided</p>
+              </div>
+            )}
+          </div>
+          {item.image_urls && item.image_urls.length > 0 && (
+            <div className="flex gap-2 p-4 overflow-x-auto bg-white border-t border-gray-100 no-scrollbar">
+              {item.image_urls.map((url, idx) => (
+                <button 
+                  key={idx} 
+                  onClick={() => setActiveImage(url)} 
+                  className={`shrink-0 w-20 h-20 rounded-xl overflow-hidden border-2 transition-all ${activeImage === url ? 'border-blue-600 scale-105 shadow-md' : 'border-transparent hover:border-gray-300 opacity-60 hover:opacity-100'}`}
+                >
+                  <img src={url} alt={`Preview ${idx}`} className="w-full h-full object-cover" />
+                </button>
+              ))}
             </div>
           )}
         </div>
@@ -165,23 +190,39 @@ export default function ItemDetail() {
                       </button>
                     )}
 
-                    {item.owner_verified && (
+                    {item.owner_verified && item.owner_rating >= 4.5 ? (
+                      <div className="flex-[0.5] flex items-center justify-center gap-2 text-amber-600 bg-amber-100/50 rounded-2xl border border-amber-200/50">
+                        <Star size={16} fill="currentColor" />
+                        <span className="text-[10px] font-black uppercase tracking-tighter">Super Owner</span>
+                      </div>
+                    ) : item.owner_verified ? (
                       <div className="flex-[0.5] flex items-center justify-center gap-2 text-blue-600 bg-blue-100/30 rounded-2xl border border-blue-100/50">
                         <CheckCircle2 size={16} />
                         <span className="text-[10px] font-black uppercase tracking-tighter">Verified</span>
                       </div>
-                    )}
+                    ) : null}
                   </div>
                 </div>
 
                 <div className="p-6 bg-blue-50 rounded-[2rem] border border-blue-100 space-y-4">
-                  <div className="flex items-center justify-between">
-                    <label className="text-[11px] font-black text-blue-900 uppercase tracking-widest">Duration (Days)</label>
-                    <input 
-                      type="number" min="1" max="30" value={days}
-                      onChange={(e) => setDays(e.target.value)}
-                      className="w-20 p-2 rounded-xl border border-blue-200 text-center font-bold text-blue-600 outline-none focus:ring-2 focus:ring-blue-500"
-                    />
+                  <div className="flex flex-col gap-4">
+                    <div className="flex items-center justify-between">
+                      <label className="text-[11px] font-black text-blue-900 uppercase tracking-widest">Start Date</label>
+                      <input 
+                        type="date" value={startDate}
+                        onChange={(e) => setStartDate(e.target.value)}
+                        className="p-2 rounded-xl border border-blue-200 font-bold text-blue-600 outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <label className="text-[11px] font-black text-blue-900 uppercase tracking-widest">End Date</label>
+                      <input 
+                        type="date" value={endDate}
+                        min={startDate}
+                        onChange={(e) => setEndDate(e.target.value)}
+                        className="p-2 rounded-xl border border-blue-200 font-bold text-blue-600 outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
                   </div>
                   <div className="flex justify-between text-blue-800 text-sm font-bold pt-3 border-t border-blue-100/50">
                     <span className="opacity-60">Total Estimated Price</span>

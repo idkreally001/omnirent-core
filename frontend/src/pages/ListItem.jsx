@@ -10,7 +10,8 @@ export default function ListItem() {
     description: '',
     price: '',
     category: 'Tools',
-    image_url: ''
+    image_url: '',
+    image_urls: []
   });
   const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState('');
@@ -25,7 +26,11 @@ export default function ListItem() {
       setIsUploading(true);
       const compressedFile = await compressImage(file);
       const secureUrl = await uploadToCloudinary(compressedFile);
-      setFormData({...formData, image_url: secureUrl});
+      setFormData(prev => ({ 
+        ...prev, 
+        image_url: prev.image_urls.length === 0 ? secureUrl : prev.image_url, 
+        image_urls: [...prev.image_urls, secureUrl] 
+      }));
     } catch (err) {
       setError('Failed to compress/upload image. Please check your connection.');
       console.error(err);
@@ -104,26 +109,24 @@ export default function ListItem() {
               disabled={isUploading}
               className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed z-10"
             />
-            {formData.image_url ? (
-              <div className="w-full h-48 rounded-2xl overflow-hidden border-2 border-green-200 relative group bg-gray-50 flex items-center justify-center">
-                <img src={formData.image_url} alt="Preview" className="w-full h-full object-cover opacity-90" />
-                <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                  <span className="text-white font-bold flex items-center gap-2"><UploadCloud /> Click to change</span>
-                </div>
-                <div className="absolute top-2 right-2 bg-green-500 text-white rounded-full p-1 shadow-md">
-                   <CheckCircle2 size={16} />
-                </div>
-              </div>
-            ) : (
-              <div className={`w-full py-12 rounded-2xl transition border-2 border-dashed flex flex-col items-center justify-center gap-3
-                ${isUploading ? 'bg-bg-secondary border-border-subtle text-text-secondary animate-pulse' : 'bg-bg-primary border-border-subtle text-text-secondary hover:bg-bg-secondary'}`}>
-                <UploadCloud size={32} className={isUploading ? 'text-gray-300' : 'text-blue-500'} /> 
-                <span className="font-bold text-sm">
-                  {isUploading ? 'Compressing & Uploading...' : 'Click or Drag to Upload Photo'}
-                </span>
-                {!isUploading && <span className="text-xs font-medium text-gray-400">Powered by Cloudinary Storage Engine</span>}
+            {formData.image_urls.length > 0 && (
+              <div className="flex gap-2 mb-4 overflow-x-auto pb-2">
+                {formData.image_urls.map((url, i) => (
+                  <div key={i} className="w-24 h-24 shrink-0 rounded-xl overflow-hidden border border-border-subtle relative">
+                    <img src={url} alt="Preview" className="w-full h-full object-cover" />
+                  </div>
+                ))}
               </div>
             )}
+            
+            <div className={`w-full py-12 rounded-2xl transition border-2 border-dashed flex flex-col items-center justify-center gap-3 relative z-0
+              ${isUploading ? 'bg-bg-secondary border-border-subtle text-text-secondary animate-pulse' : 'bg-bg-primary border-border-subtle text-text-secondary hover:bg-bg-secondary'}`}>
+              <UploadCloud size={32} className={isUploading ? 'text-gray-300' : 'text-blue-500'} /> 
+              <span className="font-bold text-sm">
+                {isUploading ? 'Compressing & Uploading...' : 'Click or Drag to Upload Multiple Photos'}
+              </span>
+              {!isUploading && <span className="text-xs font-medium text-gray-400">Powered by Cloudinary Storage Engine</span>}
+            </div>
           </div>
         </div>
 

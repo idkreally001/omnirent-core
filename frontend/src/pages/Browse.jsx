@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import api from '../api/axios';
-import { Search, Package, X, Clock, Filter, ArrowUpDown, MessageSquare } from 'lucide-react';
+import { Search, Package, X, Clock, Filter, ArrowUpDown, MessageSquare, Star } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
 export default function Browse() {
@@ -177,6 +177,12 @@ export default function Browse() {
                 <div className="absolute top-6 right-6 z-10 bg-bg-secondary/90 backdrop-blur-sm px-4 py-2 rounded-xl text-[10px] font-black uppercase text-text-secondary border border-border-subtle">
                     {item.category}
                 </div>
+
+                {item.owner_verified && item.owner_rating >= 4.5 && (
+                  <div className="absolute bottom-6 left-6 z-10 bg-amber-500 text-white text-[10px] font-black px-3 py-1.5 rounded-full shadow-lg flex items-center gap-1">
+                    <Star size={12} fill="currentColor" /> SUPER OWNER
+                  </div>
+                )}
 
                 {item.image_url ? (
                   <img 

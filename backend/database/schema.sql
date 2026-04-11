@@ -103,3 +103,7 @@ CREATE INDEX IF NOT EXISTS idx_messages_participants ON messages (sender_id, rec
 CREATE INDEX IF NOT EXISTS idx_notifications_unread ON notifications (user_id) WHERE is_read = FALSE;
 -- For fast profile review loading
 CREATE INDEX IF NOT EXISTS idx_reviews_target ON reviews (target_user_id);
+
+-- 9. ADDITIONS FOR V2
+ALTER TABLE rentals ADD COLUMN IF NOT EXISTS start_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE items ADD COLUMN IF NOT EXISTS image_urls JSONB DEFAULT '[]'::jsonb;

@@ -6,7 +6,7 @@ const emailService = require('../../services/emailService');
 
 // POST /api/rentals
 router.post('/', auth, async (req, res) => {
-    const { itemId, returnDate, totalPrice } = req.body;
+    const { itemId, startDate, returnDate, totalPrice } = req.body;
     const renterId = req.user.id; // From middleware
     const client = await pool.connect();
 
@@ -29,7 +29,20 @@ router.post('/', auth, async (req, res) => {
         // 2. State & Safety Checks
         if (owner_id === renterId) throw new Error("You cannot rent your own item.");
         if (is_deleted) throw new Error("This item has been archived by the owner.");
-        if (status !== 'available') throw new Error("This item is currently unavailable or already rented.");
+        
+        // 2.5 Overlap Check
+        if (startDate && returnDate) {
+            const overlapCheck = await client.query(
+                `SELECT id FROM rentals 
+                 WHERE item_id = $1 
+                 AND status NOT IN ('completed', 'cancelled')
+                 AND ((start_date <= $3 AND return_date >= $2) OR (start_date IS NULL AND return_date >= $2))`,
+                [itemId, startDate, returnDate]
+            );
+            if (overlapCheck.rows.length > 0) throw new Error("This item is already booked for the selected dates.");
+        } else if (status !== 'available') {
+            throw new Error("This item is currently unavailable or already rented.");
+        }
 
         // 3. Wallet Logic (Fetch & Lock)
         const renterRes = await client.query("SELECT balance FROM users WHERE id = $1 FOR UPDATE", [renterId]);
@@ -40,9 +53,10 @@ router.post('/', auth, async (req, res) => {
         await client.query("UPDATE users SET balance = balance - $1 WHERE id = $2", [totalPrice, renterId]);
 
         // 5. Create Rental & Update Item
+        const fallbackStart = startDate || new Date().toISOString();
         const rentalRes = await client.query(
-            "INSERT INTO rentals (item_id, renter_id, return_date, total_price, status) VALUES ($1, $2, $3, $4, 'pending_handover') RETURNING id",
-            [itemId, renterId, returnDate, totalPrice]
+            "INSERT INTO rentals (item_id, renter_id, start_date, return_date, total_price, status) VALUES ($1, $2, $3, $4, $5, 'pending_handover') RETURNING id",
+            [itemId, renterId, fallbackStart, returnDate, totalPrice]
         );
         await client.query("UPDATE items SET status = 'rented' WHERE id = $1", [itemId]);
 

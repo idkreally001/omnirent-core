@@ -5,11 +5,11 @@ const auth = require('../middleware/auth.middleware');
 
 // 1. CREATE ITEM
 router.post('/', auth, async (req, res) => {
-    const { title, description, price, category, image_url } = req.body; 
+    const { title, description, price, category, image_url, image_urls } = req.body; 
     try {
         const newItem = await pool.query(
-            "INSERT INTO items (owner_id, title, description, price_per_day, category, image_url) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *",
-            [req.user.id, title, description, price, category, image_url]
+            "INSERT INTO items (owner_id, title, description, price_per_day, category, image_url, image_urls) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *",
+            [req.user.id, title, description, price, category, image_url, JSON.stringify(image_urls || [])]
         );
         res.json(newItem.rows[0]);
     } catch (err) {
@@ -23,7 +23,10 @@ router.get('/', async (req, res) => {
     // Destructure new parameters from the query string
     const { search, category, sort, maxPrice } = req.query;
     
-    let queryText = "SELECT * FROM items WHERE is_deleted = FALSE";
+    let queryText = `SELECT i.*, 
+                    (SELECT tc_no IS NOT NULL FROM users WHERE id = i.owner_id) as owner_verified,
+                    (SELECT COALESCE(AVG(rating), 0) FROM reviews WHERE target_user_id = i.owner_id) as owner_rating
+                 FROM items i WHERE is_deleted = FALSE`;
     let queryParams = [];
     let paramCount = 1;
 
