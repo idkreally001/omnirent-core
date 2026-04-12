@@ -130,6 +130,22 @@ router.put('/:id/confirm-handover', auth, async (req, res) => {
             [req.params.id]
         );
 
+        // Notify the Owner that the renter officially took possession
+        const rentData = await client.query(
+            "SELECT i.owner_id, i.title, u.full_name as renter_name FROM rentals r JOIN items i ON r.item_id = i.id JOIN users u ON r.renter_id = u.id WHERE r.id = $1", 
+            [req.params.id]
+        );
+        const { owner_id, title, renter_name } = rentData.rows[0];
+        
+        const notifRes = await client.query(
+            "INSERT INTO notifications (user_id, type, message, related_id) VALUES ($1, $2, $3, $4) RETURNING *",
+            [owner_id, 'ITEM_RENTED', `${renter_name} has confirmed receipt of your "${title}". The rental is now active.`, req.params.id]
+        );
+
+        if (req.io) {
+            req.io.to(`user_${owner_id}`).emit('new_notification', notifRes.rows[0]);
+        }
+
         await client.query('COMMIT');
         res.json({ message: "Handover confirmed! Your rental is now active." });
     } catch (err) {
@@ -165,6 +181,22 @@ router.put('/:id/return', auth, async (req, res) => {
             "UPDATE rentals SET status = 'returned_by_renter' WHERE id = $1",
             [req.params.id]
         );
+
+        // Notify the Owner that the renter has dropped it off
+        const rentData = await client.query(
+            "SELECT i.owner_id, i.title, u.full_name as renter_name FROM rentals r JOIN items i ON r.item_id = i.id JOIN users u ON r.renter_id = u.id WHERE r.id = $1", 
+            [req.params.id]
+        );
+        const { owner_id, title, renter_name } = rentData.rows[0];
+
+        const notifRes = await client.query(
+            "INSERT INTO notifications (user_id, type, message, related_id) VALUES ($1, $2, $3, $4) RETURNING *",
+            [owner_id, 'RETURN_CONFIRMED', `${renter_name} securely returned your "${title}". Please review the conditions and confirm receipt.`, req.params.id]
+        );
+
+        if (req.io) {
+            req.io.to(`user_${owner_id}`).emit('new_notification', notifRes.rows[0]);
+        }
 
         await client.query('COMMIT');
         res.json({ message: "Return initiated. Waiting for owner to confirm receipt." });
@@ -324,10 +356,17 @@ router.post('/:id/dispute', auth, async (req, res) => {
 
         // Notify all admins about the new dispute
         const adminNotificationMsg = `🚨 DISPUTE RAISED on Rental #${req.params.id}. Evidence required.`;
-        await pool.query(`
+        const notifRes = await pool.query(`
             INSERT INTO notifications (user_id, type, message, related_id)
             SELECT id, 'DISPUTE_ESCALATION', $1, $2 FROM users WHERE is_admin = true
+            RETURNING *
         `, [adminNotificationMsg, req.params.id]);
+
+        if (req.io) {
+            notifRes.rows.forEach(notif => {
+                req.io.to(`user_${notif.user_id}`).emit('new_notification', notif);
+            });
+        }
 
         res.json({ message: "Dispute raised successfully. An admin will review the evidence." });
     } catch (err) {

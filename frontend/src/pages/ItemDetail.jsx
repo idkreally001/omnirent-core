@@ -69,6 +69,10 @@ export default function ItemDetail() {
   };
 
   const handleRent = async () => {
+    if (!currentUser) {
+      return navigate('/login');
+    }
+    
     setIsRenting(true);
     try {
       await api.post('/rentals', {
@@ -213,7 +217,10 @@ export default function ItemDetail() {
                     {/* 💬 MESSAGE OWNER BUTTON (Inside the Card) */}
                     {!isOwner && (
                       <button 
-                        onClick={() => navigate(`/messages?item=${item.id}&owner=${item.owner_id}`)}
+                        onClick={() => {
+                          if (!currentUser) return navigate('/login');
+                          navigate(`/messages?item=${item.id}&owner=${item.owner_id}`)
+                        }}
                         className="flex-1 px-4 py-3 rounded-2xl font-black text-[11px] uppercase tracking-widest text-white bg-gray-900 hover:bg-blue-600 transition-all flex items-center justify-center gap-2 shadow-lg shadow-gray-200"
                       >
                         <MessageSquare size={16} />
