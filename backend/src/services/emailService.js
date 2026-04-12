@@ -1,26 +1,6 @@
-const nodemailer = require('nodemailer');
-const dns = require('dns');
-
-// CRITICAL FIX: Render/Node.js 18+ often tries to resolve IPv6 for Gmail resulting in ENETUNREACH.
-// This forces Node to resolve IPv4 addresses first, which fixes the container networking block.
-dns.setDefaultResultOrder('ipv4first');
-
-const transporter = process.env.EMAIL_USER && process.env.EMAIL_PASS
-  ? nodemailer.createTransport({
-      host: 'smtp.gmail.com',
-      port: 587,
-      secure: false, // Upgrades to TLS via STARTTLS
-      requireTLS: true,
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS
-      }
-    })
-  : null;
-
 /**
  * Core Email Service for OmniRent
- * Using Nodemailer (Fallback to Console Logging in Dev if credentials missing)
+ * Using Brevo's HTTP API (Bypasses Render's blocked SMTP ports)
  */
 const emailService = {
   
@@ -39,7 +19,7 @@ const emailService = {
       </div>
     `;
 
-    return emailService._send(email, 'Verify your OmniRent Account', html);
+    return emailService._send(email, name, 'Verify your OmniRent Account', html);
   },
 
   /**
@@ -57,7 +37,7 @@ const emailService = {
       </div>
     `;
 
-    return emailService._send(email, 'OmniRent Password Reset', html);
+    return emailService._send(email, name, 'OmniRent Password Reset', html);
   },
 
   /**
@@ -75,7 +55,7 @@ const emailService = {
       </div>
     `;
 
-    return emailService._send(ownerEmail, `Action Required: New Rental Request for ${itemName}`, html);
+    return emailService._send(ownerEmail, ownerName, `Action Required: New Rental Request for ${itemName}`, html);
   },
 
   /**
@@ -93,32 +73,56 @@ const emailService = {
       </div>
     `;
 
-    return emailService._send(userEmail, `OmniRent Receipt: ${itemName}`, html);
+    return emailService._send(userEmail, userName, `OmniRent Receipt: ${itemName}`, html);
   },
 
   /**
-   * Unified Send Helper
+   * Unified Send Helper via Brevo HTTP API
    */
-  _send: async (to, subject, html) => {
-    if (!transporter) {
-      console.log('--- EMAIL MOCK (No EMAIL_USER/EMAIL_PASS provided) ---');
-      console.log(`TO: ${to}`);
+  _send: async (toEmail, toName, subject, htmlContent) => {
+    if (!process.env.BREVO_API_KEY) {
+      console.log('--- EMAIL MOCK (No BREVO_API_KEY provided) ---');
+      console.log(`TO: ${toName} <${toEmail}>`);
       console.log(`SUBJECT: ${subject}`);
       console.log('------------------');
       return { id: 'mock-id' };
     }
 
     try {
-      const info = await transporter.sendMail({
-        from: `"OmniRent Support" <${process.env.EMAIL_USER}>`,
-        to: to,
-        subject: subject,
-        html: html,
+      const response = await fetch('https://api.brevo.com/v3/smtp/email', {
+        method: 'POST',
+        headers: {
+          'accept': 'application/json',
+          'api-key': process.env.BREVO_API_KEY,
+          'content-type': 'application/json'
+        },
+        body: JSON.stringify({
+          sender: {
+            name: "OmniRent Support",
+            // Make sure you register an active verified email with Brevo!
+            email: process.env.EMAIL_USER || "admin@omnirent.org" 
+          },
+          to: [
+            {
+              email: toEmail,
+              name: toName || toEmail.split('@')[0]
+            }
+          ],
+          subject: subject,
+          htmlContent: htmlContent
+        })
       });
-      console.log(`✅ Email sent successfully to: ${to} (Message ID: ${info.messageId})`);
-      return info;
+
+      const responseData = await response.json();
+
+      if (!response.ok) {
+        throw new Error(`Brevo API Error: ${JSON.stringify(responseData)}`);
+      }
+
+      console.log(`✅ Email sent via Brevo HTTP API to: ${toEmail} (Message ID: ${responseData.messageId})`);
+      return responseData;
     } catch (error) {
-      console.error('Email Dispatch Error:', error);
+      console.error('Email Dispatch Error:', error.message || error);
       throw error;
     }
   }
