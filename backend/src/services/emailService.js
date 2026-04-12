@@ -3,13 +3,13 @@
  * Using Brevo's HTTP API (Bypasses Render's blocked SMTP ports)
  */
 const emailService = {
-  
+
   /**
    * Send a verification email to a new user
    */
   sendVerificationEmail: async (email, name, token, backendUrl) => {
     const verificationUrl = `${backendUrl}/api/auth/verify-email?token=${token}`;
-    
+
     const html = `
       <div style="font-family: sans-serif; max-width: 500px; margin: 0 auto; border: 1px solid #e5e7eb; padding: 2rem; border-radius: 12px;">
         <h2 style="color: #4b5563;">Welcome to OmniRent, ${name}!</h2>
@@ -27,7 +27,7 @@ const emailService = {
    */
   sendPasswordResetEmail: async (email, name, token, frontendUrl) => {
     const resetUrl = `${frontendUrl}/reset-password?token=${token}`;
-    
+
     const html = `
       <div style="font-family: sans-serif; max-width: 500px; margin: 0 auto; border: 1px solid #e5e7eb; padding: 2rem; border-radius: 12px;">
         <h2 style="color: #ef4444;">Password Reset Request</h2>
@@ -98,9 +98,9 @@ const emailService = {
         },
         body: JSON.stringify({
           sender: {
-            name: "OmniRent Support",
+            name: "OmniRent",
             // Make sure you register an active verified email with Brevo!
-            email: process.env.EMAIL_USER || "admin@omnirent.org" 
+            email: process.env.EMAIL_USER || "admin@omnirent.org"
           },
           to: [
             {

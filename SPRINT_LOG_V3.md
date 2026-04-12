@@ -235,11 +235,49 @@ OmniRent is now a professionally guarded platform. We have eliminated manual ver
 
 ---
 
-## **Sprint 13: Advanced Logistics & Visual Content (Proposed)**
-**Primary Focus:** Enhancing the booking experience and item representation.
+## **Sprint 13: Theme Synchronization & Admin Governance**
+**Primary Focus:** Professionalizing the internal operations portal and standardizing the global theme system.
+
+### **✅ Core Deliverables & Implementation**
+*   **Admin Dashboard Semantic Refactor:** Eliminated hardcoded CSS in the Admin Dashboard, mapping all moderation tables and dispute grids to the global Design Token system (`bg-bg-secondary`, etc.).
+*   **Theme-Aware Evidence Room:** Updated the "Handover vs. Return" photographic comparisons to support high-contrast viewing in both Light and Dark modes.
+*   **Database Schema Hardening:** Resolved various SQL syntax errors in the user moderation routes and fixed the "phone" column mismatch in the `users` table.
+
+---
+
+## **Sprint 14: Network Scaling & Domain Transition**
+**Primary Focus:** Resolving cloud infrastructure blocks, migrating to HTTP-based communication, and transitioning to the official `omnirent.org` domain.
+
+### **✅ Core Deliverables & Implementation**
+*   **Official Domain Launch:** Successfully transitioned the platform to **[omnirent.org](https://omnirent.org)**, configuring Squarespace DNS including A-records and www-redirects.
+*   **SMTP to HTTP Migration:** Migrated the entire email engine from Nodemailer/SMTP (blocked by Render's free tier ports 465/587) to **Brevo's REST API**. All transactional emails now route via secure Port 443 (HTTPS).
+*   **Outbound Network Patching:** Resolved `ENETUNREACH` errors by forcing the Node.js environment to prioritize IPv4 DNS resolutions (`dns.setDefaultResultOrder('ipv4first')`).
+*   **Security & Anti-Spam (DKIM/DMARC):** Successfully authenticated `omnirent.org` on Brevo by injecting signed DKIM and DMARC text records into the Squarespace DNS dashboard.
+*   **Proxy Trust Layer:** Configured `app.set('trust proxy', 1)` in the main server logic, allowing the rate-limiter to correctly identify real user IPs across the Render load-balancer chain.
+*   **Resend Loop Implementation:** Engineered a "Resend Activation Email" flow on the Login page with a dedicated backend route capped at 3 requests per hour to prevent API abuse.
+
+---
+
+## **Sprint 15: High-Trust UX & Multi-Image Logistics**
+**Primary Focus:** Enhancing visual fidelity and implementing automated high-trust reputation indicators.
+
+### **✅ Core Deliverables & Implementation**
+*   **Multi-Image Gallery Engine:** Upgraded the `ListItem` and `ItemDetail` modules to support batch uploads (up to 5 high-res photos) with automated client-side compression.
+*   **Interactive Preview Rail:** Developed a high-polish thumbnail rail with micro-animations allowing users to swap between multiple asset condition photos.
+*   **Automated Verification Badges:** Engineered an automated trust quantifier that awards "Super Owner" (4.5+ stars + Verified) and "Verified" badges to user profiles based on real-time database metrics.
+*   **Visual Logic Reservations:** Implemented an integrated date-selection rail in `ItemDetail.jsx` that cross-references daily pricing and auto-calculates escrow totals.
+*   **Real-Time Browser HUD:** Finalized the in-app notification system and socket-driven unread counters to provide instant feedback for peer interactions.
+
+### **🔄 Sprint Reflection**
+OmniRent has reached "Parity with Market Leaders." The visual depth of listings and the automated trust signaling provide the same professional polish found on top-tier global rental platforms.
+
+---
+
+## **Sprint 16: Geolocation & National Identity Scaling (Pending)**
+**Primary Focus:** Automating high-tier verification and implementing location-aware logistics.
 
 ### **🎯 Future Goals**
-*   **Availability Calendar:** Implement visual date-range selection on item detail pages to provide real-time booking availability and prevent overlap errors.
-*   **Multi-Image Gallery:** Support multiple high-resolution photos per listing with a performance-optimized carousel and lightbox viewer.
-*   **Real-Time Notification Bar:** Add an in-app "Toast" system for instant feedback when rental statuses change or new messages arrive.
-*   **User Verification Badges:** Implement a visual "Verified" checkmark for users who have completed their email confirmation and have a 4.5+ star rating.
+*   **e-Devlet Integration:** Transitioning from manual TCKN entry to formal **e-Devlet (National Registry) API** integration to verify real-world identity ownership and prevent fraud.
+*   **Geospatial Awareness:** Implementing "Near Me" discovery logic using browser geolocation API to surface items based on physical proximity.
+*   **Safe Transfer Zones:** Developing a library of "Pre-Coded Safe Meetup Locations" (validated high-traffic public areas) for users to select as handover points.
+*   **Intelligent Recommendations:** Implementing cookie-based preference tracking (Functional & Behavioral) to provide personalized item recommendations and refined search results.

@@ -31,6 +31,8 @@ import PublicRoute from './components/PublicRoute';
 import PrivateRoute from './components/PrivateRoute';
 import { ThemeProvider } from './context/ThemeContext';
 
+import CookieNotice from './components/CookieNotice';
+
 function App() {
   return (
     <ThemeProvider>
@@ -97,6 +99,7 @@ function App() {
             </Routes>
           </main>
           <Footer />
+          <CookieNotice />
         </div>
       </Router>
     </ThemeProvider>
