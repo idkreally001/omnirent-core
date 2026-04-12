@@ -4,11 +4,15 @@ import api from '../api/axios';
 
 export default function Login() {
   const [formData, setFormData] = useState({ email: '', password: '' });
-  const [error, setError] = useState(''); // Professional error state
+  const [error, setError] = useState('');
+  const [isUnverified, setIsUnverified] = useState(false);
+  const [resendStatus, setResendStatus] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setIsUnverified(false);
+    setResendStatus('');
     try {
       const res = await api.post('/auth/login', formData);
       localStorage.setItem('token', res.data.token);
@@ -17,8 +21,22 @@ export default function Login() {
       // Forces a refresh so Navbar catches the new token
       window.location.href = '/profile'; 
     } catch (err) {
-      setError(err.response?.data?.error || "Invalid email or password");
+      const errMsg = err.response?.data?.error || "Invalid email or password";
+      setError(errMsg);
+      if (errMsg.includes("not verified")) {
+          setIsUnverified(true);
+      }
     }
+  };
+
+  const handleResend = async () => {
+      try {
+          const res = await api.post('/auth/resend-verification', { email: formData.email });
+          setResendStatus(res.data.message);
+          setError(''); // Clear the main error so the status shows nicely
+      } catch (err) {
+          setError(err.response?.data?.error || "Failed to resend email.");
+      }
   };
 
   return (
@@ -26,8 +44,23 @@ export default function Login() {
       <h2 className="text-3xl font-black mb-6 text-text-primary">Welcome Back</h2>
       
       {error && (
-        <div className="mb-6 p-4 bg-red-600/10 border-l-4 border-red-500 text-red-500 text-[11px] font-black uppercase tracking-widest rounded-r-2xl transition-all animate-shake">
-          {error}
+        <div className="mb-6 p-4 bg-red-600/10 border-l-4 border-red-500 text-red-500 text-[11px] font-black uppercase tracking-widest rounded-r-2xl transition-all animate-shake flex flex-col gap-3">
+          <span>{error}</span>
+          {isUnverified && (
+             <button 
+                onClick={handleResend}
+                disabled={!formData.email}
+                className="self-start px-3 py-1.5 bg-red-500 text-white rounded-lg hover:bg-red-600 transition disabled:opacity-50"
+             >
+                 Resend Activation Email
+             </button>
+          )}
+        </div>
+      )}
+
+      {resendStatus && (
+        <div className="mb-6 p-4 bg-green-500/10 border-l-4 border-green-500 text-green-600 text-[11px] font-black uppercase tracking-widest rounded-r-2xl transition-all">
+          {resendStatus}
         </div>
       )}
 

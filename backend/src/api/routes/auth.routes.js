@@ -7,11 +7,20 @@ const crypto = require('crypto');
 
 const rateLimit = require('express-rate-limit');
 
-// Strict limiter: Only 5 login attempts per 15 minutes per IP
+// Strict limiter: Only 10 login attempts per 15 minutes per IP
 const loginLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, 
     max: 10, // Slightly more relaxed since people might mess up verification 
     message: { error: "Too many login attempts. Please try again in 15 minutes." },
+    standardHeaders: true,
+    legacyHeaders: false,
+});
+
+// Limiter for resending activation emails
+const resendLimiter = rateLimit({
+    windowMs: 60 * 60 * 1000, // 1 hour
+    max: 3, 
+    message: { error: "You can only request 3 activation emails per hour. Please wait." },
     standardHeaders: true,
     legacyHeaders: false,
 });
@@ -121,6 +130,42 @@ router.get('/verify-email', async (req, res) => {
     } catch (err) {
         console.error(err.message);
         res.status(500).send("Server Error");
+    }
+});
+
+// POST /resend-verification
+router.post('/resend-verification', resendLimiter, async (req, res) => {
+    const { email } = req.body;
+    if (!email) return res.status(400).json({ error: "Email is required." });
+
+    try {
+        const user = await pool.query("SELECT id, full_name, is_email_verified FROM users WHERE email = $1", [email]);
+        
+        if (user.rows.length === 0) {
+            // Return success even if not found to prevent email enumeration
+            return res.json({ message: "If an account exists, a new activation email was sent." });
+        }
+
+        if (user.rows[0].is_email_verified) {
+            return res.status(400).json({ error: "This email is already verified. You can simply log in." });
+        }
+
+        // Generate a new token
+        const newToken = crypto.randomBytes(32).toString('hex');
+
+        // Update database
+        await pool.query("UPDATE users SET verification_token = $1 WHERE id = $2", [newToken, user.rows[0].id]);
+
+        // Resend Email
+        const backendUrl = `${req.protocol}://${req.get('host')}`;
+        emailService.sendVerificationEmail(email, user.rows[0].full_name, newToken, backendUrl).catch(err => {
+            console.error("Verification email resend failed:", err);
+        });
+
+        res.json({ message: "A new activation link has been sent to your email." });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Server Error" });
     }
 });
 
