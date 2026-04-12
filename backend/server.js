@@ -34,6 +34,8 @@ const io = new Server(server, {
 const PORT = process.env.PORT || 5000;
 
 // 1. Middlewares
+app.set('trust proxy', 1); // Tell Express it is behind a proxy (like Render's Load Balancer) so IP rate limiting works correctly
+
 app.use(cors({
   origin: allowedOrigins,
   credentials: true

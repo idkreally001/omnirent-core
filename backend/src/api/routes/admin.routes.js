@@ -97,7 +97,7 @@ router.get('/disputes/:id/evidence', auth, adminAuth, async (req, res) => {
 router.get('/users', auth, adminAuth, async (req, res) => {
     try {
         const users = await pool.query(
-            "SELECT id, full_name, email, tc_no, phone, created_at, is_admin, is_banned, is_email_verified FROM users ORDER BY created_at DESC"
+            "SELECT id, full_name, email, tc_no, created_at, is_admin, is_banned, is_email_verified FROM users ORDER BY created_at DESC"
         );
         res.json(users.rows);
     } catch (err) {

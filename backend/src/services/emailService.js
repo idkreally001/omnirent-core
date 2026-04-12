@@ -107,6 +107,7 @@ const emailService = {
         subject: subject,
         html: html,
       });
+      console.log(`✅ Email sent successfully to: ${to} (Message ID: ${info.messageId})`);
       return info;
     } catch (error) {
       console.error('Email Dispatch Error:', error);
