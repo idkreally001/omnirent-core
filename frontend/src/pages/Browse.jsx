@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import api from '../api/axios';
-import { Search, Package, X, Clock, Filter, ArrowUpDown, MessageSquare, Star } from 'lucide-react';
+import { Search, Package, X, Clock, Filter, ArrowUpDown, MessageSquare, Star, Trash2 } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
 export default function Browse() {
@@ -21,9 +21,22 @@ export default function Browse() {
       setSearchTerm(query);
     }
   }, [searchParams]);
-
   // Get current user to prevent self-interactions
   const currentUser = JSON.parse(localStorage.getItem('user'));
+
+  // Admin global delete
+  const handleDeleteItem = async (e, id) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!window.confirm("ADMIN ACTION: Are you sure you want to delete this listing?")) return;
+    try {
+      await api.delete(`/items/${id}`);
+      setItems(items.filter(item => item.id !== id));
+    } catch (err) {
+      console.error(err);
+      alert("Failed to delete listing. Active rentals may exist.");
+    }
+  };
 
   const navigate = useNavigate();
   const categories = ['All', 'Tools', 'Electronics', 'Camping', 'Sports', 'Party'];
@@ -182,6 +195,16 @@ export default function Browse() {
                   <div className="absolute bottom-6 left-6 z-10 bg-amber-500 text-white text-[10px] font-black px-3 py-1.5 rounded-full shadow-lg flex items-center gap-1">
                     <Star size={12} fill="currentColor" /> SUPER OWNER
                   </div>
+                )}
+
+                {currentUser?.is_admin && (
+                  <button 
+                    onClick={(e) => handleDeleteItem(e, item.id)}
+                    className="absolute bottom-6 right-6 z-20 bg-red-50 text-red-600 p-2 rounded-xl border border-red-200 hover:bg-red-500 hover:text-white transition-all shadow-lg"
+                    title="Force Delete Listing"
+                  >
+                    <Trash2 size={16} />
+                  </button>
                 )}
 
                 {item.image_url ? (

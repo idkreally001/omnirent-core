@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import api from '../api/axios';
 import { 
-  Share2, User, ArrowLeft, Package, CheckCircle2, Star, MessageSquare, ShieldCheck
+  Share2, User, ArrowLeft, Package, CheckCircle2, Star, MessageSquare, ShieldCheck, Trash2
 } from 'lucide-react';
 
 export default function ItemDetail() {
@@ -25,6 +25,15 @@ export default function ItemDetail() {
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     setDays(diffDays > 0 ? diffDays : 1);
   }, [startDate, endDate]);
+
+  const handleStartDateChange = (e) => {
+    const newStart = e.target.value;
+    setStartDate(newStart);
+    if (new Date(newStart) >= new Date(endDate)) {
+      const nextDay = new Date(new Date(newStart).getTime() + 86400000);
+      setEndDate(nextDay.toISOString().split('T')[0]);
+    }
+  };
   const [isRenting, setIsRenting] = useState(false);
   const [rentedSuccess, setRentedSuccess] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -46,6 +55,17 @@ export default function ItemDetail() {
     navigator.clipboard.writeText(window.location.href);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleDelete = async () => {
+    if (!window.confirm("ADMIN ACTION: Are you sure you want to delete this listing?")) return;
+    try {
+      await api.delete(`/items/${id}`);
+      navigate('/browse');
+    } catch (err) {
+      console.error(err);
+      alert("Failed to delete listing. Active rentals may exist.");
+    }
   };
 
   const handleRent = async () => {
@@ -139,12 +159,23 @@ export default function ItemDetail() {
                   <span className="bg-blue-50 text-blue-600 text-[10px] font-black px-3 py-1 rounded-lg uppercase tracking-widest">
                     {item.category || 'Tool'}
                   </span>
-                  <button 
-                    onClick={handleShare}
-                    className={`flex items-center gap-2 text-[10px] font-bold px-3 py-2 rounded-xl transition ${copied ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'}`}
-                  >
-                    <Share2 size={14} /> {copied ? 'Link Copied!' : 'Share'}
-                  </button>
+                  <div className="flex gap-2">
+                    {currentUser?.is_admin && (
+                      <button 
+                        onClick={handleDelete}
+                        className="flex items-center gap-2 text-[10px] font-bold px-3 py-2 rounded-xl transition bg-red-50 text-red-600 hover:bg-red-100"
+                        title="Force Delete Listing"
+                      >
+                        <Trash2 size={14} /> Delete
+                      </button>
+                    )}
+                    <button 
+                      onClick={handleShare}
+                      className={`flex items-center gap-2 text-[10px] font-bold px-3 py-2 rounded-xl transition ${copied ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'}`}
+                    >
+                      <Share2 size={14} /> {copied ? 'Link Copied!' : 'Share'}
+                    </button>
+                  </div>
                 </div>
                 
                 <h1 className="text-4xl font-black text-gray-900 mb-6 leading-tight tracking-tight">{item.title}</h1>
@@ -210,7 +241,7 @@ export default function ItemDetail() {
                       <label className="text-[11px] font-black text-blue-900 uppercase tracking-widest">Start Date</label>
                       <input 
                         type="date" value={startDate}
-                        onChange={(e) => setStartDate(e.target.value)}
+                        onChange={handleStartDateChange}
                         className="p-2 rounded-xl border border-blue-200 font-bold text-blue-600 outline-none focus:ring-2 focus:ring-blue-500"
                       />
                     </div>

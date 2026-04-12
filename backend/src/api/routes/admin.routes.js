@@ -93,4 +93,40 @@ router.get('/disputes/:id/evidence', auth, adminAuth, async (req, res) => {
     }
 });
 
+// 4. Get all users for moderation
+router.get('/users', auth, adminAuth, async (req, res) => {
+    try {
+        const users = await pool.query(
+            "SELECT id, full_name, email, tc_no, phone, created_at, is_admin, is_banned, is_email_verified FROM users ORDER BY created_at DESC"
+        );
+        res.json(users.rows);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Server Error fetching users");
+    }
+});
+
+// 5. Toggle User Ban Status
+router.put('/users/:id/ban', auth, adminAuth, async (req, res) => {
+    const { is_banned } = req.body;
+    try {
+        // Find user first
+        const userCheck = await pool.query("SELECT * FROM users WHERE id = $1", [req.params.id]);
+        if (userCheck.rows.length === 0) return res.status(404).json({ error: "User not found" });
+        if (userCheck.rows[0].is_admin) return res.status(403).json({ error: "Cannot ban an admin account" });
+
+        await pool.query("UPDATE users SET is_banned = $1 WHERE id = $2", [is_banned, req.params.id]);
+
+        // If banned, automatically force their listings to invisible? Not strictly necessary if we block them from logging in, but good for completeness:
+        if (is_banned) {
+            await pool.query("UPDATE items SET is_deleted = TRUE WHERE owner_id = $1", [req.params.id]);
+        }
+
+        res.json({ message: `User has been successfully ${is_banned ? 'banned' : 'unbanned'}.` });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Server Error toggling ban status");
+    }
+});
+
 module.exports = router;

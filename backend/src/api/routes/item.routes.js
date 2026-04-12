@@ -100,7 +100,7 @@ router.delete('/:id', auth, async (req, res) => {
 
         const item = result.rows[0];
 
-        if (item.owner_id !== req.user.id) {
+        if (item.owner_id !== req.user.id && !req.user.is_admin) {
             return res.status(403).json({ error: "Unauthorized" });
         }
 

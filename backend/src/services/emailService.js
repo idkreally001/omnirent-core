@@ -1,12 +1,18 @@
-const { Resend } = require('resend');
+const nodemailer = require('nodemailer');
 
-const resend = process.env.RESEND_API_KEY 
-  ? new Resend(process.env.RESEND_API_KEY) 
+const transporter = process.env.EMAIL_USER && process.env.EMAIL_PASS
+  ? nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
+      }
+    })
   : null;
 
 /**
  * Core Email Service for OmniRent
- * Using Resend (Fallback to Console Logging in Dev)
+ * Using Nodemailer (Fallback to Console Logging in Dev if credentials missing)
  */
 const emailService = {
   
@@ -26,6 +32,24 @@ const emailService = {
     `;
 
     return emailService._send(email, 'Verify your OmniRent Account', html);
+  },
+
+  /**
+   * Send a secure password recovery link
+   */
+  sendPasswordResetEmail: async (email, name, token, frontendUrl) => {
+    const resetUrl = `${frontendUrl}/reset-password?token=${token}`;
+    
+    const html = `
+      <div style="font-family: sans-serif; max-width: 500px; margin: 0 auto; border: 1px solid #e5e7eb; padding: 2rem; border-radius: 12px;">
+        <h2 style="color: #ef4444;">Password Reset Request</h2>
+        <p>Hi ${name}, we received a request to reset your OmniRent password.</p>
+        <a href="${resetUrl}" style="display: inline-block; background: #ef4444; color: white; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: bold; margin: 1rem 0;">Reset Password</a>
+        <p style="color: #9ca3af; font-size: 0.8rem;">If you did not make this request, you can safely ignore this email.</p>
+      </div>
+    `;
+
+    return emailService._send(email, 'OmniRent Password Reset', html);
   },
 
   /**
@@ -68,8 +92,8 @@ const emailService = {
    * Unified Send Helper
    */
   _send: async (to, subject, html) => {
-    if (!resend) {
-      console.log('--- EMAIL MOCK ---');
+    if (!transporter) {
+      console.log('--- EMAIL MOCK (No EMAIL_USER/EMAIL_PASS provided) ---');
       console.log(`TO: ${to}`);
       console.log(`SUBJECT: ${subject}`);
       console.log('------------------');
@@ -77,13 +101,13 @@ const emailService = {
     }
 
     try {
-      const data = await resend.emails.send({
-        from: 'OmniRent <onboarding@resend.dev>', // Default Resend test domain
-        to: [to],
+      const info = await transporter.sendMail({
+        from: `"OmniRent" <${process.env.EMAIL_USER}>`,
+        to: to,
         subject: subject,
         html: html,
       });
-      return data;
+      return info;
     } catch (error) {
       console.error('Email Dispatch Error:', error);
       throw error;

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import api from '../api/axios';
-import { PackagePlus, ArrowRight, UploadCloud, CheckCircle2, ShieldCheck } from 'lucide-react';
+import { PackagePlus, ArrowRight, UploadCloud, CheckCircle2, ShieldCheck, X } from 'lucide-react';
 import { compressImage, uploadToCloudinary } from '../utils/imageCompression';
 
 export default function ListItem() {
@@ -13,39 +13,65 @@ export default function ListItem() {
     image_url: '',
     image_urls: []
   });
+  const [pendingFiles, setPendingFiles] = useState([]);
+  const [localPreviews, setLocalPreviews] = useState([]);
   const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
   const handleImageChange = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
+    const files = Array.from(e.target.files);
+    if (!files.length) return;
 
-    try {
-      setError('');
-      setIsUploading(true);
-      const compressedFile = await compressImage(file);
-      const secureUrl = await uploadToCloudinary(compressedFile);
-      setFormData(prev => ({ 
-        ...prev, 
-        image_url: prev.image_urls.length === 0 ? secureUrl : prev.image_url, 
-        image_urls: [...prev.image_urls, secureUrl] 
-      }));
-    } catch (err) {
-      setError('Failed to compress/upload image. Please check your connection.');
-      console.error(err);
-    } finally {
-      setIsUploading(false);
+    const remainingSlots = 5 - localPreviews.length;
+    if (remainingSlots <= 0) {
+      setError('You can only select up to 5 images.');
+      return;
     }
+
+    const filesToKeep = files.slice(0, remainingSlots);
+    if (files.length > remainingSlots) {
+      setError(`You can only select up to 5 images in total. Kept ${remainingSlots}.`);
+    } else {
+      setError('');
+    }
+
+    // Immediately create local preview URLs (no network upload yet)
+    const newPreviews = filesToKeep.map(file => URL.createObjectURL(file));
+    setLocalPreviews(prev => [...prev, ...newPreviews]);
+    setPendingFiles(prev => [...prev, ...filesToKeep]);
+  };
+
+  const removeImage = (indexToRemove) => {
+    URL.revokeObjectURL(localPreviews[indexToRemove]); // Free memory
+    setLocalPreviews(prev => prev.filter((_, idx) => idx !== indexToRemove));
+    setPendingFiles(prev => prev.filter((_, idx) => idx !== indexToRemove));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await api.post('/items', formData);
-      navigate('/browse'); // Go see your new listing!
+      setIsUploading(true);
+      setError('');
+
+      // ONLY NOW do we compress and upload to Cloudinary
+      const uploadPromises = pendingFiles.map(async (file) => {
+        const compressedFile = await compressImage(file);
+        return uploadToCloudinary(compressedFile);
+      });
+      const newUrls = await Promise.all(uploadPromises);
+
+      const finalData = {
+        ...formData,
+        image_urls: newUrls,
+        image_url: newUrls.length > 0 ? newUrls[0] : ''
+      };
+
+      await api.post('/items', finalData);
+      navigate('/browse');
     } catch (err) {
-      alert("Error creating listing. Make sure you are logged in.");
+      setError("Error creating listing. Make sure you are logged in and your connection is stable.");
+      setIsUploading(false);
     }
   };
 
@@ -105,15 +131,23 @@ export default function ListItem() {
             <input 
               type="file" 
               accept="image/*"
+              multiple
               onChange={handleImageChange}
-              disabled={isUploading}
+              disabled={isUploading || localPreviews.length >= 5}
               className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed z-10"
             />
-            {formData.image_urls.length > 0 && (
-              <div className="flex gap-2 mb-4 overflow-x-auto pb-2">
-                {formData.image_urls.map((url, i) => (
-                  <div key={i} className="w-24 h-24 shrink-0 rounded-xl overflow-hidden border border-border-subtle relative">
+            {localPreviews.length > 0 && (
+              <div className="flex gap-2 mb-4 overflow-x-auto pb-2 relative z-20">
+                {localPreviews.map((url, i) => (
+                  <div key={i} className="w-24 h-24 shrink-0 rounded-xl overflow-hidden border border-border-subtle relative group">
                     <img src={url} alt="Preview" className="w-full h-full object-cover" />
+                    <button 
+                      type="button"
+                      onClick={(e) => { e.preventDefault(); e.stopPropagation(); removeImage(i); }}
+                      className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity shadow-md"
+                    >
+                      <X size={12} />
+                    </button>
                   </div>
                 ))}
               </div>

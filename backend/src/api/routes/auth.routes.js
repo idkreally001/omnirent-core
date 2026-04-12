@@ -31,6 +31,11 @@ router.post('/login', loginLimiter, async (req, res) => {
              return res.status(403).json({ error: "Your email is not verified. Please check your inbox for the activation link." });
         }
 
+        // Check if user is banned
+        if (user.rows[0].is_banned) {
+             return res.status(403).json({ error: "Your account is banned. Please contact support." });
+        }
+
         const isMatch = await authService.comparePassword(password, user.rows[0].password_hash);
         if (!isMatch) {
             return res.status(401).json({ error: "Invalid Credentials" });
@@ -113,6 +118,70 @@ router.get('/verify-email', async (req, res) => {
                 </div>
             </body>
         `);
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send("Server Error");
+    }
+});
+
+// POST /forgot-password
+router.post('/forgot-password', async (req, res) => {
+    const { email } = req.body;
+    try {
+        const userCheck = await pool.query("SELECT id, full_name FROM users WHERE email = $1", [email]);
+        if (userCheck.rows.length === 0) {
+            // Return success even if not found to prevent email enumeration
+            return res.json({ message: "If an account with that email exists, we sent a password reset link." });
+        }
+
+        const resetToken = crypto.randomBytes(32).toString('hex');
+        // Token valid for 1 hour
+        const expires = new Date(Date.now() + 3600000); 
+
+        await pool.query(
+            "UPDATE users SET reset_password_token = $1, reset_password_expires = $2 WHERE email = $3",
+            [resetToken, expires, email]
+        );
+
+        const frontendUrl = (process.env.ALLOWED_ORIGINS || 'http://localhost:5173').split(',')[0];
+        
+        emailService.sendPasswordResetEmail(email, userCheck.rows[0].full_name, resetToken, frontendUrl).catch(err => {
+            console.error("Password reset email failed to send:", err);
+        });
+
+        res.json({ message: "If an account with that email exists, we sent a password reset link." });
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send("Server Error");
+    }
+});
+
+// POST /reset-password
+router.post('/reset-password', async (req, res) => {
+    const { token, newPassword } = req.body;
+    
+    if (!token || !newPassword) {
+        return res.status(400).json({ error: "Token and new password are required." });
+    }
+
+    try {
+        const userCheck = await pool.query(
+            "SELECT id FROM users WHERE reset_password_token = $1 AND reset_password_expires > NOW()", 
+            [token]
+        );
+
+        if (userCheck.rows.length === 0) {
+            return res.status(400).json({ error: "Invalid or expired password reset token." });
+        }
+
+        const passwordHash = await authService.hashPassword(newPassword);
+
+        await pool.query(
+            "UPDATE users SET password_hash = $1, reset_password_token = NULL, reset_password_expires = NULL WHERE id = $2",
+            [passwordHash, userCheck.rows[0].id]
+        );
+
+        res.json({ message: "Password has been successfully reset. You can now log in." });
     } catch (err) {
         console.error(err.message);
         res.status(500).send("Server Error");
