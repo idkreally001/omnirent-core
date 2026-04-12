@@ -1,4 +1,9 @@
 const nodemailer = require('nodemailer');
+const dns = require('dns');
+
+// CRITICAL FIX: Render/Node.js 18+ often tries to resolve IPv6 for Gmail resulting in ENETUNREACH.
+// This forces Node to resolve IPv4 addresses first, which fixes the container networking block.
+dns.setDefaultResultOrder('ipv4first');
 
 const transporter = process.env.EMAIL_USER && process.env.EMAIL_PASS
   ? nodemailer.createTransport({
