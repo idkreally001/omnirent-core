@@ -27,7 +27,7 @@ api.interceptors.response.use(
         // Only force redirect if NOT an auth route (prevents UI error message flickering on login)
         const isAuthRoute = error.config.url.includes('/auth/login') || error.config.url.includes('/auth/register');
 
-        if (error.response && error.response.status === 401 && !isAuthRoute) {
+        if (error.response && (error.response.status === 401 || error.response.status === 403) && !isAuthRoute) {
             localStorage.removeItem('token'); 
             localStorage.removeItem('user');
             window.location.href = '/login';   
