@@ -62,10 +62,14 @@ router.post('/', auth, async (req, res) => {
 
         // 6. Notify the Owner (System Notification)
         const ownerNotificationMsg = `Great news! Your "${title}" has been rented by ${renter_name}.`;
-        await client.query(
-            "INSERT INTO notifications (user_id, type, message, related_id) VALUES ($1, $2, $3, $4)",
+        const notifRes = await client.query(
+            "INSERT INTO notifications (user_id, type, message, related_id) VALUES ($1, $2, $3, $4) RETURNING *",
             [owner_id, 'ITEM_RENTED', ownerNotificationMsg, rentalRes.rows[0].id]
         );
+
+        if (req.io) {
+            req.io.to(`user_${owner_id}`).emit('new_notification', notifRes.rows[0]);
+        }
 
         // 📧 NEW: Notify Owner via Email
         emailService.sendRentalRequestAlert(owner_email, owner_name, title, renter_name, totalPrice).catch(err => {
@@ -215,10 +219,14 @@ router.put('/:id/confirm-receipt', auth, async (req, res) => {
 
         // Trigger Notification for the Renter
         const notificationMsg = `Your return for "${title}" has been confirmed! Please rate the owner.`;
-        await client.query(
-            "INSERT INTO notifications (user_id, type, message, related_id) VALUES ($1, $2, $3, $4)",
+        const notifRes = await client.query(
+            "INSERT INTO notifications (user_id, type, message, related_id) VALUES ($1, $2, $3, $4) RETURNING *",
             [renter_id, 'RETURN_CONFIRMED', notificationMsg, req.params.id]
         );
+
+        if (req.io) {
+            req.io.to(`user_${renter_id}`).emit('new_notification', notifRes.rows[0]);
+        }
 
         // 📧 NEW: Send Receipts (Renter gets it as a payment record, Owner as an earnings record)
         emailService.sendRentalReceipt(renter_email, renter_name, 'Renter', title, total_price, req.params.id).catch(e => console.error(e));

@@ -22,6 +22,14 @@ const Navbar = () => {
     }
   };
 
+  const handleBellClick = () => {
+    setShowNotifs(!showNotifs);
+    // Only ask permissions when they actively open their notifications
+    if ("Notification" in window && Notification.permission === "default") {
+      Notification.requestPermission();
+    }
+  };
+
   const fetchNotifications = async () => {
     if (!token) return;
     try {
@@ -33,11 +41,6 @@ const Navbar = () => {
   };
 
   useEffect(() => {
-    // Request Native Push Notification Permission
-    if ("Notification" in window && Notification.permission !== "granted") {
-      Notification.requestPermission();
-    }
-
     if (!token || !user) return;
 
     socket.emit('join_room', user.id);
@@ -163,7 +166,7 @@ const Navbar = () => {
                 
                 <div className="relative">
                   <button 
-                    onClick={() => setShowNotifs(!showNotifs)}
+                    onClick={handleBellClick}
                     className={`p-2 rounded-xl transition-colors ${unreadCount > 0 ? 'bg-blue-50 text-blue-600' : 'text-text-secondary hover:bg-bg-primary'}`}
                   >
                     {unreadCount > 0 ? <BellDot size={20} className="animate-pulse" /> : <Bell size={20} />}
