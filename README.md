@@ -1,41 +1,195 @@
-# OmniRent: The Universal Sharing Marketplace
+# 🚀 OmniRent — The Universal Sharing Marketplace
 
-OmniRent is a high-trust, peer-to-peer (P2P) rental platform designed to transition from a model of **"Ownership" to "Access."** It provides a secure ecosystem for users to monetize assets and access premium equipment on demand.
+OmniRent is a **high-trust peer-to-peer (P2P) rental platform** designed to shift the economy from **ownership → access**.
+
+It enables users to monetize physical assets while ensuring **financial safety, identity trust, and dispute accountability** through a production-grade escrow system.
 
 ---
 
-## 🏗 Modular System Architecture
+## ✨ Key Highlights
 
-The OmniRent platform is developed using a highly scalable, 8-module architecture:
+* 🔐 **ACID-secured escrow system** (no double-spending, no race conditions)
+* 💬 **Real-time messaging** with context-aware conversations
+* 🧪 **58 integration tests** with CI/CD enforcement (GitHub Actions)
+* ☁️ **Secure media uploads** via signed Cloudinary API
+* 📬 **Custom domain email system** with verified delivery (SPF, DKIM, DMARC)
+* 🛡 **Identity-gated platform** (email verification + optional national ID validation)
+* 🌙 **Full Dark Mode system** using Tailwind v4 design tokens
 
-1. **Identity & Trust:** Secure onboarding featuring JWT, TCKN validation, and **Mandatory Email Verification (Resend)**.
-2. **Asset Management:** A dynamic digital catalog with real-time feeds, debounced search, and multi-parameter filtering.
-3. **Transaction & Escrow:** An ACID-compliant financial engine utilizing PostgreSQL blocks to securely freeze funds until mutual verification.
-4. **Real-Time Communication:** A low-latency Socket.io layer featuring context-aware inboxes and instant Read Receipts.
-5. **Aesthetic & Experience:** A premium UI powered by **Tailwind v4 Design Tokens** and a persistent, system-aware **Dark Mode**.
-6. **Verification & Reliability:** A CI/CD pipeline using **GitHub Actions** to run **58 integration tests** on every push.
-7. **Media & Asset Evidence:** Browser-native image compression using HTML5 Canvas before **Secure Signed-Uploads** to Cloudinary.
-8. **Governance & Dispute Module:** A high-friction dispute engine where admins monitor photographic evidence to arbitrate escrow holds.
+---
+
+## 🏗 System Architecture
+
+OmniRent is built using a modular, production-oriented architecture:
+
+### 1. Identity & Trust
+
+* JWT authentication + bcrypt hashing
+* Mandatory email verification (token-based activation)
+* Optional TCKN validation with trust-tier system
+* Session validation against live database
+
+---
+
+### 2. Marketplace & Asset Management
+
+* Full CRUD system for listings
+* Multi-image upload with client-side compression
+* Debounced search + multi-parameter filtering
+* Real-time availability state
+
+---
+
+### 3. Escrow & Transaction Engine
+
+* PostgreSQL **ACID transactions (`BEGIN/COMMIT`)**
+* **Row-level locking (`FOR UPDATE`)** to prevent race conditions
+
+**Rental lifecycle:**
+
+```text
+pending_handover → active → returned_by_renter → completed
+```
+
+* Funds held securely until return confirmation
+* Automatic blocking of payouts during disputes
+
+---
+
+### 4. Real-Time Communication
+
+* Socket.io bi-directional messaging
+* Item-linked conversations
+* Read receipts (focus/blur logic)
+* Unread message synchronization
+
+---
+
+### 5. Governance & Dispute System
+
+* Evidence-based dispute resolution (before/after images)
+* Admin dashboard for arbitration
+* One-to-one mapping between rentals and disputes
+* Escrow freeze enforcement during conflicts
+
+---
+
+### 6. Security & Reliability
+
+* Rate limiting (global + login endpoints)
+* Secure upload signature flow (no exposed API secrets)
+* Zombie session invalidation
+* Global error handling middleware
+
+---
+
+### 7. Testing & DevOps
+
+* **58 integration tests** (Jest + Supertest)
+* Dedicated test database with isolation safeguards
+* GitHub Actions CI/CD pipeline (runs on every push)
+
+---
+
+### 8. UX & Platform Experience
+
+* Tailwind v4 design system (semantic tokens)
+* Persistent Dark Mode (system-aware)
+* Notification system with deep-linking
+* Trust badges (Verified / Super Owner)
 
 ---
 
 ## 🛠 Tech Stack
 
-* **Frontend:** React (Vite) + **Tailwind v4** + Lucide Icons
-* **Backend:** Node.js (Express) + JWT + PostgreSQL 17
-* **Real-Time:** Socket.io (Bi-directional)
-* **DevOps:** GitHub Actions (CI/CD)
-* **Email:** Resend (Transactional Lifecycle Emails)
-* **Storage:** Cloudinary (Secure Signature Flow)
-* **Testing:** Jest + Supertest (58 Individual Cases)
+**Frontend**
+
+* React (Vite)
+* Tailwind CSS v4
+* Lucide Icons
+
+**Backend**
+
+* Node.js (Express)
+* PostgreSQL 17
+* JWT Authentication
+
+**Real-Time**
+
+* Socket.io
+
+**DevOps**
+
+* GitHub Actions (CI/CD)
+
+**Email & Communication**
+
+* Brevo (Transactional Email API over HTTPS)
+* Google Workspace (domain email infrastructure for omnirent.org)
+
+**Storage**
+
+* Cloudinary (secure signed uploads)
+
+**Testing**
+
+* Jest + Supertest
 
 ---
 
-## 🛡 System Security & Reliability
+## 📘 Documentation & Development History
 
-* **Zero-Touch CI/CD:** Code is only promoted to production if all 58 tests pass on the main branch.
-* **Escrow Financial Freezes:** Total risk mitigation by holding rental funds securely until recovery is confirmed.
-* **Identity-Gated Lifecycle:** Login is strictly blocked for unverified accounts, ensuring market participants are verified.
+OmniRent is developed using an iterative, engineering-driven approach with detailed system tracking and requirement planning.
+
+* 📜 **Engineering Log (Timeline):**
+  A condensed, system-level overview of the platform’s evolution across all major modules.
+  👉 [View docs/ENGINEERING_TIMELINE.md](./docs/ENGINEERING_TIMELINE.md)
+
+* 📄 **Technical History (Detailed):** 
+  The high-fidelity archive containing every SQL fix, route refactor, and micro-sprint decision.
+  👉 [View docs/DETAILED_LOG.md](./docs/DETAILED_LOG.md)
+
+* 📋 **Strategic Requirements Document:**
+  Defines system vision, user roles, Agile-style user stories, and non-functional requirements.
+  👉 [View docs/REQUIREMENTS.md](./docs/REQUIREMENTS.md)
+
+<details>
+<summary>Quick Overview</summary>
+
+* Infrastructure → Identity → Marketplace → Escrow → Communication
+* Governance → Security → DevOps & UX
+
+</details>
+
+---
+
+## 📬 Email Infrastructure
+
+OmniRent utilizes a **custom domain email system** powered by **Brevo + Google Workspace**, ensuring high deliverability and production-grade reliability:
+
+* Lifecycle-triggered transactional emails:
+
+  * Account verification
+  * Rental confirmations
+  * Escrow completion receipts
+* Domain authentication via:
+
+  * SPF (Sender Policy Framework)
+  * DKIM (DomainKeys Identified Mail)
+  * DMARC (Domain-based Message Authentication)
+* Fully HTTP-based email delivery (port 443), avoiding SMTP port restrictions
+
+---
+
+## 🛡 Security Philosophy
+
+OmniRent is built with **defense-in-depth principles**:
+
+* 🔒 Identity verification before access
+* 💰 Escrow-protected financial flows
+* ⚖️ Dispute-aware transaction blocking
+* 🚫 Rate-limited endpoints to prevent abuse
+* 📬 Authenticated email infrastructure to prevent spoofing and spam
 
 ---
 
@@ -46,28 +200,70 @@ The OmniRent platform is developed using a highly scalable, 8-module architectur
 * Node.js (v22+)
 * PostgreSQL (v17+)
 
-### Installation
+---
 
-1. **Clone the repository and install dependencies:**
+### Installation
 
 ```bash
 git clone https://github.com/idkreally001/omnirent-core.git
-cd omnirent-core/backend
+cd omnirent-core
+
+# Backend
+cd backend
 npm install
 
+# Frontend
 cd ../frontend
 npm install
 ```
 
+---
+
 ### Database Setup
 
-1. Create a PostgreSQL database named `omnirent`.
-2. On backend startup, the system automatically executes `backend/src/db/schema.sql` to initialize the schema.
+1. Create a PostgreSQL database:
 
-### ⚡️ Run the Entire Platform
+```sql
+CREATE DATABASE omnirent;
+```
+
+2. On backend startup, schema is automatically initialized from:
+
+```text
+backend/src/db/schema.sql
+```
+
+---
+
+### Run the Platform
 
 ```bash
 npm run dev
 ```
 
-*(On Windows, you can also double-click `run_omnirent.bat` from the root folder)*
+Or on Windows:
+
+```text
+run_omnirent.bat
+```
+
+---
+
+## 📌 Project Status
+
+✅ Feature-complete MVP
+✅ Production-hardened backend
+🚧 Upcoming features:
+
+* Geolocation-based discovery
+* e-Devlet identity integration
+* Community moderation system
+
+---
+
+## 🤝 Contributing
+
+Contributions, ideas, and feedback are welcome.
+Feel free to open issues or submit pull requests.
+
+---

@@ -172,7 +172,7 @@ export default function Legal() {
                   <h2 className="text-2xl md:text-3xl font-black">
                     {config.title}
                   </h2>
-                  <span className="text-xs text-blue-600 bg-blue-50 px-3 py-1 rounded-full">
+                  <span className="text-xs text-blue-500 bg-blue-500/10 px-3 py-1 rounded-full font-bold tracking-widest uppercase">
                     {config.lastUpdated}
                   </span>
                 </div>
@@ -192,7 +192,7 @@ export default function Legal() {
 
                 <button
                   onClick={() => window.print()}
-                  className="mt-8 flex items-center gap-2 text-xs font-bold text-text-secondary hover:text-accent-primary"
+                  className="mt-8 flex items-center gap-2 text-xs font-bold text-text-secondary hover:text-blue-500 transition-colors"
                 >
                   <Printer size={14} />
                   Print Document
