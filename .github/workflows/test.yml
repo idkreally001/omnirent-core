@@ -5,10 +5,7 @@ on:
     branches: [main]
     paths-ignore:
       - '**.md'
-      - 'SPRINT_LOG.md'
-      - 'SPRINT_LOG_V2.md'
-      - 'SPRINT_LOG_V3.md'
-      - 'Requirements.md'
+      - 'docs/**'
   pull_request:
     branches: [main]
 
