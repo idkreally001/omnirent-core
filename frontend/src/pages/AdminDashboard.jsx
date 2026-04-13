@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ShieldCheck, ArrowRight, X, AlertCircle, Users, Ban } from 'lucide-react';
+import { ShieldCheck, ShieldOff, ArrowRight, X, AlertCircle, Users, Ban } from 'lucide-react';
 import api from '../api/axios';
 
 export default function AdminDashboard() {
@@ -82,6 +82,19 @@ export default function AdminDashboard() {
     } catch (err) {
       console.error(err);
       alert("Failed to toggle ban status.");
+    }
+  };
+
+  const handleToggleRestrict = async (userId, currentStatus, isAdmin) => {
+    if (isAdmin) return alert("Cannot restrict an admin.");
+    if (!window.confirm(`Are you sure you want to ${currentStatus ? 'unrestrict' : 'restrict'} this user?`)) return;
+
+    try {
+      await api.put(`/admin/users/${userId}/restrict`, { is_restricted: !currentStatus });
+      fetchUsers();
+    } catch (err) {
+      console.error(err);
+      alert("Failed to toggle restriction status.");
     }
   };
 
@@ -299,6 +312,10 @@ export default function AdminDashboard() {
                            <span className="bg-red-500/10 text-red-500 px-3 py-1 rounded-md text-[10px] flex w-max items-center gap-1 font-black uppercase">
                               <Ban size={12} /> Banned
                            </span>
+                        ) : u.is_restricted ? (
+                           <span className="bg-amber-500/10 text-amber-500 px-3 py-1 rounded-md text-[10px] flex w-max items-center gap-1 font-black uppercase">
+                              <ShieldOff size={12} /> Restricted
+                           </span>
                         ) : (
                            <span className="bg-green-100 text-green-600 px-3 py-1 rounded-md text-[10px] font-black uppercase inline-block">
                               Active
@@ -307,12 +324,22 @@ export default function AdminDashboard() {
                       </td>
                       <td className="py-4 px-6 text-right">
                         {!u.is_admin ? (
-                           <button 
-                             onClick={() => handleToggleBan(u.id, u.is_banned, u.is_admin)}
-                             className={`text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-xl transition shadow-sm ${u.is_banned ? 'bg-text-primary text-bg-primary hover:opacity-80' : 'bg-red-500/10 text-red-500 border border-red-500/20 hover:bg-red-500/20'}`}
-                           >
-                              {u.is_banned ? 'Unban User' : 'Ban User'}
-                           </button>
+                           <div className="flex gap-2 justify-end">
+                             <button 
+                               onClick={() => handleToggleRestrict(u.id, u.is_restricted, u.is_admin)}
+                               disabled={u.is_banned}
+                               title={u.is_banned ? 'Cannot restrict an already banned user' : ''}
+                               className={`text-[10px] font-black uppercase tracking-widest px-3 py-2 rounded-xl transition shadow-sm disabled:opacity-30 disabled:cursor-not-allowed ${u.is_restricted ? 'bg-text-primary text-bg-primary hover:opacity-80' : 'bg-amber-500/10 text-amber-500 border border-amber-500/20 hover:bg-amber-500/20'}`}
+                             >
+                               {u.is_restricted ? 'Unrestrict' : 'Restrict'}
+                             </button>
+                             <button 
+                               onClick={() => handleToggleBan(u.id, u.is_banned, u.is_admin)}
+                               className={`text-[10px] font-black uppercase tracking-widest px-3 py-2 rounded-xl transition shadow-sm ${u.is_banned ? 'bg-text-primary text-bg-primary hover:opacity-80' : 'bg-red-500/10 text-red-500 border border-red-500/20 hover:bg-red-500/20'}`}
+                             >
+                               {u.is_banned ? 'Unban' : 'Ban'}
+                             </button>
+                           </div>
                         ) : (
                            <span className="text-[10px] font-bold text-text-secondary uppercase tracking-widest">Protected</span>
                         )}

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import api from '../api/axios';
-import { X, ShieldAlert, Package } from 'lucide-react';
+import { X, ShieldAlert, ShieldOff, Package } from 'lucide-react';
 
 // Sub Components
 import ProfileSidebar from '../components/profile/ProfileSidebar';
@@ -256,6 +256,22 @@ export default function Profile() {
 
   return (
     <div className="max-w-6xl mx-auto mt-10 space-y-8 pb-20 px-4 font-sans">
+
+      {/* Restriction Banner */}
+      {user.is_restricted && (
+        <div className="flex items-start gap-4 bg-amber-500/10 border border-amber-500/30 rounded-2xl p-5">
+          <div className="w-10 h-10 flex-shrink-0 bg-amber-500/20 rounded-xl flex items-center justify-center">
+            <ShieldOff size={20} className="text-amber-500" />
+          </div>
+          <div>
+            <p className="text-amber-500 font-black uppercase tracking-widest text-[10px] mb-1">Account Restricted</p>
+            <p className="text-amber-500/80 text-xs font-medium">
+              Your account has been restricted by an administrator. You cannot list items, rent items, or verify your identity. Please contact support for more information.
+            </p>
+          </div>
+        </div>
+      )}
+
       <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
         
         {/* --- Sidebar (Col 4) --- */}
@@ -297,7 +313,8 @@ export default function Profile() {
             <LendingHistory myLendings={myLendings} />
           </div>
 
-          {/* Promotional Card */}
+          {/* Promotional Card — hidden for restricted accounts */}
+          {!user.is_restricted && (
           <div className="bg-blue-600 rounded-[2.5rem] p-10 text-white flex flex-col sm:flex-row justify-between items-center shadow-2xl shadow-blue-500/20 gap-6 transition-transform hover:scale-[1.01] duration-500">
             <div>
               <h3 className="text-2xl font-black uppercase tracking-tight">Ready to earn more?</h3>
@@ -307,6 +324,7 @@ export default function Profile() {
               Add New Listing
             </button>
           </div>
+          )}
         </div>
       </div>
 

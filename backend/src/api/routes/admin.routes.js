@@ -97,7 +97,7 @@ router.get('/disputes/:id/evidence', auth, adminAuth, async (req, res) => {
 router.get('/users', auth, adminAuth, async (req, res) => {
     try {
         const users = await pool.query(
-            "SELECT id, full_name, email, tc_no, created_at, is_admin, is_banned, is_email_verified FROM users ORDER BY created_at DESC"
+            "SELECT id, full_name, email, tc_no, created_at, is_admin, is_banned, is_restricted, is_email_verified FROM users ORDER BY created_at DESC"
         );
         res.json(users.rows);
     } catch (err) {
@@ -126,6 +126,23 @@ router.put('/users/:id/ban', auth, adminAuth, async (req, res) => {
     } catch (err) {
         console.error(err);
         res.status(500).send("Server Error toggling ban status");
+    }
+});
+
+// 6. Toggle User Restricted Status
+router.put('/users/:id/restrict', auth, adminAuth, async (req, res) => {
+    const { is_restricted } = req.body;
+    try {
+        const userCheck = await pool.query("SELECT * FROM users WHERE id = $1", [req.params.id]);
+        if (userCheck.rows.length === 0) return res.status(404).json({ error: "User not found" });
+        if (userCheck.rows[0].is_admin) return res.status(403).json({ error: "Cannot restrict an admin account" });
+
+        await pool.query("UPDATE users SET is_restricted = $1 WHERE id = $2", [is_restricted, req.params.id]);
+
+        res.json({ message: `User has been successfully ${is_restricted ? 'restricted' : 'unrestricted'}.` });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Server Error toggling restriction status");
     }
 });
 

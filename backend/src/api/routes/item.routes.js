@@ -2,9 +2,10 @@ const express = require('express');
 const router = express.Router();
 const pool = require('../../db');
 const auth = require('../middleware/auth.middleware');
+const requireNotRestricted = require('../middleware/restricted.middleware');
 
 // 1. CREATE ITEM
-router.post('/', auth, async (req, res) => {
+router.post('/', auth, requireNotRestricted, async (req, res) => {
     const { title, description, price, category, image_url, image_urls } = req.body; 
     try {
         const newItem = await pool.query(

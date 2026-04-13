@@ -27,7 +27,10 @@ api.interceptors.response.use(
         // Only force redirect if NOT an auth route (prevents UI error message flickering on login)
         const isAuthRoute = error.config.url.includes('/auth/login') || error.config.url.includes('/auth/register');
 
-        if (error.response && (error.response.status === 401 || error.response.status === 403) && !isAuthRoute) {
+        // Restricted users (403 + ACCOUNT_RESTRICTED code) stay logged in — just show the error inline
+        const isRestrictionBlock = error.response?.status === 403 && error.response?.data?.code === 'ACCOUNT_RESTRICTED';
+
+        if (error.response && (error.response.status === 401 || error.response.status === 403) && !isAuthRoute && !isRestrictionBlock) {
             localStorage.removeItem('token'); 
             localStorage.removeItem('user');
             window.location.href = '/login';   

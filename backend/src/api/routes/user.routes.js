@@ -3,13 +3,14 @@ const router = express.Router();
 const pool = require('../../db');
 const auth = require('../middleware/auth.middleware');
 const bcrypt = require('bcryptjs');
+const requireNotRestricted = require('../middleware/restricted.middleware');
 const { verifyIdentity } = require('../../services/identity/identity.service');
 
 // 1. GET Profile - FIXED to include tc_no
 router.get('/profile', auth, async (req, res) => {
     try {
         const user = await pool.query(
-            `SELECT u.id, u.full_name, u.email, u.created_at, u.balance, u.tc_no, u.is_admin,
+            `SELECT u.id, u.full_name, u.email, u.created_at, u.balance, u.tc_no, u.is_admin, u.is_restricted,
                     COALESCE(AVG(rev.rating), 0) as avg_rating,
                     COUNT(rev.id) as review_count,
                     (SELECT COALESCE(SUM(r.total_price), 0) FROM rentals r JOIN items i ON r.item_id = i.id WHERE i.owner_id = u.id AND r.status IN ('active', 'returned_by_renter')) as pending_escrow
@@ -62,7 +63,7 @@ router.get('/public/:id', async (req, res) => {
 });
 
 // PUT Verify Identity
-router.put('/verify', auth, async (req, res) => {
+router.put('/verify', auth, requireNotRestricted, async (req, res) => {
     const { tc_no } = req.body;
 
     if (!tc_no || tc_no.length !== 11) {
@@ -70,14 +71,18 @@ router.put('/verify', auth, async (req, res) => {
     }
 
     try {
-        // --- NEW: TCKN Uniqueness Check ---
+        // --- Fetch full_name from DB (JWT payload does not carry it) ---
+        const userRecord = await pool.query("SELECT full_name FROM users WHERE id = $1", [req.user.id]);
+        if (userRecord.rows.length === 0) return res.status(404).json({ error: "User not found." });
+        const fullName = userRecord.rows[0].full_name;
+
+        // --- TCKN Uniqueness Check ---
         const existing = await pool.query("SELECT id FROM users WHERE tc_no = $1 AND id != $2", [tc_no, req.user.id]);
         if (existing.rows.length > 0) {
             return res.status(400).json({ error: "This Identity Number is already verified with another account." });
         }
 
-        // We pass fullName first, then tcNo, as per your service definition
-        const verificationResult = await verifyIdentity(req.user.full_name, tc_no);
+        const verificationResult = await verifyIdentity(fullName, tc_no);
         
         // Since your mock returns { success: true, status: '...' }
         if (!verificationResult.success) {

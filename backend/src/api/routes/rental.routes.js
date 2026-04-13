@@ -2,10 +2,11 @@ const express = require('express');
 const router = express.Router();
 const pool = require('../../db');
 const auth = require('../middleware/auth.middleware');
+const requireNotRestricted = require('../middleware/restricted.middleware');
 const emailService = require('../../services/emailService');
 
 // POST /api/rentals
-router.post('/', auth, async (req, res) => {
+router.post('/', auth, requireNotRestricted, async (req, res) => {
     const { itemId, startDate, returnDate, totalPrice } = req.body;
     const renterId = req.user.id; // From middleware
     const client = await pool.connect();
